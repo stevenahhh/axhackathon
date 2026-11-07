@@ -51,6 +51,35 @@ export function classifyPair(ir: File | Blob, rgb?: File | Blob): Promise<Classi
   return request<Classification>("./api/classify", { method: "POST", body })
 }
 
+export type Sample = {
+  id: string
+  site: string
+  seq: string
+  name: string
+  capturedAt: string
+  ir: string
+  rgb?: string
+  rgbZoom?: number
+}
+
+export function fetchSamples(site?: string): Promise<{ samples: Sample[] }> {
+  const query = site ? `?site=${encodeURIComponent(site)}` : ""
+  return request<{ samples: Sample[] }>(`./api/samples${query}`)
+}
+
+// 실화상을 열화상 틀(640x512)로 리매핑한 JPEG를 받는다. zoom을 빼면 서버가 EXIF에서 읽고, 없으면 1.0으로 본다.
+export async function alignRgb(rgb: File | Blob, zoom?: number): Promise<Blob> {
+  const body = new FormData()
+  body.append("rgb", rgb)
+  if (zoom !== undefined) body.append("zoom", String(zoom))
+  const response = await fetch("./api/align", { method: "POST", body })
+  if (!response.ok) {
+    const data = await response.json().catch(() => null)
+    throw new Error(data?.error ?? `HTTP ${response.status}`)
+  }
+  return response.blob()
+}
+
 export function fetchHealth(): Promise<Health> {
   return request<Health>("./api/health")
 }
