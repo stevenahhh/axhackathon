@@ -115,7 +115,7 @@ function PhotoDetail({
           ].map(([label, value]) => (
             <div key={label} className="rounded-lg bg-muted px-2 py-2">
               <dt className="text-xs text-muted-foreground">{label}</dt>
-              <dd className="tabular text-sm font-semibold">{photo.pending ? "-" : value}</dd>
+              <dd className="tabular text-sm font-semibold">{undecidable ? "-" : value}</dd>
             </div>
           ))}
         </dl>
