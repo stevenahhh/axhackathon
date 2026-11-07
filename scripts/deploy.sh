@@ -9,7 +9,7 @@ RESTART="setsid nohup python3 serve.py >> server.log 2>&1 < /dev/null &"
 
 bun run build
 
-COPYFILE_DISABLE=1 tar -czf - dist serve.py | ssh ax "rm -rf $REMOTE_DIR/next && mkdir -p $REMOTE_DIR/next && tar -xzf - -C $REMOTE_DIR/next"
+COPYFILE_DISABLE=1 tar -czf - dist serve.py agentstream.py | ssh ax "rm -rf $REMOTE_DIR/next && mkdir -p $REMOTE_DIR/next && tar -xzf - -C $REMOTE_DIR/next"
 
 # pgrep 패턴은 ^로 고정해 원격 셸(bash -c ...)이나 다른 프로세스와 겹치지 않게 한다.
 ssh ax "set -e
@@ -19,6 +19,7 @@ rm -rf dist.prev serve.py.prev
 [ -e serve.py ] && mv serve.py serve.py.prev
 mv next/dist dist
 mv next/serve.py serve.py
+mv next/agentstream.py agentstream.py
 rm -rf next
 pids=\$(pgrep -f '^python3 serve\\.py\$' || true)
 [ -n \"\$pids\" ] && kill \$pids

@@ -4,7 +4,7 @@ AIStream 서빙과 AgentStream 챗봇은 브라우저의 CORS 요청을 받지 �
 - POST /api/predict/solar: 서빙 판정을 {width, height, defects[{bbox, area}], source}로 정규화
 - POST /api/classify: 자체 융합 서빙(ir 필수, rgb 선택) 판정을 {label, confidence, probs, irOnlyLabel, usedRgb, source}로 정규화
 - GET /api/health: 서빙 상태와 AgentStream 설정 여부(키 값은 내보내지 않음)
-- POST /api/agent/opinion: 점검 요약 JSON으로 종합의견 초안 요청
+- POST /api/agent/opinion: 점검 요약 JSON으로 종합의견 초안 요청(agentstream.py)
 설정은 같은 폴더의 .env(KEY=VALUE)나 환경변수로 받는다.
 """
 import gzip
@@ -16,6 +16,8 @@ import urllib.request
 from functools import lru_cache
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+
+import agentstream
 
 ROOT = Path(__file__).parent
 
@@ -53,12 +55,6 @@ FUSION_URL = os.environ.get(
 ).rstrip("/")
 FUSION_PATH = os.environ.get("FUSION_PATH", "/infer")
 FUSION_LABELS = ("normal", "defect", "non_panel")
-AGENT_BASE_URL = os.environ.get("AGENTSTREAM_BASE_URL", "").rstrip("/")
-AGENT_API_KEY = os.environ.get("AGENTSTREAM_API_KEY", "")
-AGENT_CHATBOT_ID = os.environ.get("AGENTSTREAM_CHATBOT_ID", "")
-AGENT_WORKSPACE_ID = os.environ.get("AGENTSTREAM_WORKSPACE_ID", "")
-AGENT_CHAT_PATH = os.environ.get("AGENTSTREAM_CHAT_PATH", "")
-NUMBER = re.compile(r"\d+(?:\.\d+)?")
 
 
 class RelayError(Exception):
@@ -102,42 +98,6 @@ def normalize_yolo(data: dict) -> list[dict]:
         w, h = max(x2 - x1, 0), max(y2 - y1, 0)
         defects.append({"bbox": [x1, y1, w, h], "area": w * h})
     return defects
-
-
-def agent_configured() -> bool:
-    return all((AGENT_BASE_URL, AGENT_API_KEY, AGENT_CHATBOT_ID, AGENT_CHAT_PATH))
-
-
-def extract_opinion(raw: bytes) -> dict:
-    try:
-        texts = [json.loads(raw)]
-    except ValueError:
-        texts = [raw.decode("utf-8", "replace")]
-    while texts:
-        node = texts.pop(0)
-        if isinstance(node, dict):
-            if isinstance(node.get("opinion"), str):
-                followups = node.get("followups") or []
-                return {"opinion": node["opinion"], "followups": [str(f) for f in followups][:3]}
-            texts.extend(node.values())
-        elif isinstance(node, list):
-            texts.extend(node)
-        elif isinstance(node, str) and "opinion" in node:
-            start, end = node.find("{"), node.rfind("}")
-            if 0 <= start < end:
-                try:
-                    texts.append(json.loads(node[start : end + 1]))
-                except ValueError:
-                    pass
-    raise RelayError(502, "챗봇 응답에서 종합의견을 찾지 못했습니다.")
-
-
-def numbers_of(text: str) -> set[str]:
-    found = set()
-    for token in NUMBER.findall(text):
-        found.add(token)
-        found.add(token.lstrip("0") or "0")
-    return found
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -265,37 +225,24 @@ class Handler(SimpleHTTPRequestHandler):
         return {
             "serving": {"ok": reachable(SERVING_URL + "/health", (200,)), "kind": SERVING_KIND},
             "fusion": {"ok": reachable(FUSION_URL + "/health", (200, 404))},
-            "agent": {"configured": agent_configured()},
+            "agent": {"configured": agentstream.configured()},
         }
 
     def agent_opinion(self) -> tuple[int, dict]:
-        if not agent_configured():
+        if not agentstream.configured():
             raise RelayError(503, "AgentStream 연동 정보가 아직 없습니다.")
         try:
             summary = json.loads(self.read_body(MAX_JSON, "요청이 너무 큽니다."))
         except ValueError:
             raise RelayError(400, "요청 본문이 JSON이 아닙니다.")
-        message = json.dumps(summary, ensure_ascii=False)
-        path = AGENT_CHAT_PATH.format(chatbot_id=AGENT_CHATBOT_ID, workspace_id=AGENT_WORKSPACE_ID)
-        request = urllib.request.Request(
-            AGENT_BASE_URL + path,
-            data=json.dumps(
-                {"chatbot_id": AGENT_CHATBOT_ID, "workspace_id": AGENT_WORKSPACE_ID, "message": message},
-                ensure_ascii=False,
-            ).encode(),
-            headers={"Content-Type": "application/json", "Authorization": f"Bearer {AGENT_API_KEY}"},
-            method="POST",
-        )
+        if not isinstance(summary, dict):
+            raise RelayError(400, "요청 본문은 JSON 객체여야 합니다.")
         try:
-            status, raw = call(request, 30)
-        except (urllib.error.URLError, TimeoutError) as error:
-            raise RelayError(502, f"AgentStream에 연결하지 못했습니다: {error}")
-        if status != 200:
-            raise RelayError(502, f"AgentStream이 응답하지 못했습니다(HTTP {status}).")
-        result = extract_opinion(raw)
-        if not numbers_of(result["opinion"]) <= numbers_of(message):
-            raise RelayError(422, "입력에 없는 숫자가 포함되어 버렸습니다.")
-        return 200, result
+            return 200, agentstream.draft_opinion(summary)
+        except agentstream.ConfigError as error:
+            raise RelayError(503, str(error))
+        except agentstream.UpstreamError as error:
+            raise RelayError(502, str(error))
 
     def send_json(self, status: int, payload: dict):
         body = json.dumps(payload, ensure_ascii=False).encode()
