@@ -38,7 +38,10 @@ export function LoginPage() {
           <span className="grid size-12 place-items-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
             <SunIcon className="size-6" />
           </span>
-          <h1 className="text-[1.3125rem] leading-tight font-semibold tracking-tight">썬텍 점검비서</h1>
+          <div className="flex flex-col items-center gap-1">
+            <h1 className="text-[1.3125rem] leading-tight font-semibold tracking-tight">SunSET</h1>
+            <p className="text-sm text-muted-foreground">태양광 정기점검 기록 에이전트</p>
+          </div>
         </div>
 
         <form className="flex flex-col gap-4" onSubmit={onSubmit} aria-label="로그인">

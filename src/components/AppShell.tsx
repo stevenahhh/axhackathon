@@ -31,7 +31,7 @@ function BrandLink({ className }: { className?: string }) {
   return (
     <a
       href="#/"
-      aria-label="썬텍 점검비서 대시보드로 이동"
+      aria-label="SunSET 대시보드로 이동"
       className={cn(
         "flex shrink-0 items-center gap-2.5 rounded-md text-[1.3125rem] leading-tight font-semibold tracking-tight whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring",
         className
@@ -40,7 +40,7 @@ function BrandLink({ className }: { className?: string }) {
       <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
         <SunIcon className="size-4.5" />
       </span>
-      썬텍 점검비서
+      SunSET
     </a>
   )
 }

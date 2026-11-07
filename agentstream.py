@@ -1,4 +1,4 @@
-"""AgentStream 챗봇(썬텍점검비서_2조)으로 종합의견 초안을 받는다. 표준 라이브러리만 쓴다.
+"""SunSET의 종합의견 초안을 AgentStream 챗봇(AGENTSTREAM_CHATBOT_ID)에서 받는다. 표준 라이브러리만 쓴다.
 
 호출 순서(경로는 AGENTSTREAM_BASE_URL 기준, 헤더 X-API-Key):
 1. POST /open/v1/chatbots/{chatbot_id}/sessions {"query"} -> 201, 최상위 session_id
