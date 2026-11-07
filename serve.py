@@ -6,12 +6,16 @@ AIStream 서빙과 AgentStream 챗봇은 브라우저의 CORS 요청을 받지 �
 - GET /api/health: 서빙 상태와 AgentStream 설정 여부(키 값은 내보내지 않음)
 - POST /api/agent/opinion: 점검 요약 JSON으로 종합의견 초안 요청(agentstream.py)
 설정은 같은 폴더의 .env(KEY=VALUE)나 환경변수로 받는다.
+
+시연 사진은 빌드 밖 DATA_DIR(기본 같은 폴더의 data/)의 drone/에서 /drone/<파일>로 제공한다.
+배포가 dist/를 갈아 끼워도 사진은 지워지지 않는다. 로컬 개발은 DATA_DIR=data-demo로 띄운다.
 """
 import gzip
 import json
 import os
 import re
 import urllib.error
+import urllib.parse
 import urllib.request
 from functools import lru_cache
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -36,6 +40,7 @@ def load_env(path: Path) -> None:
 load_env(ROOT / ".env")
 
 DIST = ROOT / "dist"
+DATA_DIR = (ROOT / os.environ.get("DATA_DIR", "data")).resolve()
 PREFIX = re.compile(r"^/i/[^/]+")
 COMPRESSIBLE = (".js", ".css", ".html", ".svg")
 MAX_UPLOAD = 30 * 1024 * 1024
@@ -103,6 +108,17 @@ def normalize_yolo(data: dict) -> list[dict]:
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(DIST), **kwargs)
+
+    def translate_path(self, path):
+        clean = urllib.parse.unquote(path.split("?", 1)[0].split("#", 1)[0])
+        if clean.startswith("/drone/"):
+            # 파일 이름만 받아 data 폴더 밖으로 나가지 못하게 한다.
+            return str(DATA_DIR / "drone" / Path(clean).name)
+        return super().translate_path(path)
+
+    def send_response(self, code, message=None):
+        self.status_code = code
+        super().send_response(code, message)
 
     def do_GET(self):
         self.path = PREFIX.sub("", self.path) or "/"
@@ -257,7 +273,7 @@ class Handler(SimpleHTTPRequestHandler):
         super().do_HEAD()
 
     def end_headers(self):
-        immutable = any(part in self.path for part in IMMUTABLE)
+        immutable = getattr(self, "status_code", 200) == 200 and any(part in self.path for part in IMMUTABLE)
         self.send_header(
             "Cache-Control", "public, max-age=31536000, immutable" if immutable else "no-cache"
         )

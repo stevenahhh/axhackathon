@@ -30,3 +30,6 @@ server.log
 # Secrets and weights
 .env
 *.pt
+
+# Demo photos live outside git (served from DATA_DIR by serve.py)
+data-demo/

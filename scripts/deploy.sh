@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # 팀 서버(ssh ax)에 web/ 빌드를 배포한다. 실행: web/ 에서 `bash scripts/deploy.sh`
 # .env, data/, 다른 프로세스는 건드리지 않는다. 서버에 sftp가 없어 tar를 ssh 파이프로 보낸다.
+# 시연 사진(data-demo/drone)은 빌드 밖 $REMOTE_DIR/data/drone에 두고, 서버에 없거나 크기가 다른 파일만 보낸다. 서버 사진은 지우지 않는다.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -8,6 +9,18 @@ REMOTE_DIR=/data/hackathon/web
 RESTART="setsid nohup python3 serve.py >> server.log 2>&1 < /dev/null &"
 
 bun run build
+
+if [ -d data-demo/drone ]; then
+  list=$(mktemp -d)
+  trap 'rm -rf "$list"' EXIT
+  ssh ax "mkdir -p $REMOTE_DIR/data/drone && cd $REMOTE_DIR/data/drone && find . -maxdepth 1 -type f -name '*.jpg' -printf '%f %s\n'" | sort > "$list/remote"
+  (cd data-demo/drone && find . -maxdepth 1 -type f -name '*.jpg' -exec stat -f '%N %z' {} + | sed 's|^\./||') | sort > "$list/local"
+  comm -23 "$list/local" "$list/remote" | cut -d' ' -f1 > "$list/send"
+  echo "시연 사진 $(wc -l < "$list/send" | tr -d ' ')장 전송"
+  if [ -s "$list/send" ]; then
+    COPYFILE_DISABLE=1 tar -cf - -C data-demo/drone -T "$list/send" | ssh ax "tar -xf - -C $REMOTE_DIR/data/drone"
+  fi
+fi
 
 COPYFILE_DISABLE=1 tar -czf - dist serve.py agentstream.py | ssh ax "rm -rf $REMOTE_DIR/next && mkdir -p $REMOTE_DIR/next && tar -xzf - -C $REMOTE_DIR/next"
 
