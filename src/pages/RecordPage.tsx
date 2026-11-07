@@ -1,12 +1,12 @@
 import { useState } from "react"
-import { PrinterIcon, ThermometerIcon } from "lucide-react"
+import { PrinterIcon } from "lucide-react"
 
 import { Form9Editor } from "@/components/Form9Editor"
 import { Form9Preview } from "@/components/Form9Preview"
 import { PaperFrame } from "@/components/PaperFrame"
 import { SiteStatusBadge } from "@/components/StatusBadges"
+import { ThermalRecord } from "@/components/ThermalRecord"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SITES, siteById } from "@/data/sites"
 import type { Summary } from "@/lib/inspection"
@@ -65,16 +65,7 @@ export function RecordPage({
       </Tabs>
 
       {tab === "thermal" ? (
-        /* todo 10: 이 블록을 <ThermalRecord site={site} photos={photos} inspection={inspection} summary={summary} />로 바꾼다. */
-        <Card>
-          <CardContent className="flex flex-col items-center gap-2 py-12 text-center">
-            <ThermometerIcon className="size-6 text-muted-foreground" />
-            <p className="text-sm font-medium">열화상 측정기록표는 준비 중입니다</p>
-            <p className="tabular text-xs text-muted-foreground">
-              확정 사진 {summary.confirmed.length}장 / 열화상 {photos.length}장
-            </p>
-          </CardContent>
-        </Card>
+        <ThermalRecord site={site} photos={photos} inspection={inspection} summary={summary} />
       ) : (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
           <div className={cn(tab === "preview" && "hidden lg:block")}>

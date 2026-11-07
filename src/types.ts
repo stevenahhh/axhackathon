@@ -38,7 +38,10 @@ export type Site = {
   pcs: { type: string; ratedKw: number; vinMin: number; vinMax: number; voutV: number }
 }
 
-export type ThermalEntry = { p1: string; p2: string; p3: string; part: string }
+// point: 핫스팟 셀과 인접 셀 2곳의 온도. area: 박스(영역) 측정의 최대·평균·최소를 p1·p2·p3에 담는다.
+export type ThermalMode = "point" | "area"
+
+export type ThermalEntry = { p1: string; p2: string; p3: string; part: string; mode?: ThermalMode }
 
 export type Inspection = {
   reviews: Record<string, Review>

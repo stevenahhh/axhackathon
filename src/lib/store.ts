@@ -18,7 +18,7 @@ const emptyInspection = (): Inspection => ({
   thermal: {},
 })
 
-const EMPTY_THERMAL: ThermalEntry = { p1: "", p2: "", p3: "", part: "태양전지 모듈 셀" }
+export const EMPTY_THERMAL: ThermalEntry = { p1: "", p2: "", p3: "", part: "태양전지 모듈 셀", mode: "point" }
 
 type State = { inspections: Record<SiteId, Inspection>; uploads: Photo[] }
 
