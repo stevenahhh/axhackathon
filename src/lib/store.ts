@@ -18,6 +18,8 @@ const emptyInspection = (): Inspection => ({
   thermal: {},
 })
 
+const EMPTY_THERMAL: ThermalEntry = { p1: "", p2: "", p3: "", part: "태양전지 모듈 셀" }
+
 type State = { inspections: Record<SiteId, Inspection>; uploads: Photo[] }
 
 function load(): State {
@@ -80,7 +82,7 @@ export const setThermal = (site: SiteId, photoId: string, patch: Partial<Thermal
   patchInspection(site, (current) => ({
     thermal: {
       ...current.thermal,
-      [photoId]: { p1: "", p2: "", p3: "", part: "태양전지 모듈 셀", ...current.thermal[photoId], ...patch },
+      [photoId]: { ...EMPTY_THERMAL, ...current.thermal[photoId], ...patch },
     },
   }))
 
