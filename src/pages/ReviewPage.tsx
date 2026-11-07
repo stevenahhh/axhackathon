@@ -1,4 +1,5 @@
-import { useRef, useState, useSyncExternalStore } from "react"
+import { useRef, useState } from "react"
+import { toast } from "sonner"
 import {
   ArrowRightIcon,
   BanIcon,
@@ -22,6 +23,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SITES, formatCapacity, siteById } from "@/data/sites"
 import { classifyPair, predictSolar } from "@/lib/api"
 import { tierOf, totalArea, type Summary } from "@/lib/inspection"
+import { useIsDesktop } from "@/lib/media"
 import { hrefOf } from "@/lib/route"
 import { addUploads, patchUpload, setReview } from "@/lib/store"
 import { cn } from "@/lib/utils"
@@ -29,22 +31,12 @@ import type { Inspection, Photo, Review, SiteId, Tier } from "@/types"
 
 type Filter = Tier | "all"
 
-const DESKTOP_QUERY = "(min-width: 1024px)"
 const TOUCH_TABS = "group-data-horizontal/tabs:h-11 lg:group-data-horizontal/tabs:h-8"
 const TOUCH_BUTTON = "h-11 lg:h-8"
 // 한 발전소에 사진이 수백 장이라 카드는 48장씩 더 그린다.
 const PAGE = 48
 
-function useIsDesktop() {
-  return useSyncExternalStore(
-    (notify) => {
-      const query = window.matchMedia(DESKTOP_QUERY)
-      query.addEventListener("change", notify)
-      return () => query.removeEventListener("change", notify)
-    },
-    () => window.matchMedia(DESKTOP_QUERY).matches
-  )
-}
+const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error))
 
 // 서빙은 요청을 하나씩 처리하므로 한 장씩 순서대로 보낸다.
 let queue = Promise.resolve()
@@ -235,7 +227,13 @@ export function ReviewPage({
       if (seq) rgbBySeq.set(seq, file)
       else files.push(file)
     }
-    if (!files.length) return
+    if (!files.length) {
+      if (all.length)
+        toast.warning("열화상 파일이 없습니다", {
+          description: "DJI 열화상(_T) JPG를 골라 주세요. 실화상(_V)은 같은 번호의 열화상과 함께 올립니다.",
+        })
+      return
+    }
     const stamp = Date.now()
     const added: Photo[] = files.map((file, index) => {
       const seq = file.name.match(/_(\d{4})_T\b/i)?.[1] ?? file.name.replace(/\.[^.]+$/, "")
@@ -272,13 +270,15 @@ export function ReviewPage({
             source: result.source,
           })
         } catch (error) {
-          patchUpload(photo.id, { pending: false, error: error instanceof Error ? error.message : String(error) })
+          patchUpload(photo.id, { pending: false, error: errorMessage(error) })
+          toast.error(`${file.name} 핫스팟 판정에 실패했습니다`, { description: errorMessage(error) })
         }
         try {
           const { label, confidence, probs, usedRgb } = await classifyPair(file, rgbBySeq.get(photo.seq))
           patchUpload(photo.id, { fusion: { label, confidence, probs, usedRgb } })
         } catch (error) {
-          patchUpload(photo.id, { fusion: { error: error instanceof Error ? error.message : String(error) } })
+          patchUpload(photo.id, { fusion: { error: errorMessage(error) } })
+          toast.error(`${file.name} 융합 판정에 실패했습니다`, { description: errorMessage(error) })
         }
       })
     })
@@ -463,7 +463,14 @@ export function ReviewPage({
       </div>
 
       {!isDesktop && detail && (
-        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+        <Sheet
+          open={sheetOpen}
+          // 시트 안 "기록 수정"이 띄운 토스트의 버튼을 누르면 포커스가 시트 밖으로 나가는데, 그 이유로는 닫지 않는다.
+          onOpenChange={(open, details) => {
+            if (!open && details.reason === "focus-out") return
+            setSheetOpen(open)
+          }}
+        >
           <SheetContent side="bottom" showCloseButton={false} className="max-h-[90dvh] gap-0 rounded-t-2xl">
             {detail}
           </SheetContent>

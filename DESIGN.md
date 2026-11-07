@@ -48,11 +48,13 @@ Layout: 모바일(<1024px)은 scroll-body-shell. 상단 앱바 56px가 sticky, �
 - 전환점은 Tailwind `lg:`(1024px) 하나다. 사이드바와 탭바는 CSS로 숨기지 않고 `matchMedia`로 렌더링을 나눈다.
 - 페이지 전환은 해시(`#/`, `#/review/<현장>`, `#/record/<현장>`)로 하고 라우터 라이브러리는 쓰지 않는다.
 
+Layout(알림): 토스트(sonner)는 모바일에서 top-center, 앱바 아래 `3.5rem + 0.75rem + safe-area-top`, 좌우 16px 전폭이라 하단 탭바와 저장 막대를 덮지 않는다. 데스크톱은 bottom-right 32px(`lg:p-8`과 같은 여백), 폭 356px. 위치는 `useIsDesktop`(matchMedia 1024px)으로 나눈다.
+
 ## 5. 셸 브리프
 
 - 주 동작: 활성 탭(현재 화면). 다른 탭은 `text-muted-foreground`, 활성 탭만 `text-primary`.
-- 정보 우선순위: 1) 현재 화면 본문 2) 내가 어디 있는지(탭·제목) 3) 서버 연결 경고(연결 실패 시에만).
-- 필수 내용: 로고 마크, 화면 제목, 테마 전환, 탭 3개(대시보드·사진 확인·기록표), 데스크톱 사이드바의 담당 현장 3곳과 상태 점, 경고 문구 "AI 판정 서버에 연결하지 못했습니다"와 다시 시도.
+- 정보 우선순위: 1) 현재 화면 본문 2) 내가 어디 있는지(탭·제목) 3) 서버 연결 경고 토스트(연결 실패 시에만).
+- 필수 내용: 로고 마크, 화면 제목, 테마 전환, 탭 3개(대시보드·사진 확인·기록표), 데스크톱 사이드바의 담당 현장 3곳과 상태 점, 연결 실패 시 지속 토스트 "AI 판정 서버에 연결하지 못했습니다"와 그 안의 다시 시도 버튼(7절).
 - 일부러 뺀 것: 햄버거 시트 메뉴, 앱바 블러, 모바일에서의 월차 점검 표시(`sm:`부터만), 탭 안의 숫자 배지.
 
 ## 6. 상태 색 매핑
@@ -65,3 +67,15 @@ Layout: 모바일(<1024px)은 scroll-body-shell. 상단 앱바 56px가 sticky, �
 | `saved` 저장 완료 | `success` | `bg-success` | 기록표를 저장해 잠김 |
 
 사진 등급: 우선 확인 `destructive`, 참고 `warning`, 이상 없음 `success`, 판정 중 `info`, 판정 실패 `outline`. 확인 결과: 핫스팟 확정 `destructive`, 오탐·패널 외 `secondary`, 미확인 `outline`. 기록표 칸: ○ `success`, × `destructive`, 해당없음 `secondary`, 미입력 `warning`.
+
+## 7. 알림(토스트)
+
+앱 안의 알림은 모두 `sonner` 토스트다(`src/components/ui/sonner.tsx`, App.tsx에 `<Toaster />` 하나). `window.confirm`·`alert`, 화면 안 경고 줄, 앱바 아래 배너는 쓰지 않는다.
+
+- 면과 글자: `bg-popover` `text-popover-foreground` `border` `rounded-lg` `shadow-lg`, 제목 `text-sm font-medium`, 설명 `text-sm text-muted-foreground`. sonner 기본 스타일은 `unstyled`로 끈다(레이어 밖 CSS라 유틸리티가 지지 못한다).
+- 종류별 잉크는 아이콘(Lucide)에만 준다: 성공 `success`, 경고 `warning`, 실패 `destructive`, 안내 `info`. 밝은 테마는 badge.tsx와 같은 짙은 값(예: 경고 `oklch(0.5 0.13 60)`)으로 대비 3:1을 지킨다. 면 색 띠(richColors)는 쓰지 않는다.
+- 테마는 `<html class="dark">`를 `useIsDark`(MutationObserver)로 읽는다. next-themes는 쓰지 않는다.
+- 버튼: 동작은 `buttonVariants()`(primary), 취소는 `outline`. 모바일은 둘째 줄 오른쪽 정렬 `h-11`(44px), 데스크톱은 같은 줄 `h-8`.
+- 확인이 필요한 동작(저장된 기록 수정, 직접 고친 종합의견 덮어쓰기)은 동작·취소 버튼이 달린 토스트로 묻고 `duration: Infinity`, 고정 id로 중복을 막는다.
+- 서버 연결 실패는 id `serving-down`인 지속 경고 토스트 하나로 알리고, 다시 시도 중에는 로딩으로 바꾸고, 복구되면 닫고 성공 토스트를 띄운다.
+- 저장·재열기·AgentStream 초안 결과·사진 판정 실패는 그때마다 토스트로 알린다. 사진 상세의 판정 실패 문구는 그 사진의 상태이므로 화면에 남긴다.

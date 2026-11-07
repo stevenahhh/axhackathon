@@ -1,32 +1,12 @@
-import { useState, useSyncExternalStore, type ReactNode } from "react"
-import {
-  ClipboardListIcon,
-  LayoutDashboardIcon,
-  MoonIcon,
-  ScanSearchIcon,
-  SunIcon,
-  TriangleAlertIcon,
-} from "lucide-react"
+import { useState, type ReactNode } from "react"
+import { ClipboardListIcon, LayoutDashboardIcon, MoonIcon, ScanSearchIcon, SunIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { SITES } from "@/data/sites"
+import { useIsDesktop } from "@/lib/media"
 import { hrefOf, type Route } from "@/lib/route"
 import { cn } from "@/lib/utils"
 import type { SiteId } from "@/types"
-
-const DESKTOP_QUERY = "(min-width: 1024px)"
-
-// CSS로 숨기면 숨은 사이드바 nav가 DOM에 남아 44px 터치 대상 검사에 걸리므로 렌더링 자체를 나눈다.
-function useIsDesktop() {
-  return useSyncExternalStore(
-    (notify) => {
-      const query = window.matchMedia(DESKTOP_QUERY)
-      query.addEventListener("change", notify)
-      return () => query.removeEventListener("change", notify)
-    },
-    () => window.matchMedia(DESKTOP_QUERY).matches
-  )
-}
 
 type Page = Route["page"]
 
@@ -147,13 +127,11 @@ export function AppShell({
   route,
   title,
   dots,
-  notice,
   children,
 }: {
   route: Route
   title: string
   dots: Record<SiteId, string>
-  notice?: ReactNode
   children: ReactNode
 }) {
   const isDesktop = useIsDesktop()
@@ -198,14 +176,6 @@ export function AppShell({
             </Button>
           </div>
         </header>
-        {notice && (
-          <div role="status" className="border-b bg-warning/15">
-            <div className="mx-auto flex max-w-[1400px] items-center gap-2 px-4 py-2.5 text-sm lg:px-8">
-              <TriangleAlertIcon className="size-4 shrink-0 text-[oklch(0.5_0.13_60)] dark:text-warning" />
-              <p className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2">{notice}</p>
-            </div>
-          </div>
-        )}
         <main className="mx-auto max-w-[1400px] p-4 pb-[calc(4.5rem_+_env(safe-area-inset-bottom))] lg:p-8">
           {children}
         </main>

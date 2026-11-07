@@ -12,6 +12,7 @@ import {
   WandSparklesIcon,
   XIcon,
 } from "lucide-react"
+import { toast } from "sonner"
 
 import { recordDate } from "@/components/Form9Preview"
 import { Badge } from "@/components/ui/badge"
@@ -71,15 +72,29 @@ const MARKS: {
 
 const MARK_LABEL: Record<MarkValue, string> = { O: "○ 적합", X: "× 부적합", NA: "해당없음" }
 
-const WARNING_LINE = "rounded-lg bg-warning/18 px-3 py-2 text-sm text-[oklch(0.5_0.13_60)] dark:text-warning"
+// sonner는 취소 버튼을 누르면 토스트를 스스로 닫으므로 추가 동작은 없다.
+const CANCEL = { label: "취소", onClick: () => {} }
 
 const savedTime = (iso: string) => new Date(iso).toLocaleString("sv-SE").slice(0, 16)
 
 // 저장된 기록을 다시 열어 고치는 진입점. 기록표·열화상·사진 확인 화면이 같은 버튼을 쓴다.
+// 확인은 동작·취소 버튼이 달린 토스트로 받고, 같은 id라 버튼을 연달아 눌러도 하나만 뜨게 한다.
 export function ReopenButton({ site, className }: { site: SiteId; className?: string }) {
   function reopen() {
-    if (!window.confirm("저장된 기록을 수정합니다. 수정 후 다시 저장해 주세요.")) return
-    reopenInspection(site)
+    toast("저장된 기록을 수정할까요?", {
+      id: `reopen-${site}`,
+      icon: <PencilLineIcon />,
+      description: "저장 잠금이 풀리고 수정 회차가 올라갑니다.",
+      duration: Infinity,
+      action: {
+        label: "수정",
+        onClick: () => {
+          reopenInspection(site)
+          toast.success("기록을 다시 열었습니다", { description: "수정 후 다시 저장해 주세요." })
+        },
+      },
+      cancel: CANCEL,
+    })
   }
   return (
     <Button variant="outline" className={cn("h-11", className)} onClick={reopen}>
@@ -253,8 +268,6 @@ export function Form9Editor({
   const fromAgent = inspection.opinionSource === "agent"
   const opinion = inspection.opinionEdited || fromAgent ? inspection.opinion : draft
   const [drafting, setDrafting] = useState(false)
-  const [agentError, setAgentError] = useState<string>()
-  const [agentWarnings, setAgentWarnings] = useState<string[]>([])
   const rule = article5(inspection, summary)
   const fillable = missing.cells.filter((cell) => cell !== HOTSPOT)
   const field = (key: "weather" | "org" | "inspector" | "insulation" | "ground") => ({
@@ -275,15 +288,21 @@ export function Form9Editor({
           ? "AI 판정 사진이 없어 직접 골라야 합니다."
           : `우선 확인 사진 ${summary.pendingReview}장을 처리하면 제안이 생깁니다.`
 
-  async function draftWithAgent() {
-    if (
-      inspection.opinionEdited &&
-      !window.confirm("직접 고친 종합의견을 AgentStream 초안으로 바꿀까요?")
-    )
-      return
+  // 직접 고친 문장이 있으면 토스트로 바꿀지 묻고, 아니면 바로 요청한다.
+  function draftWithAgent() {
+    if (!inspection.opinionEdited) return void requestDraft()
+    toast("직접 고친 종합의견을 AgentStream 초안으로 바꿀까요?", {
+      id: `opinion-${site}`,
+      icon: <BotIcon />,
+      description: "지금 쓴 문장은 사라집니다.",
+      duration: Infinity,
+      action: { label: "바꾸기", onClick: () => void requestDraft() },
+      cancel: CANCEL,
+    })
+  }
+
+  async function requestDraft() {
     setDrafting(true)
-    setAgentError(undefined)
-    setAgentWarnings([])
     try {
       const result = await requestOpinion(opinionPayload(site, inspection, summary))
       setFields(site, {
@@ -292,10 +311,27 @@ export function Form9Editor({
         opinionSource: "agent",
         thermalOpinion: result.thermal_opinion,
       })
-      setAgentWarnings(result.warnings ?? [])
+      toast.success("AgentStream 초안을 넣었습니다")
+      const warnings = result.warnings ?? []
+      if (warnings.length)
+        toast.warning("초안의 숫자를 확인해 주세요", {
+          description:
+            warnings.length === 1 ? (
+              warnings[0]
+            ) : (
+              <ul className="list-disc pl-4">
+                {warnings.map((warning) => (
+                  <li key={warning}>{warning}</li>
+                ))}
+              </ul>
+            ),
+        })
     } catch (error) {
+      // 초안을 받지 못했으므로 자동 문장으로 되돌리고 "자동 문장" 배지를 유지한다.
       if (!inspection.opinionEdited) setFields(site, { opinionSource: "template" })
-      setAgentError(error instanceof Error ? error.message : String(error))
+      toast.error("AgentStream 초안을 받지 못했습니다", {
+        description: error instanceof Error ? error.message : String(error),
+      })
     } finally {
       setDrafting(false)
     }
@@ -313,6 +349,7 @@ export function Form9Editor({
     if (!inspection.opinion.trim()) setFields(site, { opinion: draft })
     if (!hotspotChosen) setMark(site, HOTSPOT, suggestion)
     saveInspection(site)
+    toast.success("점검기록표를 저장했습니다", { description: "사진 판정과 입력이 잠겼습니다." })
   }
 
   return (
@@ -432,16 +469,6 @@ export function Form9Editor({
               {drafting ? "AgentStream이 초안을 쓰는 중" : "AgentStream으로 초안 쓰기"}
             </Button>
           )}
-          {agentError && (
-            <p role="alert" className={WARNING_LINE}>
-              AgentStream 초안을 받지 못해 자동 문장을 유지합니다: {agentError}
-            </p>
-          )}
-          {agentWarnings.map((warning) => (
-            <p key={warning} role="status" className={WARNING_LINE}>
-              {warning}. 문장을 확인해 주세요.
-            </p>
-          ))}
           <textarea
             id="form9-opinion"
             aria-label="종합의견"

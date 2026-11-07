@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { toast } from "sonner"
 
 import { AppShell } from "@/components/AppShell"
 import type { SiteStatus } from "@/components/StatusBadges"
 import { Toaster } from "@/components/ui/sonner"
-import { Button } from "@/components/ui/button"
 import { fetchHealth } from "@/lib/api"
 import { photosOf, summarize, type Summary } from "@/lib/inspection"
 import { hrefOf, useRoute, type Route } from "@/lib/route"
@@ -35,10 +35,14 @@ function statusOf(inspection: Inspection, summary: Summary): SiteStatus {
   return "todo"
 }
 
+const SERVING_TOAST = "serving-down"
+
 // 첫 호출이 60분 무호출로 일시정지된 AIStream 서빙을 미리 깨운다.
+// 연결 실패는 지속 토스트 하나(id 고정)로 알리고, 다시 시도 중에는 로딩으로 바꾸고, 복구되면 닫는다.
 function useServingHealth() {
   const [down, setDown] = useState(false)
   const [busy, setBusy] = useState(true)
+  const wasDown = useRef(false)
   const probe = useCallback(
     () =>
       fetchHealth()
@@ -52,17 +56,45 @@ function useServingHealth() {
   useEffect(() => {
     void probe()
   }, [probe])
-  const retry = () => {
-    setBusy(true)
-    void probe()
-  }
-  return { down, busy, retry }
+  useEffect(() => {
+    if (!down) {
+      // 띄운 적 없는 id를 dismiss하면 sonner가 그 닫기를 한 프레임 뒤에 처리해, 바로 뒤에 만든 같은 id의 토스트를 지울 수 있다.
+      if (!wasDown.current) return
+      wasDown.current = false
+      toast.dismiss(SERVING_TOAST)
+      toast.success("AI 판정 서버에 연결했습니다")
+      return
+    }
+    wasDown.current = true
+    if (busy) {
+      toast.loading("AI 판정 서버에 다시 연결하는 중", {
+        id: SERVING_TOAST,
+        duration: Infinity,
+        description: undefined,
+        action: undefined,
+      })
+      return
+    }
+    toast.warning("AI 판정 서버에 연결하지 못했습니다", {
+      id: SERVING_TOAST,
+      duration: Infinity,
+      description: "추가한 열화상의 핫스팟 판정이 되지 않습니다.",
+      action: {
+        label: "다시 시도",
+        onClick: (event) => {
+          event.preventDefault()
+          setBusy(true)
+          void probe()
+        },
+      },
+    })
+  }, [down, busy, probe])
 }
 
 export default function App() {
   const route = useRoute()
   const { inspections, uploads } = useAppState()
-  const serving = useServingHealth()
+  useServingHealth()
 
   const photos = useMemo(
     () =>
@@ -86,17 +118,8 @@ export default function App() {
     window.scrollTo(0, 0)
   }, [href])
 
-  const notice = serving.down ? (
-    <>
-      <span>AI 판정 서버에 연결하지 못했습니다.</span>
-      <Button variant="link" size="sm" className="h-auto p-0" disabled={serving.busy} onClick={serving.retry}>
-        다시 시도
-      </Button>
-    </>
-  ) : undefined
-
   return (
-    <AppShell route={route} title={TITLES[route.page]} dots={dots} notice={notice}>
+    <AppShell route={route} title={TITLES[route.page]} dots={dots}>
       {route.page === "dashboard" && <DashboardPage stats={stats} />}
       {route.page === "review" && (
         <ReviewPage
