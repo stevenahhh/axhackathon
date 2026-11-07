@@ -3,7 +3,7 @@ import { toast } from "sonner"
 
 import { setStoreUser } from "@/lib/store"
 
-// 로그인 상태. 서버가 HttpOnly 쿠키(suntek_session)로 세션을 들고 있어 브라우저는 /api/me로만 확인한다.
+// 로그인 상태. 서버가 HttpOnly 쿠키(sunset_session)로 세션을 들고 있어 브라우저는 /api/me로만 확인한다.
 export type Session = { status: "loading" } | { status: "out" } | { status: "in"; id: string }
 
 let session: Session = { status: "loading" }

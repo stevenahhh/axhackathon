@@ -10,7 +10,7 @@ export const COMPARE_MODES: { value: CompareMode; label: string }[] = [
   { value: "side", label: "나란히" },
 ]
 
-const STORAGE_KEY = "suntek.compareMode"
+const STORAGE_KEY = "sunset.compareMode"
 
 export function readCompareMode(): CompareMode {
   const saved = localStorage.getItem(STORAGE_KEY)
