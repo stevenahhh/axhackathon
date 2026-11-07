@@ -1,6 +1,12 @@
-# 썬텍 점검비서 디자인 규칙
+# SunSET 디자인 규칙
 
 토큰의 원본은 `src/index.css`다. 색, 크기, 간격은 모두 여기 적힌 토큰과 Tailwind 단계만 쓴다. 컴포넌트는 `src/components/ui/*`(shadcn, base-ui)에서 시작한다.
+
+## 0. 브랜드 표기
+
+- 제품명은 워드마크 `SunSET` 한 가지로 쓴다(대소문자 고정). 한국어 문장에서 읽기가 필요하면 문서마다 처음 한 번만 `SunSET(선셋)`으로 쓰고 그 다음부터는 `SunSET`이다. 회사명 썬텍(2팀 썬텍, 점검자 소속 기본값 "썬텍 전기안전관리")은 제품명이 아니므로 그대로 둔다.
+- 태그라인은 "태양광 정기점검 기록 에이전트"다. 로그인 화면과 README 제목 아래에만 두고 앱 셸의 브랜드 링크에는 붙이지 않는다.
+- 로고 마크는 `bg-sidebar-primary`(호박색) 둥근 정사각형 안의 lucide `SunIcon`(`text-sidebar-primary-foreground`)이다. 앱 셸은 `size-8`/`size-4.5`, 로그인은 `size-12`/`size-6`. 파비콘 `public/favicon.svg`은 같은 두 토큰을 hex로 구운 같은 마크다. 워드마크 글자는 `text-[1.3125rem] font-semibold tracking-tight`.
 
 ## 1. 색 역할
 

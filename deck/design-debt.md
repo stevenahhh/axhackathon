@@ -1,4 +1,4 @@
-# Design Debt — 썬텍 점검비서 발표 덱
+# Design Debt — SunSET 발표 덱
 
 | Slide | Finding | Severity | Why deferred | Fix |
 |-------|---------|----------|--------------|-----|
