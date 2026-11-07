@@ -3,13 +3,12 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { AppShell } from "@/components/AppShell"
 import type { SiteStatus } from "@/components/StatusBadges"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { siteById } from "@/data/sites"
 import { fetchHealth } from "@/lib/api"
 import { photosOf, summarize, type Summary } from "@/lib/inspection"
 import { hrefOf, useRoute, type Route } from "@/lib/route"
 import { useAppState } from "@/lib/store"
 import { DashboardPage, type SiteStat } from "@/pages/DashboardPage"
+import { RecordPage } from "@/pages/RecordPage"
 import { ReviewPage } from "@/pages/ReviewPage"
 import type { Inspection, Photo, SiteId } from "@/types"
 
@@ -57,28 +56,6 @@ function useServingHealth() {
     void probe()
   }
   return { down, busy, retry }
-}
-
-function RecordPlaceholder({ site, summary }: { site: SiteId; summary: Summary }) {
-  return (
-    <Card>
-      <CardContent className="flex flex-col gap-3">
-        <h2 className="text-base font-semibold">{siteById(site).name} 기록표</h2>
-        <p className="text-sm text-muted-foreground">
-          기록표 편집 화면을 아직 연결하지 않았습니다. 확정 핫스팟 {summary.confirmed.length}장, 우선 확인
-          미처리 {summary.pendingReview}장.
-        </p>
-        <Button
-          variant="outline"
-          className="w-full sm:w-fit"
-          nativeButton={false}
-          render={<a href={hrefOf({ page: "review", site })} />}
-        >
-          사진 확인으로 이동
-        </Button>
-      </CardContent>
-    </Card>
-  )
 }
 
 export default function App() {
@@ -130,7 +107,13 @@ export default function App() {
         />
       )}
       {route.page === "record" && (
-        <RecordPlaceholder site={route.site} summary={stats[route.site].summary} />
+        <RecordPage
+          key={route.site}
+          site={route.site}
+          photos={photos[route.site]}
+          inspection={stats[route.site].inspection}
+          summary={stats[route.site].summary}
+        />
       )}
     </AppShell>
   )
