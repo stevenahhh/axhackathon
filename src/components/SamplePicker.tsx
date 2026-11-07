@@ -21,7 +21,7 @@ type View = "list" | "icons"
 
 type Folder = { site: SiteId; label: string; samples: Sample[] }
 
-const VIEW_KEY = "suntek.samplePicker.view"
+const VIEW_KEY = "sunset.samplePicker.view"
 
 // DJI SD 카드의 DCIM 폴더처럼 보이게 비행 날짜와 지역으로 이름을 짓는다.
 function folderOf(site: SiteId, samples: Sample[]): Folder {

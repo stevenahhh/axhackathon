@@ -52,6 +52,25 @@ class SessionTokenTest(unittest.TestCase):
             self.assertIsNone(serve.verify_session(token, SECRET, now=1001))
 
 
+class CookieUserTest(unittest.TestCase):
+    ACCOUNTS = {"guest": "guest"}
+
+    def test_reads_new_and_legacy_cookie_names(self):
+        token = serve.sign_session("guest", SECRET, now=1000)
+        self.assertEqual(serve.cookie_user(f"sunset_session={token}", SECRET, 1001, self.ACCOUNTS), "guest")
+        self.assertEqual(
+            serve.cookie_user(f"theme=dark; suntek_session={token}", SECRET, 1001, self.ACCOUNTS), "guest"
+        )
+        self.assertIsNone(serve.cookie_user(f"session={token}", SECRET, 1001, self.ACCOUNTS))
+        self.assertIsNone(serve.cookie_user("", SECRET, 1001, self.ACCOUNTS))
+
+    def test_rejects_unknown_account_and_expired_token(self):
+        ghost = serve.sign_session("ghost", SECRET, now=1000)
+        self.assertIsNone(serve.cookie_user(f"sunset_session={ghost}", SECRET, 1001, self.ACCOUNTS))
+        expired = serve.sign_session("guest", SECRET, now=1000, ttl=1)
+        self.assertIsNone(serve.cookie_user(f"sunset_session={expired}", SECRET, 1001, self.ACCOUNTS))
+
+
 class LimiterTest(unittest.TestCase):
     def test_blocks_after_limit_until_window_passes(self):
         limiter = serve.LoginLimiter(limit=3, window=60)
