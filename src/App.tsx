@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { AppShell } from "@/components/AppShell"
 import type { SiteStatus } from "@/components/StatusBadges"
+import { Toaster } from "@/components/ui/sonner"
 import { Button } from "@/components/ui/button"
 import { fetchHealth } from "@/lib/api"
 import { photosOf, summarize, type Summary } from "@/lib/inspection"
@@ -115,6 +116,7 @@ export default function App() {
           summary={stats[route.site].summary}
         />
       )}
+      <Toaster />
     </AppShell>
   )
 }
