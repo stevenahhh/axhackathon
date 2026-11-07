@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { CURRENT_YM, HISTORY, siteById } from "@/data/sites"
+import { CURRENT_PERIOD, HISTORY, periodLabel, previousPeriod, siteById } from "@/data/sites"
 import { requestOpinion } from "@/lib/api"
 import {
   FORM9,
@@ -104,25 +104,21 @@ export function ReopenButton({ site, className }: { site: SiteId; className?: st
   )
 }
 
-function previousYm(ym: string) {
-  const [year, month] = ym.split("-").map(Number)
-  return month === 1 ? `${year - 1}-12` : `${year}-${String(month - 1).padStart(2, "0")}`
-}
-
 // AgentStream에 보낼 점검 요약. 서버가 key=value 줄로 바꿔 챗봇에 넘긴다.
 function opinionPayload(site: SiteId, inspection: Inspection, summary: Summary) {
-  const previous = previousYm(CURRENT_YM)
+  const previous = previousPeriod(CURRENT_PERIOD)
   const top = [...summary.confirmed].sort((a, b) => totalArea(b) - totalArea(a)).slice(0, 3)
   return {
     site_alias: `${site}현장`,
-    ym: CURRENT_YM,
+    ym: CURRENT_PERIOD,
+    period: `${periodLabel(CURRENT_PERIOD)} 정기점검`,
     photos_total: summary.total,
     excluded: summary.excluded,
     flagged: summary.flagged,
     confirmed: summary.confirmed.length,
     rejected: summary.rejected,
     top_photos: top.map((photo) => ({ seq: photo.seq, count: photo.boxes.length, area_px: totalArea(photo) })),
-    previous_month: {
+    previous_period: {
       ym: previous,
       confirmed: HISTORY.find((entry) => entry.site === site && entry.ym === previous)?.confirmed ?? null,
     },

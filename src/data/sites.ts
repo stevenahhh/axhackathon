@@ -1,7 +1,17 @@
 import drone from "@/data/drone.json"
 import type { Folder, HistoryEntry, Photo, Site, SiteId } from "@/types"
 
-export const CURRENT_YM = "2026-11"
+// 점검 주기는 분기다. HistoryEntry.ym에는 "2026-Q4"처럼 연도와 분기를 적는다.
+export const CURRENT_PERIOD = "2026-Q4"
+
+export const quarterOf = (period: string) => `${Number(period.slice(6))}분기`
+export const quarterShort = (period: string) => `${Number(period.slice(6))}Q`
+export const periodLabel = (period: string) => `${period.slice(0, 4)}년 ${quarterOf(period)}`
+export function previousPeriod(period: string) {
+  const year = Number(period.slice(0, 4))
+  const quarter = Number(period.slice(6))
+  return quarter === 1 ? `${year - 1}-Q4` : `${year}-Q${quarter - 1}`
+}
 
 const MODULE = { type: "HiS-S440 단결정", pmaxKw: 0.44, vmpV: 41.2, impA: 10.68 }
 
@@ -75,20 +85,21 @@ export const BASE_PHOTOS: Photo[] = (
   drone as (Omit<Photo, "site" | "folder"> & { site: string; folder: string })[]
 ).map((photo) => ({ ...photo, site: photo.site as SiteId, folder: photo.folder as Folder }))
 
+// 올해 1~3분기 정기점검의 시연용 예시 기록. 4분기(CURRENT_PERIOD)는 앱 상태에서 계산한다.
 export const HISTORY: HistoryEntry[] = [
-  { site: "A", ym: "2026-08", photos: 299, confirmed: 3, savedAt: "2026-08-12", seeded: true },
-  { site: "A", ym: "2026-09", photos: 301, confirmed: 4, savedAt: "2026-09-10", seeded: true },
-  { site: "A", ym: "2026-10", photos: 300, confirmed: 6, savedAt: "2026-10-14", seeded: true },
-  { site: "B", ym: "2026-08", photos: 648, confirmed: 2, savedAt: "2026-08-19", seeded: true },
-  { site: "B", ym: "2026-09", photos: 652, confirmed: 2, savedAt: "2026-09-17", seeded: true },
-  { site: "B", ym: "2026-10", photos: 650, confirmed: 3, savedAt: "2026-10-22", seeded: true },
-  { site: "C", ym: "2026-08", photos: 18, confirmed: 1, savedAt: "2026-08-08", seeded: true },
-  { site: "C", ym: "2026-09", photos: 19, confirmed: 1, savedAt: "2026-09-09", seeded: true },
-  { site: "C", ym: "2026-10", photos: 19, confirmed: 2, savedAt: "2026-10-07", seeded: true },
-  { site: "D", ym: "2026-08", photos: 46, confirmed: 1, savedAt: "2026-08-13", seeded: true },
-  { site: "D", ym: "2026-09", photos: 48, confirmed: 2, savedAt: "2026-09-11", seeded: true },
-  { site: "D", ym: "2026-10", photos: 47, confirmed: 2, savedAt: "2026-10-15", seeded: true },
-  { site: "E", ym: "2026-08", photos: 76, confirmed: 2, savedAt: "2026-08-21", seeded: true },
-  { site: "E", ym: "2026-09", photos: 78, confirmed: 2, savedAt: "2026-09-18", seeded: true },
-  { site: "E", ym: "2026-10", photos: 77, confirmed: 3, savedAt: "2026-10-23", seeded: true },
+  { site: "A", ym: "2026-Q1", photos: 299, confirmed: 3, savedAt: "2026-03-12", seeded: true },
+  { site: "A", ym: "2026-Q2", photos: 301, confirmed: 4, savedAt: "2026-06-10", seeded: true },
+  { site: "A", ym: "2026-Q3", photos: 300, confirmed: 6, savedAt: "2026-09-14", seeded: true },
+  { site: "B", ym: "2026-Q1", photos: 648, confirmed: 2, savedAt: "2026-03-19", seeded: true },
+  { site: "B", ym: "2026-Q2", photos: 652, confirmed: 2, savedAt: "2026-06-17", seeded: true },
+  { site: "B", ym: "2026-Q3", photos: 650, confirmed: 3, savedAt: "2026-09-22", seeded: true },
+  { site: "C", ym: "2026-Q1", photos: 18, confirmed: 1, savedAt: "2026-03-08", seeded: true },
+  { site: "C", ym: "2026-Q2", photos: 19, confirmed: 1, savedAt: "2026-06-09", seeded: true },
+  { site: "C", ym: "2026-Q3", photos: 19, confirmed: 2, savedAt: "2026-09-07", seeded: true },
+  { site: "D", ym: "2026-Q1", photos: 46, confirmed: 1, savedAt: "2026-03-13", seeded: true },
+  { site: "D", ym: "2026-Q2", photos: 48, confirmed: 2, savedAt: "2026-06-11", seeded: true },
+  { site: "D", ym: "2026-Q3", photos: 47, confirmed: 2, savedAt: "2026-09-15", seeded: true },
+  { site: "E", ym: "2026-Q1", photos: 76, confirmed: 2, savedAt: "2026-03-21", seeded: true },
+  { site: "E", ym: "2026-Q2", photos: 78, confirmed: 2, savedAt: "2026-06-18", seeded: true },
+  { site: "E", ym: "2026-Q3", photos: 77, confirmed: 3, savedAt: "2026-09-23", seeded: true },
 ]

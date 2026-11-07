@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react"
 import { ClipboardListIcon, LayoutDashboardIcon, MoonIcon, ScanSearchIcon, SunIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { SITES } from "@/data/sites"
+import { CURRENT_PERIOD, SITES, periodLabel } from "@/data/sites"
 import { useIsDesktop } from "@/lib/media"
 import { hrefOf, type Route } from "@/lib/route"
 import { cn } from "@/lib/utils"
@@ -163,7 +163,7 @@ export function AppShell({
               {title}
             </h1>
             <span className="hidden shrink-0 rounded-full bg-solar/20 px-2.5 py-1 text-xs font-medium sm:inline">
-              2026년 11월 월차 점검
+              {periodLabel(CURRENT_PERIOD)} 정기점검
             </span>
             <Button
               variant="ghost"

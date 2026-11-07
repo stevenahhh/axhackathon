@@ -60,7 +60,16 @@ export function ThermalPreview({
     <div className="flex flex-col gap-[4mm] p-[10mm] text-[9.5pt] leading-snug print:p-0">
       <h2 className="text-center text-[14pt] font-bold tracking-wide">
         적외선 열화상분포 측정기록표
-        <span className="text-[10pt] font-normal tracking-normal">(분기 · 반기 · 연차)</span>
+        <span className="text-[10pt] font-normal tracking-normal">
+          (
+          <span
+            data-slot="thermal-period"
+            className="inline-block rounded-full border border-neutral-800 px-[1.2mm] leading-tight font-bold"
+          >
+            분기
+          </span>
+          {" · 반기 · 연차)"}
+        </span>
       </h2>
 
       <div className="flex items-end justify-between px-[1mm]">

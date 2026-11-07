@@ -176,7 +176,7 @@ export function draftOpinion(summary: Summary, inspection: Inspection) {
     lines.push(
       `면적이 가장 큰 ${top.seq}번 사진 위치부터 모듈 오염, 셀 손상, 바이패스 다이오드 이상 여부를 현장에서 확인하고 소유자에게 알리겠습니다.`
     )
-  else lines.push("핫스팟 의심 부위가 확인되지 않아 다음 달 정기 점검에서 추이를 계속 살피겠습니다.")
+  else lines.push("핫스팟 의심 부위가 확인되지 않아 다음 분기 정기점검에서 추이를 계속 살피겠습니다.")
   if (summary.rejected + summary.excluded > 0)
     lines.push(`오탐 ${summary.rejected}장과 패널 외 ${summary.excluded}장은 기록에서 제외했습니다.`)
   if (inspection.insulation || inspection.ground)

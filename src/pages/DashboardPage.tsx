@@ -27,7 +27,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { CURRENT_YM, HISTORY, SITES, formatCapacity, siteById } from "@/data/sites"
+import {
+  CURRENT_PERIOD,
+  HISTORY,
+  SITES,
+  formatCapacity,
+  periodLabel,
+  quarterOf,
+  quarterShort,
+  siteById,
+} from "@/data/sites"
 import type { Summary } from "@/lib/inspection"
 import { hrefOf } from "@/lib/route"
 import { cn } from "@/lib/utils"
@@ -35,7 +44,7 @@ import type { Inspection, Site, SiteId } from "@/types"
 
 export type SiteStat = { summary: Summary; inspection: Inspection; status: SiteStatus }
 
-const MONTHS = ["2026-08", "2026-09", "2026-10", CURRENT_YM]
+const PERIODS = ["2026-Q1", "2026-Q2", "2026-Q3", CURRENT_PERIOD]
 const SITE_COLOR: Record<SiteId, string> = {
   A: "bg-chart-1",
   B: "bg-chart-2",
@@ -43,9 +52,6 @@ const SITE_COLOR: Record<SiteId, string> = {
   D: "bg-chart-4",
   E: "bg-chart-5",
 }
-
-const monthOf = (ym: string) => `${Number(ym.slice(5))}월`
-const monthLabel = (ym: string) => `${ym.slice(0, 4)}년 ${monthOf(ym)}`
 
 function Kpi({
   icon,
@@ -143,37 +149,37 @@ function SiteCard({ site, stat }: { site: Site; stat: SiteStat }) {
 }
 
 function TrendChart({ stats }: { stats: Record<SiteId, SiteStat> }) {
-  const value = (site: SiteId, ym: string) =>
-    ym === CURRENT_YM
+  const value = (site: SiteId, period: string) =>
+    period === CURRENT_PERIOD
       ? stats[site].summary.confirmed.length
-      : (HISTORY.find((entry) => entry.site === site && entry.ym === ym)?.confirmed ?? 0)
-  const max = Math.max(4, ...MONTHS.flatMap((ym) => SITES.map((site) => value(site.id, ym))))
+      : (HISTORY.find((entry) => entry.site === site && entry.ym === period)?.confirmed ?? 0)
+  const max = Math.max(4, ...PERIODS.flatMap((period) => SITES.map((site) => value(site.id, period))))
   return (
     <Card>
       <CardHeader>
-        <CardTitle>월별 확정 핫스팟</CardTitle>
-        <CardDescription>8~10월은 시연용 예시 기록입니다.</CardDescription>
+        <CardTitle>분기별 확정 핫스팟</CardTitle>
+        <CardDescription>1~3분기는 시연용 예시 기록입니다.</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <div
           role="group"
-          aria-label="월별 현장별 확정 핫스팟 막대 그래프"
+          aria-label="분기별 현장별 확정 핫스팟 막대 그래프"
           className="grid h-44 grid-cols-4 items-end gap-3 border-b pb-1"
         >
-          {MONTHS.map((ym) => (
-            <div key={ym} className="flex h-full min-w-0 items-end justify-center gap-0.5 sm:gap-1">
+          {PERIODS.map((period) => (
+            <div key={period} className="flex h-full min-w-0 items-end justify-center gap-0.5 sm:gap-1">
               {SITES.map((site) => {
-                const count = value(site.id, ym)
+                const count = value(site.id, period)
                 return (
                   <div
                     key={site.id}
                     role="img"
-                    aria-label={`${site.name} ${monthLabel(ym)} 확정 핫스팟 ${count}장`}
-                    title={`${site.name} ${monthLabel(ym)}: ${count}장`}
+                    aria-label={`${site.name} ${periodLabel(period)} 확정 핫스팟 ${count}장`}
+                    title={`${site.name} ${periodLabel(period)}: ${count}장`}
                     className={cn(
                       "min-w-0 max-w-3.5 flex-1 rounded-t-sm",
                       SITE_COLOR[site.id],
-                      ym !== CURRENT_YM && "opacity-60"
+                      period !== CURRENT_PERIOD && "opacity-60"
                     )}
                     style={{ height: `${Math.max(3, (count / max) * 100)}%` }}
                   />
@@ -183,9 +189,12 @@ function TrendChart({ stats }: { stats: Record<SiteId, SiteStat> }) {
           ))}
         </div>
         <div className="grid grid-cols-4 gap-3 text-center text-xs text-muted-foreground">
-          {MONTHS.map((ym) => (
-            <span key={ym} className={cn("tabular", ym === CURRENT_YM && "font-medium text-foreground")}>
-              {monthOf(ym)}
+          {PERIODS.map((period) => (
+            <span
+              key={period}
+              className={cn("tabular", period === CURRENT_PERIOD && "font-medium text-foreground")}
+            >
+              {quarterShort(period)}
             </span>
           ))}
         </div>
@@ -216,8 +225,8 @@ function historyRows(stats: Record<SiteId, SiteStat>): HistoryRow[] {
   const current = SITES.map((site) => {
     const { summary, inspection, status } = stats[site.id]
     return {
-      key: `${site.id}-${CURRENT_YM}`,
-      ym: CURRENT_YM,
+      key: `${site.id}-${CURRENT_PERIOD}`,
+      ym: CURRENT_PERIOD,
       site: site.id,
       photos: summary.total,
       confirmed: summary.confirmed.length,
@@ -257,7 +266,7 @@ function History({ stats }: { stats: Record<SiteId, SiteStat> }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>월별 점검 이력</CardTitle>
+        <CardTitle>분기별 점검 이력</CardTitle>
         <CardDescription>기록표는 설치장소마다 4년간 보존합니다(직무고시 제6조).</CardDescription>
       </CardHeader>
       <CardContent className="px-0">
@@ -265,7 +274,7 @@ function History({ stats }: { stats: Record<SiteId, SiteStat> }) {
           {groups.map((group) => (
             <div key={group.ym} className="border-t first:border-t-0">
               <p className="px-4 pt-3 pb-1 text-xs font-medium text-muted-foreground">
-                {monthLabel(group.ym)}
+                {periodLabel(group.ym)}
               </p>
               <ul className="divide-y">
                 {group.rows.map((row) => (
@@ -291,7 +300,7 @@ function History({ stats }: { stats: Record<SiteId, SiteStat> }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="pl-4">점검월</TableHead>
+                <TableHead className="pl-4">점검 분기</TableHead>
                 <TableHead>현장</TableHead>
                 <TableHead className="text-right">열화상</TableHead>
                 <TableHead className="text-right">확정 핫스팟</TableHead>
@@ -303,7 +312,7 @@ function History({ stats }: { stats: Record<SiteId, SiteStat> }) {
               {rows.map((row) => (
                 <TableRow key={row.key}>
                   <TableCell className={cn("tabular pl-4", row.status && "font-medium")}>
-                    {monthLabel(row.ym)}
+                    {periodLabel(row.ym)}
                   </TableCell>
                   <TableCell>{siteById(row.site).name}</TableCell>
                   <TableCell className="tabular text-right">{row.photos}</TableCell>
@@ -337,7 +346,7 @@ export function DashboardPage({ stats }: { stats: Record<SiteId, SiteStat> }) {
         className="flex flex-col gap-4 rounded-2xl bg-linear-to-br from-primary to-[oklch(0.45_0.17_285)] p-5 text-primary-foreground lg:flex-row lg:items-end lg:justify-between lg:p-6 dark:from-[oklch(0.3_0_0)] dark:to-[oklch(0.22_0_0)] dark:text-foreground"
       >
         <div>
-          <p className="text-sm opacity-80">{monthOf(CURRENT_YM)} 월차 점검</p>
+          <p className="text-sm opacity-80">{quarterOf(CURRENT_PERIOD)} 정기점검</p>
           <h2 id="dashboard-summary" className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
             담당 현장 {SITES.length}곳 중 {saved}곳 기록 완료
           </h2>

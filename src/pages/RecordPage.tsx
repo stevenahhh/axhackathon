@@ -54,7 +54,10 @@ export function RecordPage({
           <TabsTrigger value="preview" className="lg:hidden">
             미리보기
           </TabsTrigger>
-          <TabsTrigger value="thermal">열화상 측정기록표</TabsTrigger>
+          <TabsTrigger value="thermal">
+            <span className="lg:hidden">열화상 측정기록표</span>
+            <span className="hidden lg:inline">열화상 측정기록표 (분기)</span>
+          </TabsTrigger>
         </TabsList>
       </Tabs>
 
