@@ -1,3 +1,5 @@
+import { sessionExpired } from "@/lib/session"
+
 export type Defect = { bbox: [number, number, number, number]; area: number }
 
 export type Prediction = {
@@ -33,6 +35,7 @@ export type Opinion = {
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, init)
+  if (response.status === 401) sessionExpired()
   const data = await response.json().catch(() => null)
   if (!response.ok) throw new Error(data?.error ?? data?.detail ?? `HTTP ${response.status}`)
   return data as T
@@ -73,6 +76,7 @@ export async function alignRgb(rgb: File | Blob, zoom?: number): Promise<Blob> {
   body.append("rgb", rgb)
   if (zoom !== undefined) body.append("zoom", String(zoom))
   const response = await fetch("./api/align", { method: "POST", body })
+  if (response.status === 401) sessionExpired()
   if (!response.ok) {
     const data = await response.json().catch(() => null)
     throw new Error(data?.error ?? `HTTP ${response.status}`)

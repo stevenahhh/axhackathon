@@ -1,5 +1,13 @@
 import { useState, type ReactNode } from "react"
-import { ClipboardListIcon, LayoutDashboardIcon, MoonIcon, ScanSearchIcon, SunIcon } from "lucide-react"
+import {
+  ClipboardListIcon,
+  LayoutDashboardIcon,
+  LogOutIcon,
+  MoonIcon,
+  ScanSearchIcon,
+  SunIcon,
+  UserIcon,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { CURRENT_PERIOD, SITES, periodLabel } from "@/data/sites"
@@ -41,10 +49,14 @@ function SidebarBody({
   route,
   site,
   dots,
+  user,
+  onSignOut,
 }: {
   route: Route
   site: SiteId
   dots: Record<SiteId, string>
+  user: string
+  onSignOut: () => void
 }) {
   return (
     <div className="flex h-full flex-col gap-6 p-4">
@@ -85,7 +97,21 @@ function SidebarBody({
           </a>
         ))}
       </div>
-      <p className="mt-auto text-xs leading-5 text-sidebar-foreground/60">
+      <div className="mt-auto flex items-center gap-2 px-1 text-sm text-sidebar-foreground">
+        <UserIcon className="size-4 shrink-0 text-sidebar-foreground/60" aria-hidden />
+        <span className="min-w-0 flex-1 truncate">
+          {user}
+        </span>
+        <button
+          type="button"
+          onClick={onSignOut}
+          className="flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium text-sidebar-foreground outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring [&_svg]:size-3.5"
+        >
+          <LogOutIcon aria-hidden />
+          로그아웃
+        </button>
+      </div>
+      <p className="text-xs leading-5 text-sidebar-foreground/60">
         판정 AIStream · 문장 AgentStream
         <br />
         최종 판정과 서명은 점검자가 합니다.
@@ -127,11 +153,15 @@ export function AppShell({
   route,
   title,
   dots,
+  user,
+  onSignOut,
   children,
 }: {
   route: Route
   title: string
   dots: Record<SiteId, string>
+  user: string
+  onSignOut: () => void
   children: ReactNode
 }) {
   const isDesktop = useIsDesktop()
@@ -147,7 +177,7 @@ export function AppShell({
     <div className="min-h-dvh bg-background text-foreground lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
       {isDesktop && (
         <aside className="sticky top-0 h-dvh bg-sidebar">
-          <SidebarBody route={route} site={site} dots={dots} />
+          <SidebarBody route={route} site={site} dots={dots} user={user} onSignOut={onSignOut} />
         </aside>
       )}
       <div className="min-w-0">
@@ -174,6 +204,17 @@ export function AppShell({
             >
               {dark ? <SunIcon /> : <MoonIcon />}
             </Button>
+            {!isDesktop && (
+              <Button
+                variant="ghost"
+                className="-mr-2 h-11 max-w-28 gap-1.5 px-2 text-xs text-muted-foreground"
+                aria-label={`${user} 로그아웃`}
+                onClick={onSignOut}
+              >
+                <span className="truncate">{user}</span>
+                <LogOutIcon />
+              </Button>
+            )}
           </div>
         </header>
         <main className="mx-auto max-w-[1400px] p-4 pb-[calc(4.5rem_+_env(safe-area-inset-bottom))] lg:p-8">
