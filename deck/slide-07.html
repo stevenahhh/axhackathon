@@ -9,42 +9,44 @@
 html,body{width:720pt;height:405pt;overflow:hidden}
 body{font-family:'Pretendard JP','Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:#FFFFFF;color:#1A1A1A;position:relative;word-break:keep-all;line-height:1.35}
 .band{position:absolute;left:0;top:0;width:720pt;height:48.6pt;background:#0B2C5C;display:flex;align-items:center;padding:0 36pt;gap:12pt}
-.chip{width:26pt;height:26pt;background:#1B66C9;color:#fff;font-size:15pt;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;line-height:1}
+.chip{width:26pt;height:26pt;background:#1B66C9;display:flex;align-items:center;justify-content:center;flex:none}
+.chip p{color:#fff;font-size:15pt;font-weight:700;line-height:1}
 .band h1{color:#fff;font-size:22pt;font-weight:700;letter-spacing:-0.01em;line-height:1.2}
-.cap{font-size:11pt;color:#5C6470;position:absolute;left:36pt;bottom:12pt;line-height:1.3}
+.cap{font-size:12pt;color:#5C6470;position:absolute;left:36pt;bottom:40pt;line-height:1.3}
 .lbl{font-size:14pt;color:#5C6470;font-weight:500}
 .navy{color:#0B2C5C}.blue{color:#1B66C9}.red{color:#E03B3B}.green{color:#1F9D57}.muted{color:#5C6470}
-.abs{position:absolute}
+.row{display:flex;align-items:center}
 
 body{background:#0B2C5C}
 .title{position:absolute;left:48pt;top:90pt}
 .title h1{font-size:60pt;font-weight:800;color:#fff;letter-spacing:-0.02em;line-height:1.3}
 .rule{width:60pt;height:4pt;background:#1B66C9;margin:14pt 0 16pt}
-.team{list-style:none;display:flex;flex-direction:column;gap:6pt}
-.team p{font-size:15pt;color:#fff;font-weight:500}
-.team p .r{opacity:.75;margin-left:8pt}
-.links{position:absolute;left:48pt;bottom:40pt;list-style:none;display:flex;flex-direction:column;gap:6pt}
-.links li{display:flex;align-items:center;gap:8pt}
-.links p{font-size:14pt;color:#fff;opacity:.9}
+.team{display:flex;flex-direction:column;gap:6pt}
+.member{display:flex;align-items:baseline;gap:8pt}
+.member .n{font-size:15pt;color:#fff;font-weight:700}
+.member .r{font-size:15pt;color:#C5D2E3;font-weight:500}
+.links{position:absolute;left:48pt;bottom:42pt;display:flex;flex-direction:column;gap:6pt}
+.link{display:flex;align-items:center;gap:8pt}
+.link p{font-size:14pt;color:#fff}
 .qr{position:absolute;left:532pt;top:90pt;width:150pt;height:150pt;background:#fff;padding:8pt}
 .qr img{width:134pt;height:134pt;display:block}
-.qrl{position:absolute;left:532pt;top:246pt;width:150pt;text-align:center;font-size:14pt;color:#fff;opacity:.9}
+.qrl{position:absolute;left:532pt;top:246pt;width:150pt;text-align:center;font-size:14pt;color:#fff}
 </style>
 </head>
 <body>
 <div class="title">
   <h1>감사합니다</h1>
   <div class="rule"></div>
-  <ul class="team">
-    <li><p>박건일<span class="r">현장 · 도메인</span></p></li>
-    <li><p>주아리<span class="r">데이터 · 발표</span></p></li>
-    <li><p>안순광<span class="r">모델 · 플랫폼 · 웹</span></p></li>
-  </ul>
+  <div class="team">
+    <div class="member"><p class="n">박건일</p><p class="r">현장 · 도메인</p></div>
+    <div class="member"><p class="n">주아리</p><p class="r">데이터 · 발표</p></div>
+    <div class="member"><p class="n">안순광</p><p class="r">모델 · 플랫폼 · 웹</p></div>
+  </div>
 </div>
-<ul class="links">
-  <li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16pt" height="16pt" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg><p>devopen-gpu.jntp-ax.or.kr/i/z-kOTvqeFZjwBkOj</p></li>
-  <li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16pt" height="16pt" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6a9 9 0 0 0-9 9V3"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/></svg><p>github.com/stevenahhh/axhackathon</p></li>
-</ul>
+<div class="links">
+  <div class="link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16pt" height="16pt" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg><p>devopen-gpu.jntp-ax.or.kr/i/z-kOTvqeFZjwBkOj</p></div>
+  <div class="link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16pt" height="16pt" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6a9 9 0 0 0-9 9V3"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/></svg><p>github.com/stevenahhh/axhackathon</p></div>
+</div>
 <div class="qr"><img src="./assets/qr-demo.png" alt="시연 사이트 QR"></div>
 <p class="qrl">시연 사이트</p>
 </body></html>

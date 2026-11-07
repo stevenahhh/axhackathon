@@ -9,25 +9,27 @@
 html,body{width:720pt;height:405pt;overflow:hidden}
 body{font-family:'Pretendard JP','Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:#FFFFFF;color:#1A1A1A;position:relative;word-break:keep-all;line-height:1.35}
 .band{position:absolute;left:0;top:0;width:720pt;height:48.6pt;background:#0B2C5C;display:flex;align-items:center;padding:0 36pt;gap:12pt}
-.chip{width:26pt;height:26pt;background:#1B66C9;color:#fff;font-size:15pt;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;line-height:1}
+.chip{width:26pt;height:26pt;background:#1B66C9;display:flex;align-items:center;justify-content:center;flex:none}
+.chip p{color:#fff;font-size:15pt;font-weight:700;line-height:1.3}
 .band h1{color:#fff;font-size:22pt;font-weight:700;letter-spacing:-0.01em;line-height:1.2}
-.cap{font-size:11pt;color:#5C6470;position:absolute;left:36pt;bottom:12pt;line-height:1.3}
+.cap{font-size:12pt;color:#5C6470;position:absolute;left:36pt;bottom:40pt;line-height:1.3}
 .lbl{font-size:14pt;color:#5C6470;font-weight:500}
 .navy{color:#0B2C5C}.blue{color:#1B66C9}.red{color:#E03B3B}.green{color:#1F9D57}.muted{color:#5C6470}
-.abs{position:absolute}
+.row{display:flex;align-items:center}
 
 body{background:#0B2C5C}
 .title{position:absolute;left:48pt;top:90pt}
 .title h1{font-size:60pt;font-weight:800;color:#fff;letter-spacing:-0.02em;line-height:1.3}
 .rule{width:60pt;height:4pt;background:#1B66C9;margin:14pt 0 12pt}
-.url{font-size:15pt;color:#fff;opacity:.9;font-weight:500}
+.url{font-size:15pt;color:#fff;font-weight:500}
 .qr{position:absolute;left:532pt;top:90pt;width:150pt;height:150pt;background:#fff;padding:8pt}
 .qr img{width:134pt;height:134pt;display:block}
-.qrl{position:absolute;left:532pt;top:246pt;width:150pt;text-align:center;font-size:14pt;color:#fff;opacity:.9}
-.steps{position:absolute;left:48pt;top:296pt;width:634pt;display:flex;justify-content:space-between;list-style:none}
-.steps li{display:flex;flex-direction:column;align-items:flex-start;gap:6pt;width:74pt}
-.steps .n{width:22pt;height:22pt;background:#1B66C9;color:#fff;font-size:13pt;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1}
-.steps .t{font-size:14pt;color:#fff;font-weight:500;white-space:nowrap}
+.qrl{position:absolute;left:532pt;top:246pt;width:150pt;text-align:center;font-size:14pt;color:#fff}
+.steps{position:absolute;left:48pt;top:296pt;width:634pt;display:flex;justify-content:space-between}
+.st{display:flex;flex-direction:column;align-items:flex-start;gap:6pt;width:74pt}
+.st .n{width:22pt;height:22pt;background:#1B66C9;display:flex;align-items:center;justify-content:center}
+.st .n p{color:#fff;font-size:13pt;font-weight:700;line-height:1.3}
+.st .t{font-size:14pt;color:#fff;font-weight:500;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -38,7 +40,7 @@ body{background:#0B2C5C}
 </div>
 <div class="qr"><img src="./assets/qr-demo.png" alt="시연 사이트 QR"></div>
 <p class="qrl">휴대폰으로 함께 보기</p>
-<ol class="steps">
-<li><p class="n">1</p><p class="t">현장 5곳</p></li><li><p class="n">2</p><p class="t">영광 652장</p></li><li><p class="n">3</p><p class="t">열화상 박스</p></li><li><p class="n">4</p><p class="t">융합 판정</p></li><li><p class="n">5</p><p class="t">실시간 판정</p></li><li><p class="n">6</p><p class="t">별지 제9호</p></li><li><p class="n">7</p><p class="t">의견 초안</p></li><li><p class="n">8</p><p class="t">점검자 수정</p></li>
-</ol>
+<div class="steps">
+<div class="st"><div class="n"><p>1</p></div><p class="t">현장 5곳</p></div><div class="st"><div class="n"><p>2</p></div><p class="t">영광 652장</p></div><div class="st"><div class="n"><p>3</p></div><p class="t">열화상 박스</p></div><div class="st"><div class="n"><p>4</p></div><p class="t">융합 판정</p></div><div class="st"><div class="n"><p>5</p></div><p class="t">실시간 판정</p></div><div class="st"><div class="n"><p>6</p></div><p class="t">별지 제9호</p></div><div class="st"><div class="n"><p>7</p></div><p class="t">의견 초안</p></div><div class="st"><div class="n"><p>8</p></div><p class="t">점검자 수정</p></div>
+</div>
 </body></html>

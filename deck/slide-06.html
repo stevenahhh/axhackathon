@@ -9,12 +9,13 @@
 html,body{width:720pt;height:405pt;overflow:hidden}
 body{font-family:'Pretendard JP','Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:#FFFFFF;color:#1A1A1A;position:relative;word-break:keep-all;line-height:1.35}
 .band{position:absolute;left:0;top:0;width:720pt;height:48.6pt;background:#0B2C5C;display:flex;align-items:center;padding:0 36pt;gap:12pt}
-.chip{width:26pt;height:26pt;background:#1B66C9;color:#fff;font-size:15pt;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;line-height:1}
+.chip{width:26pt;height:26pt;background:#1B66C9;display:flex;align-items:center;justify-content:center;flex:none}
+.chip p{color:#fff;font-size:15pt;font-weight:700;line-height:1.3}
 .band h1{color:#fff;font-size:22pt;font-weight:700;letter-spacing:-0.01em;line-height:1.2}
-.cap{font-size:12pt;color:#5C6470;position:absolute;left:36pt;bottom:12pt;line-height:1.3}
+.cap{font-size:12pt;color:#5C6470;position:absolute;left:36pt;bottom:40pt;line-height:1.3}
 .lbl{font-size:14pt;color:#5C6470;font-weight:500}
 .navy{color:#0B2C5C}.blue{color:#1B66C9}.red{color:#E03B3B}.green{color:#1F9D57}.muted{color:#5C6470}
-.abs{position:absolute}
+.row{display:flex;align-items:center}
 
 .big{position:absolute;left:36pt;top:68pt}
 .big .lbl{font-size:14pt}
@@ -24,47 +25,46 @@ body{font-family:'Pretendard JP','Pretendard','Apple SD Gothic Neo','Noto Sans K
 .center{position:absolute;left:36pt;top:168pt;width:168pt;height:168pt;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .center .v{font-size:30pt;font-weight:800;color:#0B2C5C;line-height:1.3}
 .center .k{font-size:14pt;color:#5C6470;margin-top:4pt}
-.leg{position:absolute;left:216pt;top:196pt;list-style:none;display:flex;flex-direction:column;gap:12pt}
-.leg li{display:flex;align-items:center;gap:7pt}
+.leg{position:absolute;left:216pt;top:196pt;display:flex;flex-direction:column;gap:12pt}
+.leg .item{display:flex;align-items:center;gap:7pt}
 .leg .sw{width:12pt;height:12pt;flex:none}
 .leg p{font-size:14pt;font-weight:600;color:#1A1A1A;white-space:nowrap}
 .rt{position:absolute;left:356pt;top:70pt;font-size:14pt;font-weight:600;color:#0B2C5C}
-.thumbs{position:absolute;left:356pt;top:94pt;display:flex;gap:5pt;list-style:none}
-.thumbs li{position:relative;width:42pt;height:34pt}
-.thumbs img{width:42pt;height:34pt;object-fit:cover;display:block}
-.thumbs .x{position:absolute;left:0;top:0;width:42pt;height:34pt;display:flex;align-items:center;justify-content:center;background:rgba(224,59,59,0.28)}
+.thumbs{position:absolute;left:356pt;top:94pt;display:flex;gap:5pt}
+.th{position:relative;width:42pt;height:34pt}
+.th img{width:42pt;height:34pt;display:block}
+.th .x{position:absolute;left:0;top:0;width:42pt;height:34pt;display:flex;align-items:center;justify-content:center}
 .fix{position:absolute;left:356pt;top:172pt;display:flex;align-items:center;gap:10pt}
 .fix .ring{width:40pt;height:40pt;background:#E8F1FB;border:1.5pt solid #1B66C9;display:flex;align-items:center;justify-content:center}
 .fix p{font-size:14pt;font-weight:600;color:#0B2C5C}
 .ct{position:absolute;left:356pt;top:262pt;font-size:14pt;font-weight:600;color:#0B2C5C}
-.cycle{position:absolute;left:356pt;top:288pt;display:flex;align-items:center;gap:6pt;list-style:none}
-.cycle li{width:88pt;height:38pt;border:1pt solid #C5D2E3;display:flex;align-items:center;justify-content:center;background:#FFFFFF}
-.cycle li.on{background:#1B66C9;border-color:#1B66C9}
-.cycle li.on p{color:#fff}
-.cycle li.arr{width:auto;border:0;background:none}
-.cycle p{font-size:15pt;font-weight:700;color:#0B2C5C}
+.cycle{position:absolute;left:356pt;top:288pt;display:flex;align-items:center;gap:6pt}
+.cy{width:88pt;height:38pt;border:1pt solid #C5D2E3;display:flex;align-items:center;justify-content:center;background:#FFFFFF}
+.cy.on{background:#1B66C9;border-color:#1B66C9}
+.cy.on p{color:#fff}
+.cy p{font-size:15pt;font-weight:700;color:#0B2C5C}
 </style>
 </head>
 <body>
-<div class="band"><p class="chip">4</p><h1>기대효과</h1></div>
+<div class="band"><div class="chip"><p>4</p></div><h1>기대효과</h1></div>
 <div class="big">
   <p class="lbl">점검자가 우선 확인할 사진</p>
   <div class="num"><p class="muted">652장</p><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="26pt" height="26pt" fill="none" stroke="#5C6470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><p class="blue">138장</p></div>
 </div>
-<div class="donut"><canvas id="dn"></canvas></div>
+<div class="donut"><canvas id="dn" aria-label="영광 652장 판정 비율"></canvas></div>
 <div class="center"><p class="v">652</p><p class="k">전체</p></div>
-<ul class="leg">
-  <li><div class="sw" style="background:#E03B3B"></div><p>우선 확인 138</p></li>
-  <li><div class="sw" style="background:#5C6470"></div><p>참고 111</p></li>
-  <li><div class="sw" style="background:#1F9D57"></div><p>이상 없음 403</p></li>
-</ul>
+<div class="leg">
+  <div class="item"><div class="sw" style="background:#E03B3B"></div><p>우선 확인 138</p></div>
+  <div class="item"><div class="sw" style="background:#5C6470"></div><p>참고 111</p></div>
+  <div class="item"><div class="sw" style="background:#1F9D57"></div><p>이상 없음 403</p></div>
+</div>
 <p class="rt">AI가 놓친 결함 7장 · 음성</p>
-<ul class="thumbs">
-<li><img src="./assets/C_0003_T.jpg" alt="음성 결함 열화상 C_0003"><div class="x"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></li><li><img src="./assets/C_0004_T.jpg" alt="음성 결함 열화상 C_0004"><div class="x"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></li><li><img src="./assets/C_0012_T.jpg" alt="음성 결함 열화상 C_0012"><div class="x"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></li><li><img src="./assets/C_0013_T.jpg" alt="음성 결함 열화상 C_0013"><div class="x"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></li><li><img src="./assets/C_0014_T.jpg" alt="음성 결함 열화상 C_0014"><div class="x"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></li><li><img src="./assets/C_0015_T.jpg" alt="음성 결함 열화상 C_0015"><div class="x"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></li><li><img src="./assets/C_0019_T.jpg" alt="음성 결함 열화상 C_0019"><div class="x"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></li>
-</ul>
+<div class="thumbs">
+<div class="th"><img src="./assets/C_0003_T.jpg" alt="음성 결함 열화상 C_0003"><div class="x"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></div><div class="th"><img src="./assets/C_0004_T.jpg" alt="음성 결함 열화상 C_0004"><div class="x"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></div><div class="th"><img src="./assets/C_0012_T.jpg" alt="음성 결함 열화상 C_0012"><div class="x"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></div><div class="th"><img src="./assets/C_0013_T.jpg" alt="음성 결함 열화상 C_0013"><div class="x"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></div><div class="th"><img src="./assets/C_0014_T.jpg" alt="음성 결함 열화상 C_0014"><div class="x"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></div><div class="th"><img src="./assets/C_0015_T.jpg" alt="음성 결함 열화상 C_0015"><div class="x"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></div><div class="th"><img src="./assets/C_0019_T.jpg" alt="음성 결함 열화상 C_0019"><div class="x"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></div>
+</div>
 <div class="fix"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#5C6470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><div class="ring"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20pt" height="20pt" fill="none" stroke="#1B66C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 11 2 2 4-4"/><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><p>놓친 사진은 점검자가 확정</p></div>
 <p class="ct">정기점검 확대</p>
-<ul class="cycle"><li class="on"><p>분기</p></li><li class="arr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#5C6470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></li><li><p>반기</p></li><li class="arr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#5C6470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></li><li><p>연차</p></li></ul>
+<div class="cycle"><div class="cy on"><p>분기</p></div><div class="arr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#5C6470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div><div class="cy"><p>반기</p></div><div class="arr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#5C6470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div><div class="cy"><p>연차</p></div></div>
 <p class="cap">출처: 영광 652장 AI 판정 결과 · 음성 19장 중 결함 7장</p>
 <script>
 Chart.defaults.font.family="'Pretendard JP','Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif";Chart.defaults.font.size=18;Chart.defaults.color='#1A1A1A';
