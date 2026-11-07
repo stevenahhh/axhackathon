@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:720pt;height:405pt;overflow:hidden}
+body{font-family:'Pretendard JP','Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:#FFFFFF;color:#1A1A1A;position:relative;word-break:keep-all;line-height:1.35}
+.band{position:absolute;left:0;top:0;width:720pt;height:48.6pt;background:#0B2C5C;display:flex;align-items:center;padding:0 36pt;gap:12pt}
+.chip{width:26pt;height:26pt;background:#1B66C9;color:#fff;font-size:15pt;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;line-height:1}
+.band h1{color:#fff;font-size:22pt;font-weight:700;letter-spacing:-0.01em;line-height:1.2}
+.cap{font-size:12pt;color:#5C6470;position:absolute;left:36pt;bottom:12pt;line-height:1.3}
+.lbl{font-size:14pt;color:#5C6470;font-weight:500}
+.navy{color:#0B2C5C}.blue{color:#1B66C9}.red{color:#E03B3B}.green{color:#1F9D57}.muted{color:#5C6470}
+.abs{position:absolute}
+
+.panel{position:absolute;background:#E8F1FB;border:1pt solid #C5D2E3}
+.panel h3{position:absolute;left:12pt;top:8pt;font-size:14pt;font-weight:700;color:#0B2C5C;white-space:nowrap}
+.bx{position:absolute;height:30pt;background:#FFFFFF;border:1pt solid #C5D2E3;display:flex;align-items:center;gap:8pt;padding:0 8pt 0 6pt;list-style:none}
+.bx .num{width:22pt;height:22pt;background:#1B66C9;color:#fff;font-size:13pt;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;line-height:1}
+.bx .name{font-size:14pt;font-weight:600;color:#1A1A1A;white-space:nowrap}
+.bx.hub{background:#0B2C5C;border-color:#0B2C5C}
+.bx.hub .name{color:#fff}
+.bx.hub .num{background:#fff;color:#0B2C5C}
+.bx.off{border-style:dashed;border-color:#5C6470;background:#FFFFFF}
+.bx.off .num{background:#5C6470}
+.bx.off .name{color:#5C6470}
+.wires{position:absolute;left:0;top:0;width:720pt;height:405pt;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="band"><p class="chip">3</p><h1>AI 플랫폼 활용</h1></div>
+<div class="panel" style="left:36pt;top:90pt;width:214pt;height:246pt"><h3>AIStream</h3></div>
+<div class="panel" style="left:280pt;top:90pt;width:160pt;height:246pt"><h3>팀 개발 서버 · B200</h3></div>
+<div class="panel" style="left:470pt;top:90pt;width:214pt;height:246pt"><h3>AgentStream</h3></div>
+<ul>
+<li class="bx " style="left:48pt;top:122pt;width:190pt"><p class="num">1</p><p class="name">융합 모델 v2 등록</p></li>
+<li class="bx " style="left:48pt;top:164pt;width:190pt"><p class="num">2</p><p class="name">서빙 템플릿 게시</p></li>
+<li class="bx " style="left:48pt;top:206pt;width:190pt"><p class="num">3</p><p class="name">자체 서빙</p></li>
+<li class="bx " style="left:48pt;top:248pt;width:190pt"><p class="num">4</p><p class="name">제공 서빙 · 결함 위치</p></li>
+<li class="bx off" style="left:48pt;top:290pt;width:190pt"><p class="num">5</p><p class="name">YOLO11m · 미사용</p></li>
+<li class="bx " style="left:292pt;top:122pt;width:136pt"><p class="num">6</p><p class="name">모델 학습</p></li>
+<li class="bx hub" style="left:292pt;top:218pt;width:136pt"><p class="num">7</p><p class="name">웹 대시보드</p></li>
+<li class="bx " style="left:482pt;top:122pt;width:190pt"><p class="num">8</p><p class="name">LLM · 임베딩</p></li>
+<li class="bx " style="left:482pt;top:164pt;width:190pt"><p class="num">9</p><p class="name">지식베이스</p></li>
+<li class="bx " style="left:482pt;top:206pt;width:190pt"><p class="num">10</p><p class="name">RAG 챗봇</p></li>
+<li class="bx " style="left:482pt;top:248pt;width:190pt"><p class="num">11</p><p class="name">Open API 호출</p></li>
+</ul>
+<svg class="wires" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 405" aria-hidden="true">
+  <defs>
+    <marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#1B66C9"/></marker>
+  </defs>
+  <g transform="translate(0 22)">
+  <!-- AIStream chain 2 -> 3 -> 4 -->
+  <line x1="143" y1="130" x2="143" y2="141" stroke="#1B66C9" stroke-width="1.75" marker-end="url(#ah)"/>
+  <line x1="143" y1="172" x2="143" y2="183" stroke="#1B66C9" stroke-width="1.75" marker-end="url(#ah)"/>
+  <!-- AgentStream chain 6 -> 7 -> 8 -> 9 -->
+  <line x1="577" y1="130" x2="577" y2="141" stroke="#1B66C9" stroke-width="1.75" marker-end="url(#ah)"/>
+  <line x1="577" y1="172" x2="577" y2="183" stroke="#1B66C9" stroke-width="1.75" marker-end="url(#ah)"/>
+  <line x1="577" y1="214" x2="577" y2="225" stroke="#1B66C9" stroke-width="1.75" marker-end="url(#ah)"/>
+  <!-- 10 model training -> 2 register -->
+  <line x1="292" y1="115" x2="240" y2="115" stroke="#1B66C9" stroke-width="1.75" marker-end="url(#ah)"/>
+  <!-- 11 web -> 4 (self serving) and 1 (provided serving) -->
+  <polyline points="292,211 266,211 266,199 240,199" fill="none" stroke="#1B66C9" stroke-width="1.75" marker-end="url(#ah)"/>
+  <polyline points="266,211 266,241 240,241" fill="none" stroke="#1B66C9" stroke-width="1.75" marker-end="url(#ah)"/>
+  <!-- 11 web -> 9 open api -->
+  <polyline points="428,211 455,211 455,241 480,241" fill="none" stroke="#1B66C9" stroke-width="1.75" marker-end="url(#ah)"/>
+  </g>
+</svg>
+<p class="cap">번호는 설명 순서 · 화살표는 호출·등록 방향 · 점선 상자는 학습했지만 쓰지 않은 모델</p>
+</body></html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:720pt;height:405pt;overflow:hidden}
+body{font-family:'Pretendard JP','Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:#FFFFFF;color:#1A1A1A;position:relative;word-break:keep-all;line-height:1.35}
+.band{position:absolute;left:0;top:0;width:720pt;height:48.6pt;background:#0B2C5C;display:flex;align-items:center;padding:0 36pt;gap:12pt}
+.chip{width:26pt;height:26pt;background:#1B66C9;color:#fff;font-size:15pt;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;line-height:1}
+.band h1{color:#fff;font-size:22pt;font-weight:700;letter-spacing:-0.01em;line-height:1.2}
+.cap{font-size:12pt;color:#5C6470;position:absolute;left:36pt;bottom:12pt;line-height:1.3}
+.lbl{font-size:14pt;color:#5C6470;font-weight:500}
+.navy{color:#0B2C5C}.blue{color:#1B66C9}.red{color:#E03B3B}.green{color:#1F9D57}.muted{color:#5C6470}
+.abs{position:absolute}
+
+.steps{position:absolute;left:36pt;top:66pt;width:648pt;display:flex;align-items:center;justify-content:space-between;list-style:none}
+.steps li{display:flex;align-items:center;gap:8pt;height:36pt;padding:0 12pt 0 6pt;border:1pt solid #C5D2E3;background:#FFFFFF}
+.steps li.ai{background:#1B66C9;border-color:#1B66C9}
+.steps li.ai p{color:#fff}
+.steps li.arr{border:0;padding:0;background:none}
+.steps p{font-size:14pt;font-weight:600;white-space:nowrap;color:#0B2C5C}
+.sq{width:24pt;height:24pt;display:flex;align-items:center;justify-content:center}
+.legend{position:absolute;left:36pt;top:110pt;display:flex;gap:14pt;list-style:none}
+.legend li{display:flex;align-items:center;gap:5pt}
+.legend p{font-size:14pt;color:#1A1A1A}
+.k{width:11pt;height:11pt}
+.img{position:absolute;width:128pt;height:102pt}
+.img img{width:128pt;height:102pt;object-fit:cover;display:block}
+.pill{position:absolute;left:0;top:0;background:#0B2C5C;padding:2pt 7pt}
+.pill p{font-size:14pt;color:#fff;font-weight:600}
+.badge{position:absolute;left:318pt;top:207pt;width:86pt;height:36pt;background:#E03B3B;display:flex;align-items:center;justify-content:center}
+.badge p{color:#fff;font-size:17pt;font-weight:700}
+.alabel{position:absolute;font-size:14pt;font-weight:600;color:#1B66C9}
+.wires{position:absolute;left:0;top:0;width:720pt;height:405pt;pointer-events:none}
+.chartbox{position:absolute;left:470pt;top:178pt;width:214pt;height:176pt}
+.ctitle{position:absolute;left:470pt;top:150pt;font-size:14pt;font-weight:600;color:#0B2C5C;width:214pt}
+.ftitle{position:absolute;left:36pt;top:150pt;font-size:14pt;font-weight:600;color:#0B2C5C}
+</style>
+</head>
+<body>
+<div class="band"><p class="chip">2</p><h1>해결 방식</h1></div>
+<ol class="steps">
+<li class="hu"><div class="sq"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20pt" height="20pt" fill="none" stroke="#0B2C5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg></div><p>사진 업로드</p></li><li class="arr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#5C6470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></li><li class="ai"><div class="sq"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20pt" height="20pt" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/><path d="m16 16-1.9-1.9"/></svg></div><p>AI 선별</p></li><li class="arr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#5C6470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></li><li class="hu"><div class="sq"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20pt" height="20pt" fill="none" stroke="#0B2C5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 11 2 2 4-4"/><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><p>점검자 확정</p></li><li class="arr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#5C6470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></li><li class="ai"><div class="sq"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20pt" height="20pt" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg></div><p>별지 제9호 기입</p></li><li class="arr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18pt" height="18pt" fill="none" stroke="#5C6470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></li><li class="ai"><div class="sq"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20pt" height="20pt" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/><path d="M7 11h10"/><path d="M7 15h6"/><path d="M7 7h8"/></svg></div><p>의견 초안</p></li>
+</ol>
+<ul class="legend"><li><div class="k" style="background:#1B66C9"></div><p>AI 단계</p></li><li><div class="k" style="background:#FFFFFF;border:1pt solid #C5D2E3"></div><p>점검자 단계</p></li></ul>
+<p class="ftitle">열화상+실화상 융합</p>
+<div class="img" style="left:36pt;top:174pt"><img src="./assets/B_0647_T.jpg" alt="열화상"><div class="pill"><p>열화상</p></div></div>
+<div class="img" style="left:36pt;top:262pt"><img src="./assets/B_0647_A.jpg" alt="실화상"><div class="pill"><p>실화상</p></div></div>
+<svg class="wires" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 405" aria-hidden="true">
+  <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#1B66C9"/></marker></defs>
+  <polyline points="166,225 316,225" fill="none" stroke="#1B66C9" stroke-width="1.75" marker-end="url(#ah)"/>
+  <polyline points="166,313 300,313 300,225" fill="none" stroke="#1B66C9" stroke-width="1.75" stroke-dasharray="5 4"/>
+</svg>
+<p class="alabel" style="left:178pt;top:204pt">판정</p>
+<p class="alabel" style="left:178pt;top:294pt">오탐 보정</p>
+<div class="badge"><p>결함</p></div>
+<p class="ctitle">정상을 결함으로 오판</p>
+<div class="chartbox"><canvas id="fp"></canvas></div>
+<p class="cap">출처: 융합 모델 검증 178쌍</p>
+<script>
+Chart.defaults.font.family="'Pretendard JP','Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif";Chart.defaults.font.size=18;Chart.defaults.color='#1A1A1A';
+const topLabels={id:'tl',afterDatasetsDraw(c){const ctx=c.ctx;c.data.datasets.forEach((ds,i)=>c.getDatasetMeta(i).data.forEach((el,j)=>{ctx.save();ctx.font="800 26px 'Pretendard JP','Pretendard',sans-serif";ctx.fillStyle=ds.backgroundColor[j];ctx.textBaseline='bottom';ctx.textAlign='center';ctx.fillText(ds.data[j]+'장',el.x,el.y-6);ctx.restore();}));}};
+new Chart(document.getElementById('fp'),{type:'bar',data:{labels:['열화상만','열화상+실화상'],datasets:[{data:[8,2],backgroundColor:['#5C6470','#1B66C9'],borderWidth:0,barThickness:54}]},options:{animation:false,responsive:true,maintainAspectRatio:false,layout:{padding:{top:36}},plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{y:{display:false,beginAtZero:true,max:9},x:{grid:{display:false},border:{display:false},ticks:{font:{size:19,weight:'600'}}}}},plugins:[topLabels]});
+</script>
+</body></html>
