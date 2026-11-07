@@ -63,6 +63,11 @@ export const formatCapacity = (kw: number) =>
 
 export const formatVoltage = (v: number) => (v === 380 ? "380/220V" : `${v.toLocaleString("ko-KR")}V`)
 
+export const formatKv = (v: number) => `${(v / 1000).toLocaleString("ko-KR", { maximumFractionDigits: 1 })}kV`
+
+// 칩과 탭처럼 좁은 자리에 쓰는 이름: "하동 태양광발전소" → "하동"
+export const shortName = (site: Site) => site.name.replace(/ 태양광발전소$/, "")
+
 export const siteById = (id: SiteId) => SITES.find((site) => site.id === id) ?? SITES[0]
 
 // A(하동)·B(영광)·C(음성)·D(이천)·E(제주 와산)의 드론 열화상·실화상 쌍 전부다. scripts/prepare_demo.py가 만든다.

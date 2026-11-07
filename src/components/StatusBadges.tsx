@@ -61,6 +61,16 @@ const SITE_STATUS: Record<SiteStatus, { label: string; variant: "outline" | "war
   saved: { label: "저장 완료", variant: "success" },
 }
 
+export const siteStatusLabel = (status: SiteStatus) => SITE_STATUS[status].label
+
+// 사이드바와 현장 칩의 상태 점. DESIGN.md 6절의 매핑과 같다.
+export const SITE_DOT: Record<SiteStatus, string> = {
+  todo: "bg-muted-foreground",
+  review: "bg-warning",
+  record: "bg-info",
+  saved: "bg-success",
+}
+
 export function SiteStatusBadge({ status }: { status: SiteStatus }) {
   const { label, variant } = SITE_STATUS[status]
   return <Badge variant={variant}>{label}</Badge>

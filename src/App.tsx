@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { toast } from "sonner"
 
 import { AppShell } from "@/components/AppShell"
-import type { SiteStatus } from "@/components/StatusBadges"
+import { SITE_DOT, type SiteStatus } from "@/components/StatusBadges"
 import { Toaster } from "@/components/ui/sonner"
 import { fetchHealth } from "@/lib/api"
 import { photosOf, summarize, type Summary } from "@/lib/inspection"
@@ -19,13 +19,6 @@ const TITLES: Record<Route["page"], string> = {
   dashboard: "대시보드",
   review: "사진 확인",
   record: "기록표",
-}
-
-const DOT: Record<SiteStatus, string> = {
-  todo: "bg-muted-foreground",
-  review: "bg-warning",
-  record: "bg-info",
-  saved: "bg-success",
 }
 
 function statusOf(inspection: Inspection, summary: Summary): SiteStatus {
@@ -110,7 +103,7 @@ export default function App() {
     return Object.fromEntries(entries) as Record<SiteId, SiteStat>
   }, [inspections, photos])
   const dots = Object.fromEntries(
-    SITE_IDS.map((id) => [id, DOT[stats[id].status]])
+    SITE_IDS.map((id) => [id, SITE_DOT[stats[id].status]])
   ) as Record<SiteId, string>
 
   const href = hrefOf(route)
@@ -128,6 +121,7 @@ export default function App() {
           photos={photos[route.site]}
           inspection={stats[route.site].inspection}
           summary={stats[route.site].summary}
+          stats={stats}
         />
       )}
       {route.page === "record" && (
@@ -137,6 +131,7 @@ export default function App() {
           photos={photos[route.site]}
           inspection={stats[route.site].inspection}
           summary={stats[route.site].summary}
+          stats={stats}
         />
       )}
       <Toaster />

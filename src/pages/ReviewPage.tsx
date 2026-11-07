@@ -14,19 +14,21 @@ import {
 import { DetectionImage } from "@/components/DetectionImage"
 import { ReopenButton } from "@/components/Form9Editor"
 import { PhotoCompare } from "@/components/PhotoCompare"
+import { SitePicker, SiteSummaryCard, type SiteChip } from "@/components/SitePicker"
 import { FusionBadge, ReviewBadge, SourceBadge, TierBadge } from "@/components/StatusBadges"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { SITES, formatCapacity, siteById } from "@/data/sites"
+import { SITES } from "@/data/sites"
 import { classifyPair, predictSolar } from "@/lib/api"
 import { tierOf, totalArea, type Summary } from "@/lib/inspection"
 import { useIsDesktop } from "@/lib/media"
 import { hrefOf } from "@/lib/route"
 import { addUploads, patchUpload, setReview } from "@/lib/store"
 import { cn } from "@/lib/utils"
+import type { SiteStat } from "@/pages/DashboardPage"
 import type { Inspection, Photo, Review, SiteId, Tier } from "@/types"
 
 type Filter = Tier | "all"
@@ -167,11 +169,13 @@ export function ReviewPage({
   photos,
   inspection,
   summary,
+  stats,
 }: {
   site: SiteId
   photos: Photo[]
   inspection: Inspection
   summary: Summary
+  stats: Record<SiteId, SiteStat>
 }) {
   const [filter, setFilterState] = useState<Filter>("review")
   const [limit, setLimit] = useState(PAGE)
@@ -197,6 +201,12 @@ export function ReviewPage({
     visible[0] ??
     photos[0]
   const progress = summary.priority ? (summary.handled / summary.priority) * 100 : 100
+  const chips = Object.fromEntries(
+    SITES.map((item) => [
+      item.id,
+      { status: stats[item.id].status, note: `대기 ${stats[item.id].summary.pendingReview}` },
+    ])
+  ) as Record<SiteId, SiteChip>
 
   function open(photoId: string) {
     setSelectedId(photoId)
@@ -296,58 +306,40 @@ export function ReviewPage({
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-        <div className="overflow-x-auto">
-          <Tabs
-            value={site}
-            onValueChange={(value) => (window.location.hash = hrefOf({ page: "review", site: value as SiteId }))}
-          >
-            <TabsList className={TOUCH_TABS} aria-label="현장 선택">
-              {SITES.map((item) => (
-                <TabsTrigger key={item.id} value={item.id} className="px-3">
-                  {item.name.replace(" 태양광발전소", "")}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        </div>
-        <p className="text-sm text-muted-foreground">
-          {siteById(site).region} · {formatCapacity(siteById(site).capacityKw)}
-        </p>
-        <div className="flex gap-2 sm:ml-auto">
+      <SitePicker page="review" site={site} chips={chips} />
+      <SiteSummaryCard site={site} status={stats[site].status}>
+        <Button
+          variant="outline"
+          className={cn(TOUCH_BUTTON, "flex-1 sm:flex-none")}
+          disabled={locked}
+          onClick={() => fileInput.current?.click()}
+        >
+          <ImageUpIcon />
+          열화상 추가
+        </Button>
+        {!done && (
           <Button
             variant="outline"
             className={cn(TOUCH_BUTTON, "flex-1 sm:flex-none")}
-            disabled={locked}
-            onClick={() => fileInput.current?.click()}
+            render={<a href={recordHref} />}
+            nativeButton={false}
           >
-            <ImageUpIcon />
-            열화상 추가
+            {locked ? "기록표 보기" : "기록표 작성"}
+            <ArrowRightIcon />
           </Button>
-          {!done && (
-            <Button
-              variant="outline"
-              className={cn(TOUCH_BUTTON, "flex-1 sm:flex-none")}
-              render={<a href={recordHref} />}
-              nativeButton={false}
-            >
-              {locked ? "기록표 보기" : "기록표 작성"}
-              <ArrowRightIcon />
-            </Button>
-          )}
-          <input
-            ref={fileInput}
-            type="file"
-            accept="image/jpeg"
-            multiple
-            hidden
-            onChange={(event) => {
-              upload(event.target.files)
-              event.target.value = ""
-            }}
-          />
-        </div>
-      </div>
+        )}
+        <input
+          ref={fileInput}
+          type="file"
+          accept="image/jpeg"
+          multiple
+          hidden
+          onChange={(event) => {
+            upload(event.target.files)
+            event.target.value = ""
+          }}
+        />
+      </SiteSummaryCard>
 
       <Card size="sm">
         <CardContent className="flex flex-col gap-3">

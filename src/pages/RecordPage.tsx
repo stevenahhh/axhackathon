@@ -4,14 +4,14 @@ import { PrinterIcon } from "lucide-react"
 import { Form9Editor } from "@/components/Form9Editor"
 import { Form9Preview } from "@/components/Form9Preview"
 import { PaperFrame } from "@/components/PaperFrame"
-import { SiteStatusBadge } from "@/components/StatusBadges"
+import { SitePicker, SiteSummaryCard, type SiteChip } from "@/components/SitePicker"
 import { ThermalRecord } from "@/components/ThermalRecord"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { SITES, formatCapacity, siteById } from "@/data/sites"
-import type { Summary } from "@/lib/inspection"
-import { hrefOf } from "@/lib/route"
+import { SITES } from "@/data/sites"
+import { missingCells, type Summary } from "@/lib/inspection"
 import { cn } from "@/lib/utils"
+import type { SiteStat } from "@/pages/DashboardPage"
 import type { Inspection, Photo, SiteId } from "@/types"
 
 type Tab = "edit" | "preview" | "thermal"
@@ -21,37 +21,29 @@ export function RecordPage({
   photos,
   inspection,
   summary,
+  stats,
 }: {
   site: SiteId
   photos: Photo[]
   inspection: Inspection
   summary: Summary
+  stats: Record<SiteId, SiteStat>
 }) {
   const [tab, setTab] = useState<Tab>("edit")
-  const info = siteById(site)
+  const chips = Object.fromEntries(
+    SITES.map((item) => {
+      const stat = stats[item.id]
+      const note = stat.inspection.savedAt
+        ? "저장됨"
+        : `미입력 ${missingCells(stat.inspection, stat.summary).count}`
+      return [item.id, { status: stat.status, note }]
+    })
+  ) as Record<SiteId, SiteChip>
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="max-w-full overflow-x-auto">
-          <Tabs
-            value={site}
-            onValueChange={(value) => (window.location.hash = hrefOf({ page: "record", site: value as SiteId }))}
-          >
-            <TabsList className="group-data-horizontal/tabs:h-11">
-              {SITES.map((item) => (
-                <TabsTrigger key={item.id} value={item.id} className="min-w-11 px-3">
-                  {item.name.replace(" 태양광발전소", "")}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        </div>
-        <p className="text-sm text-muted-foreground">
-          {info.region} · {formatCapacity(info.capacityKw)}
-        </p>
-        <SiteStatusBadge status={inspection.savedAt ? "saved" : "record"} />
-      </div>
+      <SitePicker page="record" site={site} chips={chips} />
+      <SiteSummaryCard site={site} status={stats[site].status} />
 
       <Tabs value={tab} onValueChange={(value) => setTab(value as Tab)}>
         <TabsList className="w-full group-data-horizontal/tabs:h-13 lg:w-fit">
