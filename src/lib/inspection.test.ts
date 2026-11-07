@@ -104,6 +104,11 @@ describe("thermalJudgement", () => {
     expect(thermalJudgement({ p1: "29", p2: "25", p3: "", part: "" })).toEqual({ delta: 4, level: "정상" })
   })
 
+  test("treats exactly 5 as normal and exactly 10 as abnormal", () => {
+    expect(thermalJudgement({ p1: "30", p2: "25", p3: "", part: "" })?.level).toBe("정상")
+    expect(thermalJudgement({ p1: "35", p2: "25", p3: "", part: "" })?.level).toBe("이상")
+  })
+
   test("needs at least two readings", () => {
     expect(thermalJudgement({ p1: "30", p2: "", p3: "", part: "" })).toBeNull()
   })
