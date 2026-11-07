@@ -11,33 +11,38 @@ export const SITES: Site[] = [
     id: "A",
     name: "A 태양광발전소",
     region: "경남 하동",
-    capacityKw: 99.0,
-    voltageV: 380,
+    capacityKw: 9000,
+    voltageV: 22900,
     device: "DJI M3T 열화상 드론",
     module: MODULE,
-    pcs: { type: "3상 계통연계형", ratedKw: 100, vinMin: 200, vinMax: 1000, voutV: 380 },
+    pcs: { type: "3상 계통연계형 500kW × 18대", ratedKw: 9000, vinMin: 600, vinMax: 1500, voutV: 380 },
   },
   {
     id: "B",
     name: "B 태양광발전소",
     region: "전남 영광",
-    capacityKw: 98.6,
-    voltageV: 380,
+    capacityKw: 10000,
+    voltageV: 22900,
     device: "DJI M3T 열화상 드론",
     module: MODULE,
-    pcs: { type: "3상 계통연계형", ratedKw: 100, vinMin: 200, vinMax: 1000, voutV: 380 },
+    pcs: { type: "3상 계통연계형 500kW × 20대", ratedKw: 10000, vinMin: 600, vinMax: 1500, voutV: 380 },
   },
   {
     id: "C",
     name: "C 태양광발전소",
     region: "충북 음성",
-    capacityKw: 49.3,
-    voltageV: 380,
+    capacityKw: 1000,
+    voltageV: 22900,
     device: "DJI M3T 열화상 드론",
     module: MODULE,
-    pcs: { type: "3상 계통연계형", ratedKw: 50, vinMin: 200, vinMax: 1000, voutV: 380 },
+    pcs: { type: "3상 계통연계형 500kW × 2대", ratedKw: 1000, vinMin: 600, vinMax: 1500, voutV: 380 },
   },
 ]
+
+export const formatCapacity = (kw: number) =>
+  kw >= 1000 ? `${(kw / 1000).toLocaleString("ko-KR", { maximumFractionDigits: 1 })}MW` : `${kw.toLocaleString("ko-KR")}kW`
+
+export const formatVoltage = (v: number) => (v === 380 ? "380/220V" : `${v.toLocaleString("ko-KR")}V`)
 
 export const siteById = (id: SiteId) => SITES.find((site) => site.id === id) ?? SITES[0]
 

@@ -18,7 +18,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { SITES, siteById } from "@/data/sites"
+import { SITES, formatCapacity, siteById } from "@/data/sites"
 import { classifyPair, predictSolar } from "@/lib/api"
 import { tierOf, totalArea, type Summary } from "@/lib/inspection"
 import { hrefOf } from "@/lib/route"
@@ -298,7 +298,7 @@ export function ReviewPage({
           </Tabs>
         </div>
         <p className="text-sm text-muted-foreground">
-          {siteById(site).region} · {siteById(site).capacityKw}kW
+          {siteById(site).region} · {formatCapacity(siteById(site).capacityKw)}
         </p>
         <div className="flex gap-2 sm:ml-auto">
           <Button

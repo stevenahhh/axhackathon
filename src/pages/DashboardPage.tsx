@@ -27,7 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { CURRENT_YM, HISTORY, SITES, siteById } from "@/data/sites"
+import { CURRENT_YM, HISTORY, SITES, formatCapacity, siteById } from "@/data/sites"
 import type { Summary } from "@/lib/inspection"
 import { hrefOf } from "@/lib/route"
 import { cn } from "@/lib/utils"
@@ -89,7 +89,7 @@ function SiteCard({ site, stat }: { site: Site; stat: SiteStat }) {
           {site.name}
         </CardTitle>
         <CardDescription>
-          {site.region} · {site.capacityKw}kW
+          {site.region} · {formatCapacity(site.capacityKw)}
         </CardDescription>
         <CardAction>
           <SiteStatusBadge status={status} />

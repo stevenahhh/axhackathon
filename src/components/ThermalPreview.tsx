@@ -1,5 +1,5 @@
 import { DetectionImage } from "@/components/DetectionImage"
-import { siteById } from "@/data/sites"
+import { formatVoltage, siteById } from "@/data/sites"
 import { thermalJudgement } from "@/lib/inspection"
 import { cn } from "@/lib/utils"
 import type { Inspection, Photo, SiteId, ThermalEntry, ThermalMode } from "@/types"
@@ -54,7 +54,7 @@ export function ThermalPreview({
   const judgement = thermalJudgement(entry)
   const values = [entry.p1, entry.p2, entry.p3]
   const head = "bg-neutral-100 text-center font-semibold"
-  const voltage = info.voltageV === 380 ? "380/220V" : `${info.voltageV}V`
+  const voltage = formatVoltage(info.voltageV)
 
   return (
     <div className="flex flex-col gap-[4mm] p-[10mm] text-[9.5pt] leading-snug print:p-0">

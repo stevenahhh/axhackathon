@@ -8,7 +8,7 @@ import { SiteStatusBadge } from "@/components/StatusBadges"
 import { ThermalRecord } from "@/components/ThermalRecord"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { SITES, siteById } from "@/data/sites"
+import { SITES, formatCapacity, siteById } from "@/data/sites"
 import type { Summary } from "@/lib/inspection"
 import { hrefOf } from "@/lib/route"
 import { cn } from "@/lib/utils"
@@ -46,7 +46,7 @@ export function RecordPage({
           </TabsList>
         </Tabs>
         <p className="text-sm text-muted-foreground">
-          {info.region} · {info.capacityKw}kW
+          {info.region} · {formatCapacity(info.capacityKw)}
         </p>
         <SiteStatusBadge status={inspection.savedAt ? "saved" : "record"} />
       </div>

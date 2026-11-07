@@ -1,4 +1,4 @@
-import { siteById } from "@/data/sites"
+import { formatVoltage, siteById } from "@/data/sites"
 import {
   FORM9,
   appearanceMark,
@@ -61,7 +61,7 @@ export function Form9Preview({
           <tr>
             <th className={head}>설비용량</th>
             <td className="tabular">
-              {info.capacityKw} kW / {info.voltageV} V
+              {info.capacityKw.toLocaleString("ko-KR")} kW / {formatVoltage(info.voltageV)}
             </td>
             <th className={head}>측정장비</th>
             <td>{info.device}</td>
