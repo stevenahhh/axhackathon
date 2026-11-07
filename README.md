@@ -10,8 +10,8 @@
 ![AgentStream](https://img.shields.io/badge/AgentStream-chatbot-7C3AED)
 
 - 서비스 주소: https://devopen-gpu.jntp-ax.or.kr/i/z-kOTvqeFZjwBkOj/
-- 체험 계정: guest / guest
-- 작업 내용은 브라우저 localStorage에 저장합니다.
+- 체험 계정: guest / guest, test1 / 1234, test2 / 1234, test3 / 1234
+- 작업 내용은 브라우저 localStorage에 계정별로 따로 저장합니다.
 
 ## 문제와 해결
 
@@ -127,6 +127,8 @@ bash scripts/deploy.sh
 | `FUSION_URL`, `FUSION_PATH` | 융합 판정 서빙, 기본은 SV-29e9b912 `/infer` |
 | `AGENTSTREAM_BASE_URL`, `AGENTSTREAM_WORKSPACE_ID`, `AGENTSTREAM_CHATBOT_ID`, `AGENTSTREAM_CHAT_PATH` | AgentStream 연동 정보 |
 | `AGENTSTREAM_API_KEY` | AgentStream API Key, 서버 `.env`에만 둡니다 |
+| `APP_ACCOUNTS` | 로그인 계정 `id:pw,id2:pw2`, 기본 `guest:guest,test1:1234,test2:1234,test3:1234` |
+| `SESSION_SECRET` | 세션 쿠키 서명 키, 없으면 서버를 띄울 때마다 새로 만들어 재시작하면 다시 로그인합니다 |
 
 키가 없으면 종합의견을 템플릿 문장으로 채우고 "자동 문장" 표시를 붙입니다.
 
