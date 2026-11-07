@@ -2,6 +2,7 @@
 
 AIStream 서빙과 AgentStream 챗봇은 브라우저의 CORS 요청을 받지 않으므로 이 서버가 중계한다.
 - POST /api/predict/solar: 서빙 판정을 {width, height, defects[{bbox, area}], source}로 정규화
+- POST /api/classify: 자체 융합 서빙(ir 필수, rgb 선택) 판정을 {label, confidence, probs, irOnlyLabel, usedRgb, source}로 정규화
 - GET /api/health: 서빙 상태와 AgentStream 설정 여부(키 값은 내보내지 않음)
 - POST /api/agent/opinion: 점검 요약 JSON으로 종합의견 초안 요청
 설정은 같은 폴더의 .env(KEY=VALUE)나 환경변수로 받는다.
@@ -47,6 +48,11 @@ SERVING_KIND = os.environ.get("SERVING_KIND", "provided")
 SERVING_SOLAR_PATH = os.environ.get(
     "SERVING_SOLAR_PATH", "/predict/solar" if SERVING_KIND == "provided" else "/predict"
 )
+FUSION_URL = os.environ.get(
+    "FUSION_URL", "https://aiopen-serving.jntp-ax.or.kr/jntp-cpu/SV-29e9b912"
+).rstrip("/")
+FUSION_PATH = os.environ.get("FUSION_PATH", "/infer")
+FUSION_LABELS = ("normal", "defect", "non_panel")
 AGENT_BASE_URL = os.environ.get("AGENTSTREAM_BASE_URL", "").rstrip("/")
 AGENT_API_KEY = os.environ.get("AGENTSTREAM_API_KEY", "")
 AGENT_CHATBOT_ID = os.environ.get("AGENTSTREAM_CHATBOT_ID", "")
@@ -159,7 +165,11 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         route = PREFIX.sub("", self.path).split("?", 1)[0]
-        handlers = {"/api/predict/solar": self.predict_solar, "/api/agent/opinion": self.agent_opinion}
+        handlers = {
+            "/api/predict/solar": self.predict_solar,
+            "/api/classify": self.classify,
+            "/api/agent/opinion": self.agent_opinion,
+        }
         if route not in handlers:
             return self.send_json(404, {"error": "없는 경로입니다."})
         try:
@@ -204,13 +214,59 @@ class Handler(SimpleHTTPRequestHandler):
             "source": "provided" if SERVING_KIND == "provided" else "own",
         }
 
-    def health(self) -> dict:
+    def classify(self) -> tuple[int, dict]:
+        if not int(self.headers.get("Content-Length") or 0):
+            raise RelayError(400, "열화상 사진(ir)을 보내 주세요.")
+        body = self.read_body(MAX_UPLOAD, "사진은 합쳐서 30MB 이하로 올려 주세요.")
+        request = urllib.request.Request(
+            FUSION_URL + FUSION_PATH,
+            data=body,
+            headers={"Content-Type": self.headers.get("Content-Type", "application/octet-stream")},
+            method="POST",
+        )
         try:
-            status, _ = call(urllib.request.Request(SERVING_URL + "/health"), 5)
-            ok = status == 200
-        except (urllib.error.URLError, TimeoutError):
-            ok = False
-        return {"serving": {"ok": ok, "kind": SERVING_KIND}, "agent": {"configured": agent_configured()}}
+            status, raw = call(request, 90)
+        except (urllib.error.URLError, TimeoutError, OSError) as error:
+            raise RelayError(502, f"자체 융합 모델 서빙에 연결하지 못했습니다: {error}")
+        try:
+            data = json.loads(raw)
+        except ValueError:
+            raise RelayError(502, f"자체 융합 모델이 JSON이 아닌 응답을 보냈습니다(HTTP {status}).")
+        if 400 <= status < 500:
+            if status == 422:
+                raise RelayError(422, "열화상 사진(ir)이 빠졌거나 요청 형식이 맞지 않습니다.")
+            detail = data.get("detail") if isinstance(data, dict) else None
+            raise RelayError(status, f"자체 융합 모델이 판정하지 못했습니다: {detail or f'HTTP {status}'}")
+        if status != 200:
+            raise RelayError(502, f"자체 융합 모델 서빙이 응답하지 못했습니다(HTTP {status}).")
+        try:
+            label = data["label"]
+            if label not in FUSION_LABELS:
+                raise ValueError(label)
+            return 200, {
+                "label": label,
+                "confidence": float(data["confidence"]),
+                "probs": {key: float(data["probs"][key]) for key in FUSION_LABELS},
+                "irOnlyLabel": (data.get("ir_only") or {}).get("label"),
+                "usedRgb": bool(data.get("used_rgb")),
+                "source": "own",
+            }
+        except (KeyError, TypeError, ValueError):
+            raise RelayError(502, "자체 융합 모델 응답 형식을 해석하지 못했습니다.")
+
+    def health(self) -> dict:
+        def reachable(url: str, accept: tuple[int, ...]) -> bool:
+            try:
+                status, _ = call(urllib.request.Request(url), 5)
+                return status in accept
+            except (urllib.error.URLError, TimeoutError, OSError):
+                return False
+
+        return {
+            "serving": {"ok": reachable(SERVING_URL + "/health", (200,)), "kind": SERVING_KIND},
+            "fusion": {"ok": reachable(FUSION_URL + "/health", (200, 404))},
+            "agent": {"configured": agent_configured()},
+        }
 
     def agent_opinion(self) -> tuple[int, dict]:
         if not agent_configured():
