@@ -24,6 +24,16 @@ export function ReviewBadge({ review }: { review: Review }) {
   return <Badge variant={variant}>{REVIEW_LABEL[review]}</Badge>
 }
 
+const SOURCE_LABEL: Record<NonNullable<Photo["source"]>, string> = {
+  own: "AIStream 자체 모델",
+  provided: "AIStream 제공 모델",
+}
+
+export function SourceBadge({ source }: { source: Photo["source"] }) {
+  if (!source) return null
+  return <Badge variant={source === "own" ? "info" : "secondary"}>{SOURCE_LABEL[source]}</Badge>
+}
+
 export type SiteStatus = "todo" | "review" | "record" | "saved"
 
 const SITE_STATUS: Record<SiteStatus, { label: string; variant: "outline" | "warning" | "info" | "success" }> = {

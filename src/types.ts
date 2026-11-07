@@ -18,6 +18,7 @@ export type Photo = {
   uploaded?: boolean
   pending?: boolean
   error?: string
+  source?: "own" | "provided"
 }
 
 export type Review = "unset" | "confirmed" | "rejected" | "excluded"
