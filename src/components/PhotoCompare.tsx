@@ -49,7 +49,13 @@ function AlignedRgb({ photo, style }: { photo: Photo; style?: CSSProperties }) {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden bg-black" style={style}>
       {photo.rgbAligned ? (
-        <img src={photo.rgbAligned} alt="" decoding="async" className="absolute inset-0 size-full" />
+        <img
+          key={photo.rgbAligned}
+          src={photo.rgbAligned}
+          alt=""
+          decoding="async"
+          className="motion-fade-in absolute inset-0 size-full"
+        />
       ) : (
         <img
           src={photo.rgb}

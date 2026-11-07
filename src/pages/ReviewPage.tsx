@@ -14,6 +14,8 @@ import {
 import { DetectionImage } from "@/components/DetectionImage"
 import { ReopenButton } from "@/components/Form9Editor"
 import { PhotoCompare } from "@/components/PhotoCompare"
+import { PipelineStatus } from "@/components/PipelineStatus"
+import { SamplePicker } from "@/components/SamplePicker"
 import { SitePicker, SiteSummaryCard, type SiteChip } from "@/components/SitePicker"
 import { FusionBadge, ReviewBadge, SourceBadge, TierBadge } from "@/components/StatusBadges"
 import { Button } from "@/components/ui/button"
@@ -22,7 +24,7 @@ import { Progress } from "@/components/ui/progress"
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SITES } from "@/data/sites"
-import { classifyPair, predictSolar } from "@/lib/api"
+import { alignRgb, classifyPair, predictSolar, type Sample } from "@/lib/api"
 import { tierOf, totalArea, type Summary } from "@/lib/inspection"
 import { useIsDesktop } from "@/lib/media"
 import { hrefOf } from "@/lib/route"
@@ -40,8 +42,46 @@ const PAGE = 48
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error))
 
+// 업로드 사진이 도착하기 전에 카드가 빈 src로 페이지를 다시 요청하지 않게 같은 비율의 빈 그림을 둔다.
+const PLACEHOLDER = `data:image/svg+xml,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="512"><rect width="640" height="512" fill="#1a1118"/></svg>'
+)}`
+
 // 서빙은 요청을 하나씩 처리하므로 한 장씩 순서대로 보낸다.
 let queue = Promise.resolve()
+
+// 서빙이 따뜻하면 네 단계가 1초 안에 끝나 무엇이 돌았는지 보이지 않는다. 단계마다 최소 이 시간만큼은 보여 준다(연산은 그대로 돈다).
+const STAGE_MIN_MS = 900
+const paced = async <T,>(work: Promise<T>): Promise<T> => {
+  const [result] = await Promise.all([work, new Promise((resolve) => setTimeout(resolve, STAGE_MIN_MS))])
+  return result
+}
+
+// 업로드 한 건. 내 컴퓨터 파일은 File로, SD 카드 샘플은 차례가 오면 /drone에서 받아 올린다.
+type UploadSource = {
+  seq: string
+  name: string
+  capturedAt?: string
+  zoom?: number
+  load: () => Promise<{ ir: File; rgb?: File }>
+}
+
+const asFile = async (url: string, name: string) => {
+  const response = await fetch(url)
+  if (!response.ok) throw new Error(`${name}을(를) 불러오지 못했습니다(HTTP ${response.status}).`)
+  return new File([await response.blob()], name, { type: "image/jpeg" })
+}
+
+const fromSample = (sample: Sample): UploadSource => ({
+  seq: sample.seq,
+  name: sample.name,
+  capturedAt: sample.capturedAt,
+  zoom: sample.rgbZoom,
+  load: async () => ({
+    ir: await asFile(sample.ir, sample.name),
+    rgb: sample.rgb ? await asFile(sample.rgb, sample.name.replace(/_T\.JPG$/i, "_V.JPG")) : undefined,
+  }),
+})
 
 function PhotoDetail({
   photo,
@@ -69,9 +109,9 @@ function PhotoDetail({
             <h2 className="text-lg font-semibold">{title}</h2>
           )}
           {inSheet ? (
-            <SheetDescription>{photo.capturedAt}</SheetDescription>
+            <SheetDescription className="truncate">{photo.name ?? photo.capturedAt}</SheetDescription>
           ) : (
-            <p className="text-sm text-muted-foreground">{photo.capturedAt}</p>
+            <p className="truncate text-sm text-muted-foreground">{photo.name ?? photo.capturedAt}</p>
           )}
         </div>
         <div className="flex shrink-0 flex-wrap justify-end gap-1.5 pt-0.5">
@@ -89,6 +129,7 @@ function PhotoDetail({
 
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-4">
         <PhotoCompare photo={photo} caption={`열화상 · AI 후보 ${undecidable ? "-" : `${boxes}곳`}`} />
+        {photo.stage && <PipelineStatus stage={photo.stage} hasRgb={!!photo.rgb} error={photo.error} />}
         <dl className="grid grid-cols-3 gap-2 text-center">
           {[
             ["후보 위치", `${boxes}곳`],
@@ -113,14 +154,16 @@ function PhotoDetail({
               AIStream 자체 융합 모델
               {"usedRgb" in photo.fusion && !photo.fusion.usedRgb && " · 열화상만"}
             </span>
-            <FusionBadge fusion={photo.fusion} />
+            <FusionBadge fusion={photo.fusion} live={!!photo.stage} />
           </div>
         )}
         {photo.fusion && "error" in photo.fusion && (
           <p className="text-sm text-destructive">융합 판정을 받지 못했습니다. {photo.fusion.error}</p>
         )}
-        {photo.pending && <p className="text-sm text-muted-foreground">AIStream 서빙이 핫스팟을 찾고 있습니다.</p>}
-        {photo.error && <p className="text-sm text-destructive">판정하지 못했습니다. {photo.error}</p>}
+        {photo.pending && !photo.stage && (
+          <p className="text-sm text-muted-foreground">AIStream 서빙이 핫스팟을 찾고 있습니다.</p>
+        )}
+        {photo.error && !photo.stage && <p className="text-sm text-destructive">판정하지 못했습니다. {photo.error}</p>}
       </div>
 
       <div className="flex flex-col gap-2 border-t p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
@@ -185,6 +228,7 @@ export function ReviewPage({
   }
   const [selectedId, setSelectedId] = useState<string>()
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [pickerOpen, setPickerOpen] = useState(false)
   const fileInput = useRef<HTMLInputElement>(null)
   const isDesktop = useIsDesktop()
   const reviewOf = (photo: Photo) => inspection.reviews[photo.id] ?? "unset"
@@ -227,9 +271,9 @@ export function ReviewPage({
     } else setSheetOpen(false)
   }
 
-  function upload(list: FileList | null) {
+  function uploadFiles(list: FileList | null) {
     const all = Array.from(list ?? [])
-    // DJI 실화상(_V)은 같은 번호의 열화상과 짝지어 융합 판정에만 쓴다.
+    // DJI 실화상(_V)은 같은 번호의 열화상과 짝지어 융합 판정과 정렬에 쓴다.
     const rgbBySeq = new Map<string, File>()
     const files: File[] = []
     for (const file of all) {
@@ -244,52 +288,90 @@ export function ReviewPage({
         })
       return
     }
+    run(
+      files.map((file) => {
+        const seq = file.name.match(/_(\d{4})_T\b/i)?.[1] ?? file.name.replace(/\.[^.]+$/, "")
+        return { seq, name: file.name, load: async () => ({ ir: file, rgb: rgbBySeq.get(seq) }) }
+      })
+    )
+  }
+
+  // 업로드 한 장마다 수신 → 핫스팟 탐지 → 융합 판정 → 실화상 정렬을 순서대로 돌리고 단계마다 화면에 반영한다.
+  function run(sources: UploadSource[]) {
     const stamp = Date.now()
-    const added: Photo[] = files.map((file, index) => {
-      const seq = file.name.match(/_(\d{4})_T\b/i)?.[1] ?? file.name.replace(/\.[^.]+$/, "")
-      const rgb = rgbBySeq.get(seq)
-      return {
-        id: `U_${stamp}_${index}`,
-        site,
-        seq,
-        capturedAt: new Date().toLocaleString("sv-SE"),
-        ir: URL.createObjectURL(file),
-        rgb: rgb && URL.createObjectURL(rgb),
-        width: 640,
-        height: 512,
-        boxes: [],
-        folder: "unknown",
-        uploaded: true,
-        pending: true,
-        fusion: { pending: true },
-      }
-    })
+    const added: Photo[] = sources.map((source, index) => ({
+      id: `U_${stamp}_${index}`,
+      site,
+      seq: source.seq,
+      name: source.name,
+      capturedAt: source.capturedAt ?? new Date().toLocaleString("sv-SE"),
+      ir: PLACEHOLDER,
+      rgbZoom: source.zoom,
+      width: 640,
+      height: 512,
+      boxes: [],
+      folder: "unknown",
+      uploaded: true,
+      pending: true,
+      stage: "queued",
+      fusion: { pending: true },
+    }))
     addUploads(added)
     setFilter("all")
     open(added[0].id)
     added.forEach((photo, index) => {
-      const file = files[index]
+      const source = sources[index]
+      // 사진 수신은 바로 시작해 카드에 먼저 보이고, 서빙 호출만 차례를 기다린다.
+      const loading = source.load().then((files) => {
+        patchUpload(photo.id, { ir: URL.createObjectURL(files.ir), rgb: files.rgb && URL.createObjectURL(files.rgb) })
+        return files
+      })
+      loading.catch(() => undefined)
       queue = queue.then(async () => {
+        let ir: File
+        let rgb: File | undefined
         try {
-          const result = await predictSolar(file)
+          ;({ ir, rgb } = await paced(loading))
+        } catch (error) {
+          patchUpload(photo.id, { pending: false, error: errorMessage(error), stage: "error" })
+          toast.error(`${source.name}을(를) 받지 못했습니다`, { description: errorMessage(error) })
+          return
+        }
+        patchUpload(photo.id, { stage: "detecting" })
+        try {
+          const result = await paced(predictSolar(ir))
           patchUpload(photo.id, {
             pending: false,
             width: result.width,
             height: result.height,
             boxes: result.defects.map(({ bbox, area }) => ({ bbox, area })),
             source: result.source,
+            stage: "classifying",
           })
         } catch (error) {
-          patchUpload(photo.id, { pending: false, error: errorMessage(error) })
-          toast.error(`${file.name} 핫스팟 판정에 실패했습니다`, { description: errorMessage(error) })
+          patchUpload(photo.id, { pending: false, error: errorMessage(error), stage: "error" })
+          toast.error(`${source.name} 핫스팟 판정에 실패했습니다`, { description: errorMessage(error) })
+          return
         }
         try {
-          const { label, confidence, probs, usedRgb } = await classifyPair(file, rgbBySeq.get(photo.seq))
+          const { label, confidence, probs, usedRgb } = await paced(classifyPair(ir, rgb))
           patchUpload(photo.id, { fusion: { label, confidence, probs, usedRgb } })
         } catch (error) {
           patchUpload(photo.id, { fusion: { error: errorMessage(error) } })
-          toast.error(`${file.name} 융합 판정에 실패했습니다`, { description: errorMessage(error) })
+          toast.error(`${source.name} 융합 판정에 실패했습니다`, { description: errorMessage(error) })
         }
+        if (rgb) {
+          patchUpload(photo.id, { stage: "aligning" })
+          try {
+            const aligned = await paced(alignRgb(rgb, source.zoom))
+            patchUpload(photo.id, { rgbAligned: URL.createObjectURL(aligned) })
+          } catch (error) {
+            toast.warning(`${source.name} 실화상 정렬에 실패했습니다`, {
+              description: `${errorMessage(error)} 줌 기준 배율로만 겹칩니다.`,
+            })
+          }
+        }
+        patchUpload(photo.id, { stage: "done" })
       })
     })
   }
@@ -312,11 +394,18 @@ export function ReviewPage({
           variant="outline"
           className={cn(TOUCH_BUTTON, "flex-1 sm:flex-none")}
           disabled={locked}
-          onClick={() => fileInput.current?.click()}
+          onClick={() => setPickerOpen(true)}
         >
           <ImageUpIcon />
           열화상 추가
         </Button>
+        <SamplePicker
+          open={pickerOpen}
+          onOpenChange={setPickerOpen}
+          site={site}
+          onUpload={(samples) => run(samples.map(fromSample))}
+          onPickFiles={() => fileInput.current?.click()}
+        />
         {!done && (
           <Button
             variant="outline"
@@ -335,7 +424,7 @@ export function ReviewPage({
           multiple
           hidden
           onChange={(event) => {
-            upload(event.target.files)
+            uploadFiles(event.target.files)
             event.target.value = ""
           }}
         />
@@ -413,7 +502,7 @@ export function ReviewPage({
                     review !== "unset" && "opacity-70"
                   )}
                 >
-                  <DetectionImage photo={photo} boxClassName="border" loading="lazy" />
+                  <DetectionImage photo={photo} boxClassName="border" loading="lazy" stage={photo.stage} />
                   <div className="flex flex-col gap-1.5 p-2.5">
                     <div className="flex items-center justify-between gap-2">
                       <span className="truncate text-sm font-medium">{photo.seq}번</span>
@@ -421,9 +510,12 @@ export function ReviewPage({
                         {photo.pending || photo.error ? "-" : `${totalArea(photo)}px²`}
                       </span>
                     </div>
+                    {photo.stage && photo.stage !== "done" && (
+                      <PipelineStatus stage={photo.stage} hasRgb={!!photo.rgb} error={photo.error} compact />
+                    )}
                     <div className="flex flex-wrap gap-1">
                       <TierBadge photo={photo} />
-                      <FusionBadge fusion={photo.fusion} />
+                      <FusionBadge fusion={photo.fusion} live={!!photo.stage} />
                       {review !== "unset" && <ReviewBadge review={review} />}
                     </div>
                   </div>

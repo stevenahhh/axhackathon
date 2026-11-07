@@ -4,6 +4,10 @@ export type Box = { bbox: number[]; area: number }
 
 export type Folder = "abnormal" | "normal" | "outside" | "unknown"
 
+// 업로드한 사진의 실시간 연산 단계. queued는 차례 대기, detecting은 핫스팟 탐지(AIStream 제공 서빙),
+// classifying은 열·실화상 융합 판정(자체 서빙), aligning은 실화상을 열화상 틀로 정렬. 실화상이 없으면 aligning을 건너뛴다.
+export type Stage = "queued" | "detecting" | "classifying" | "aligning" | "done" | "error"
+
 export type Photo = {
   id: string
   site: SiteId
@@ -22,6 +26,9 @@ export type Photo = {
   uploaded?: boolean
   pending?: boolean
   error?: string
+  // 업로드 사진의 원본 파일 이름(DJI_..._T.JPG)과 현재 연산 단계. 미리 실린 사진에는 없다.
+  name?: string
+  stage?: Stage
   source?: "own" | "provided"
   // AIStream 자체 융합 모델(열화상+실화상) 판정. 업로드 사진은 판정 전 pending, 실패 시 error를 담는다.
   fusion?:
