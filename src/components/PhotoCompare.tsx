@@ -1,85 +1,43 @@
-import { useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react"
-import { ChevronsLeftRightIcon } from "lucide-react"
+import { useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode, type Ref } from "react"
+import { ChevronsLeftRightIcon, Maximize2Icon } from "lucide-react"
 
+import { AlignedRgb, COMPARE_LABEL } from "@/components/AlignedRgb"
 import { DetectionImage } from "@/components/DetectionImage"
+import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { COMPARE_MODES, clamp, rgbNarrower, type CompareMode } from "@/lib/compare"
 import { cn } from "@/lib/utils"
 import type { Photo } from "@/types"
 
-type Mode = "wipe" | "overlap" | "side"
-
-const MODES: { value: Mode; label: string }[] = [
-  { value: "wipe", label: "슬라이더" },
-  { value: "overlap", label: "오버랩" },
-  { value: "side", label: "나란히" },
-]
-const STORAGE_KEY = "suntek.compareMode"
-
-// DJI M3T 열화상 화각은 줌 1.0 광각 실화상(4000x3000)의 가운데 2544x2040이다(짝 사진 24쌍 실측).
-// 실화상 줌이 z면 열화상 화각은 실화상의 가로 63.6%·z, 세로 68%·z에 해당한다. 그 역수만큼 실화상을
-// 키우거나(줌 1.0이면 157%) 줄여서(줌 1.95면 81%) 가운데에 두면 열화상 좌표의 박스가 두 사진 모두에 맞는다.
-const IR_FRACTION = { x: 2544 / 4000, y: 2040 / 3000 }
-
-function alignedRgbStyle(zoom = 1): CSSProperties {
-  const scaleX = 1 / (IR_FRACTION.x * zoom)
-  const scaleY = 1 / (IR_FRACTION.y * zoom)
-  return {
-    width: `${scaleX * 100}%`,
-    height: `${scaleY * 100}%`,
-    left: `${((1 - scaleX) / 2) * 100}%`,
-    top: `${((1 - scaleY) / 2) * 100}%`,
-  }
-}
-
-// 줌이 약 1.47을 넘으면 실화상이 열화상 화각보다 좁아 가장자리가 비된다.
-function rgbNarrower(photo: Photo) {
-  return (photo.rgbZoom ?? 1) * IR_FRACTION.y > 1
-}
-
-const LABEL = "pointer-events-none absolute top-2 rounded-md bg-black/60 px-1.5 py-0.5 text-xs font-medium text-white"
-
-function readMode(): Mode {
-  const saved = localStorage.getItem(STORAGE_KEY)
-  return MODES.some((mode) => mode.value === saved) ? (saved as Mode) : "wipe"
-}
-
-function AlignedRgb({ photo, style }: { photo: Photo; style?: CSSProperties }) {
-  // 서버가 렌즈 왜곡까지 맞춘 정렬본이 있으면 그대로 덮고, 없으면(업로드 사진) 줌 기준 배율로 맞춘다.
-  // 실화상이 덧지 않는 가장자리는 검게 비워, 비치는 열화상이 실화상처럼 보이지 않게 한다.
+function ExpandButton({ onClick, ref }: { onClick: () => void; ref?: Ref<HTMLButtonElement> }) {
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden bg-black" style={style}>
-      {photo.rgbAligned ? (
-        <img
-          key={photo.rgbAligned}
-          src={photo.rgbAligned}
-          alt=""
-          decoding="async"
-          className="motion-fade-in absolute inset-0 size-full"
-        />
-      ) : (
-        <img
-          src={photo.rgb}
-          alt=""
-          decoding="async"
-          className="absolute max-w-none"
-          style={alignedRgbStyle(photo.rgbZoom)}
-        />
-      )}
-    </div>
+    <Button
+      ref={ref}
+      type="button"
+      variant="ghost"
+      size="icon"
+      aria-label="크게 보기"
+      data-slot="compare-expand"
+      className="absolute top-2 right-2 size-11 bg-black/60 text-white hover:bg-black/75 hover:text-white lg:size-8"
+      onClick={onClick}
+    >
+      <Maximize2Icon />
+    </Button>
   )
 }
 
-function WipeCompare({ photo }: { photo: Photo }) {
+function WipeCompare({ photo, children }: { photo: Photo; children?: ReactNode }) {
   const [split, setSplit] = useState(50)
   const frame = useRef<HTMLDivElement>(null)
 
   function moveTo(clientX: number) {
     const rect = frame.current?.getBoundingClientRect()
     if (!rect?.width) return
-    setSplit(Math.min(100, Math.max(0, ((clientX - rect.left) / rect.width) * 100)))
+    setSplit(clamp(((clientX - rect.left) / rect.width) * 100, 0, 100))
   }
 
   function onPointerDown(event: PointerEvent<HTMLDivElement>) {
+    if ((event.target as Element).closest("button")) return
     event.currentTarget.setPointerCapture(event.pointerId)
     moveTo(event.clientX)
   }
@@ -92,7 +50,7 @@ function WipeCompare({ photo }: { photo: Photo }) {
     const step = { ArrowLeft: -5, ArrowRight: 5, Home: -100, End: 100 }[event.key]
     if (step === undefined) return
     event.preventDefault()
-    setSplit((value) => Math.min(100, Math.max(0, value + step)))
+    setSplit((value) => clamp(value + step, 0, 100))
   }
 
   return (
@@ -108,8 +66,8 @@ function WipeCompare({ photo }: { photo: Photo }) {
         className="rounded-lg"
         layer={<AlignedRgb photo={photo} style={{ clipPath: `inset(0 0 0 ${split}%)` }} />}
       >
-        <span className={cn(LABEL, "left-2")}>열화상</span>
-        <span className={cn(LABEL, "right-2")}>실화상</span>
+        <span className={cn(COMPARE_LABEL, "left-2")}>열화상</span>
+        <span className={cn(COMPARE_LABEL, "right-2")}>실화상</span>
         <div
           className="pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-white shadow-[0_0_0_1px_rgb(0_0_0/0.4)]"
           style={{ left: `${split}%` }}
@@ -122,18 +80,20 @@ function WipeCompare({ photo }: { photo: Photo }) {
           aria-valuemax={100}
           aria-valuenow={Math.round(split)}
           aria-valuetext={`실화상 ${Math.round(100 - split)}% 표시`}
+          data-slot="compare-handle"
           onKeyDown={onKeyDown}
           className="absolute top-1/2 flex size-11 -translate-1/2 items-center justify-center rounded-full bg-white text-black shadow-md ring-1 ring-black/30 outline-none focus-visible:ring-3 focus-visible:ring-ring"
           style={{ left: `${split}%` }}
         >
           <ChevronsLeftRightIcon className="size-5" />
         </div>
+        {children}
       </DetectionImage>
     </div>
   )
 }
 
-function OverlapCompare({ photo }: { photo: Photo }) {
+function OverlapCompare({ photo, children }: { photo: Photo; children?: ReactNode }) {
   const [opacity, setOpacity] = useState(50)
   return (
     <div className="flex flex-col gap-1" data-slot="compare-overlap">
@@ -155,25 +115,37 @@ function OverlapCompare({ photo }: { photo: Photo }) {
         className="rounded-lg"
         layer={<AlignedRgb photo={photo} style={{ opacity: opacity / 100 }} />}
       >
-        <span className={cn(LABEL, "left-2")}>0% 열화상</span>
-        <span className={cn(LABEL, "right-2")}>100% 실화상</span>
+        <span className={cn(COMPARE_LABEL, "left-2")}>0% 열화상</span>
+        <span className={cn(COMPARE_LABEL, "right-2")}>100% 실화상</span>
+        {children}
       </DetectionImage>
     </div>
   )
 }
 
-export function PhotoCompare({ photo, caption }: { photo: Photo; caption: string }) {
-  const [mode, setMode] = useState<Mode>(readMode)
-
-  function choose(value: Mode) {
-    setMode(value)
-    localStorage.setItem(STORAGE_KEY, value)
-  }
+export function PhotoCompare({
+  photo,
+  caption,
+  mode,
+  onModeChange,
+  onExpand,
+  expandRef,
+}: {
+  photo: Photo
+  caption: string
+  mode: CompareMode
+  onModeChange: (mode: CompareMode) => void
+  onExpand: () => void
+  expandRef?: Ref<HTMLButtonElement>
+}) {
+  const expand = <ExpandButton ref={expandRef} onClick={onExpand} />
 
   if (!photo.rgb) {
     return (
       <figure className="flex flex-col gap-1">
-        <DetectionImage photo={photo} className="rounded-lg" />
+        <DetectionImage photo={photo} className="rounded-lg">
+          {expand}
+        </DetectionImage>
         <figcaption className="text-xs text-muted-foreground">{caption}</figcaption>
       </figure>
     )
@@ -181,12 +153,9 @@ export function PhotoCompare({ photo, caption }: { photo: Photo; caption: string
 
   return (
     <div className="flex flex-col gap-2">
-      <Tabs value={mode} onValueChange={(value) => choose(value as Mode)}>
-        <TabsList
-          className="w-full group-data-horizontal/tabs:h-auto"
-          aria-label="사진 비교 방식"
-        >
-          {MODES.map(({ value, label }) => (
+      <Tabs value={mode} onValueChange={(value) => onModeChange(value as CompareMode)}>
+        <TabsList className="w-full group-data-horizontal/tabs:h-auto" aria-label="사진 비교 방식">
+          {COMPARE_MODES.map(({ value, label }) => (
             <TabsTrigger key={value} value={value} className="h-11 lg:h-7">
               {label}
             </TabsTrigger>
@@ -196,7 +165,9 @@ export function PhotoCompare({ photo, caption }: { photo: Photo; caption: string
       {mode === "side" ? (
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
           <figure className="flex flex-col gap-1">
-            <DetectionImage photo={photo} className="rounded-lg" />
+            <DetectionImage photo={photo} className="rounded-lg">
+              {expand}
+            </DetectionImage>
             <figcaption className="text-xs text-muted-foreground">{caption}</figcaption>
           </figure>
           <figure className="flex flex-col gap-1">
@@ -204,6 +175,7 @@ export function PhotoCompare({ photo, caption }: { photo: Photo; caption: string
               src={photo.rgb}
               alt={`${photo.seq}번 실화상`}
               decoding="async"
+              draggable={false}
               className="aspect-[4/3] w-full rounded-lg bg-muted object-cover"
             />
             <figcaption className="text-xs text-muted-foreground">같은 시각 실화상</figcaption>
@@ -211,7 +183,11 @@ export function PhotoCompare({ photo, caption }: { photo: Photo; caption: string
         </div>
       ) : (
         <figure className="flex flex-col gap-1">
-          {mode === "wipe" ? <WipeCompare photo={photo} /> : <OverlapCompare photo={photo} />}
+          {mode === "wipe" ? (
+            <WipeCompare photo={photo}>{expand}</WipeCompare>
+          ) : (
+            <OverlapCompare photo={photo}>{expand}</OverlapCompare>
+          )}
           <figcaption className="text-xs text-muted-foreground">
             {caption} ·{" "}
             {rgbNarrower(photo)

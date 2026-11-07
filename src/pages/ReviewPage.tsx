@@ -1,20 +1,12 @@
 import { useRef, useState } from "react"
 import { toast } from "sonner"
-import {
-  ArrowRightIcon,
-  BanIcon,
-  CheckCircle2Icon,
-  FlameIcon,
-  ImageUpIcon,
-  LockIcon,
-  RotateCcwIcon,
-  XIcon,
-} from "lucide-react"
+import { ArrowRightIcon, CheckCircle2Icon, ImageUpIcon, LockIcon, XIcon } from "lucide-react"
 
 import { DetectionImage } from "@/components/DetectionImage"
-import { ReopenButton } from "@/components/Form9Editor"
 import { PhotoCompare } from "@/components/PhotoCompare"
+import { PhotoViewer } from "@/components/PhotoViewer"
 import { PipelineStatus } from "@/components/PipelineStatus"
+import { ReviewActions } from "@/components/ReviewActions"
 import { SamplePicker } from "@/components/SamplePicker"
 import { SitePicker, SiteSummaryCard, type SiteChip } from "@/components/SitePicker"
 import { FusionBadge, ReviewBadge, SourceBadge, TierBadge } from "@/components/StatusBadges"
@@ -25,6 +17,7 @@ import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle } from "@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SITES } from "@/data/sites"
 import { alignRgb, classifyPair, predictSolar, type Sample } from "@/lib/api"
+import { useCompareMode } from "@/lib/compare"
 import { tierOf, totalArea, type Summary } from "@/lib/inspection"
 import { useIsDesktop } from "@/lib/media"
 import { hrefOf } from "@/lib/route"
@@ -88,17 +81,26 @@ function PhotoDetail({
   review,
   locked,
   inSheet,
+  prev,
+  next,
+  onSelect,
   onReview,
 }: {
   photo: Photo
   review: Review
   locked: boolean
   inSheet: boolean
+  prev?: Photo
+  next?: Photo
+  onSelect: (photoId: string) => void
   onReview: (review: Review) => void
 }) {
   const boxes = photo.boxes.length
   const undecidable = photo.pending || !!photo.error
   const title = `${photo.seq}번 사진`
+  const [mode, setMode] = useCompareMode()
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const expandButton = useRef<HTMLButtonElement>(null)
   return (
     <>
       <div className="flex items-start gap-3 px-4 pt-4 pb-3">
@@ -128,7 +130,14 @@ function PhotoDetail({
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-4">
-        <PhotoCompare photo={photo} caption={`열화상 · AI 후보 ${undecidable ? "-" : `${boxes}곳`}`} />
+        <PhotoCompare
+          photo={photo}
+          caption={`열화상 · AI 후보 ${undecidable ? "-" : `${boxes}곳`}`}
+          mode={mode}
+          onModeChange={setMode}
+          onExpand={() => setViewerOpen(true)}
+          expandRef={expandButton}
+        />
         {photo.stage && <PipelineStatus stage={photo.stage} hasRgb={!!photo.rgb} error={photo.error} />}
         <dl className="grid grid-cols-3 gap-2 text-center">
           {[
@@ -166,43 +175,24 @@ function PhotoDetail({
         {photo.error && !photo.stage && <p className="text-sm text-destructive">판정하지 못했습니다. {photo.error}</p>}
       </div>
 
-      <div className="flex flex-col gap-2 border-t p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-        {locked ? (
-          <>
-            <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <LockIcon className="size-4 shrink-0" />
-              기록표를 저장해 판정이 잠겼습니다.
-            </p>
-            <ReopenButton site={photo.site} />
-          </>
-        ) : (
-          <>
-            <Button
-              variant="destructive"
-              className="h-11 bg-destructive text-white hover:bg-destructive/90 dark:bg-destructive dark:text-[oklch(0.145_0_0)]"
-              disabled={undecidable}
-              onClick={() => onReview("confirmed")}
-            >
-              <FlameIcon />
-              핫스팟으로 확정
-            </Button>
-            <div className="grid grid-cols-3 gap-2">
-              <Button variant="outline" className="h-11" disabled={undecidable} onClick={() => onReview("rejected")}>
-                <XIcon />
-                오탐
-              </Button>
-              <Button variant="outline" className="h-11" disabled={undecidable} onClick={() => onReview("excluded")}>
-                <BanIcon />
-                패널 외
-              </Button>
-              <Button variant="ghost" className="h-11" disabled={review === "unset"} onClick={() => onReview("unset")}>
-                <RotateCcwIcon />
-                되돌리기
-              </Button>
-            </div>
-          </>
-        )}
+      <div className="border-t p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <ReviewActions photo={photo} review={review} locked={locked} onReview={onReview} />
       </div>
+
+      <PhotoViewer
+        open={viewerOpen}
+        onOpenChange={setViewerOpen}
+        photo={photo}
+        review={review}
+        locked={locked}
+        mode={mode}
+        onModeChange={setMode}
+        prev={prev}
+        next={next}
+        onSelect={onSelect}
+        onReview={onReview}
+        returnFocus={expandButton}
+      />
     </>
   )
 }
@@ -252,23 +242,31 @@ export function ReviewPage({
     ])
   ) as Record<SiteId, SiteChip>
 
+  const position = selected ? visible.findIndex((photo) => photo.id === selected.id) : -1
+  const prev = position > 0 ? visible[position - 1] : undefined
+  const next = position >= 0 ? visible[position + 1] : undefined
+
   function open(photoId: string) {
     setSelectedId(photoId)
     if (!isDesktop) setSheetOpen(true)
+  }
+
+  // 목록에서 보이지 않는 사진을 고르면 그 사진까지 카드를 더 그린다.
+  function select(photo: Photo) {
+    setSelectedId(photo.id)
+    const shownUpTo = Math.ceil((visible.indexOf(photo) + 1) / PAGE) * PAGE
+    setLimit((current) => Math.max(current, shownUpTo))
   }
 
   function decide(review: Review) {
     if (!selected) return
     setReview(site, selected.id, review)
     if (review === "unset") return
-    const next = visible.find(
+    const pending = visible.find(
       (photo) => photo.id !== selected.id && !photo.pending && !photo.error && reviewOf(photo) === "unset"
     )
-    if (next) {
-      setSelectedId(next.id)
-      const shownUpTo = Math.ceil((visible.indexOf(next) + 1) / PAGE) * PAGE
-      setLimit((current) => Math.max(current, shownUpTo))
-    } else setSheetOpen(false)
+    if (pending) select(pending)
+    else setSheetOpen(false)
   }
 
   function uploadFiles(list: FileList | null) {
@@ -382,6 +380,12 @@ export function ReviewPage({
       review={reviewOf(selected)}
       locked={locked}
       inSheet={!isDesktop}
+      prev={prev}
+      next={next}
+      onSelect={(photoId) => {
+        const photo = photos.find((item) => item.id === photoId)
+        if (photo) select(photo)
+      }}
       onReview={decide}
     />
   )

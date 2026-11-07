@@ -51,6 +51,7 @@ export function DetectionImage({
         height={photo.height}
         loading={loading}
         decoding="async"
+        draggable={false}
         className="block h-auto w-full"
       />
       {layer}
