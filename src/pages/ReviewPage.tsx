@@ -93,7 +93,7 @@ function PhotoDetail({
         <div className={cn("grid gap-2", photo.rgb && "sm:grid-cols-2 lg:grid-cols-1")}>
           <figure className="flex flex-col gap-1">
             <DetectionImage photo={photo} className="rounded-lg" />
-            <figcaption className="text-xs text-muted-foreground">열화상 · AI 후보 {boxes}곳</figcaption>
+            <figcaption className="text-xs text-muted-foreground">열화상 · AI 후보 {undecidable ? "-" : `${boxes}곳`}</figcaption>
           </figure>
           {photo.rgb && (
             <figure className="flex flex-col gap-1">
