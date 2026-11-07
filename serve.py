@@ -5,18 +5,24 @@ AIStream 서빙과 AgentStream 챗봇은 브라우저의 CORS 요청을 받지 �
 - POST /api/classify: 자체 융합 서빙(ir 필수, rgb 선택) 판정을 {label, confidence, probs, irOnlyLabel, usedRgb, source}로 정규화
 - GET /api/health: 서빙 상태와 AgentStream 설정 여부(키 값은 내보내지 않음)
 - POST /api/agent/opinion: 점검 요약 JSON으로 종합의견 초안 요청(agentstream.py)
+- GET /api/samples[?site=A]: 샘플 업로드 피커에 보여 줄 짝 사진 목록(같은 폴더의 samples.json, scripts/split_samples.py가 만든다)
+- POST /api/align: multipart rgb(필수)·zoom(선택, 없으면 EXIF)으로 실화상을 열화상 틀로 리매핑한 JPEG를 돌려준다(scripts/align.py, numpy·pillow 필요)
 설정은 같은 폴더의 .env(KEY=VALUE)나 환경변수로 받는다.
 
 시연 사진은 빌드 밖 DATA_DIR(기본 같은 폴더의 data/)의 drone/에서 /drone/<파일>로 제공한다.
 배포가 dist/를 갈아 끼워도 사진은 지워지지 않는다. 로컬 개발은 DATA_DIR=data-demo로 띄운다.
 """
 import gzip
+import io
 import json
 import os
 import re
+import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+from email.parser import BytesParser
+from email.policy import HTTP
 from functools import lru_cache
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -24,6 +30,9 @@ from pathlib import Path
 import agentstream
 
 ROOT = Path(__file__).parent
+SAMPLES_JSON = ROOT / "samples.json"
+EXIF_IFD, EXIF_DIGITAL_ZOOM = 0x8769, 0xA404
+sys.path.insert(0, str(ROOT / "scripts"))
 
 
 def load_env(path: Path) -> None:
@@ -71,6 +80,32 @@ class RelayError(Exception):
 @lru_cache(maxsize=32)
 def compressed(path: str, mtime: float) -> bytes:
     return gzip.compress(Path(path).read_bytes(), 6)
+
+
+@lru_cache(maxsize=4)
+def samples(mtime: float) -> list[dict]:
+    return json.loads(SAMPLES_JSON.read_text(encoding="utf-8"))
+
+
+def parse_multipart(content_type: str, body: bytes) -> dict[str, bytes]:
+    """multipart/form-data를 {필드이름: 바이트}로 풀어 준다. 표준 cgi 모듈이 없어지므로 email 파서를 쓴다."""
+    if not content_type.startswith("multipart/form-data"):
+        raise RelayError(400, "multipart/form-data로 보내 주세요.")
+    message = BytesParser(policy=HTTP).parsebytes(b"Content-Type: " + content_type.encode() + b"\r\n\r\n" + body)
+    fields: dict[str, bytes] = {}
+    for part in message.iter_parts():
+        name = part.get_param("name", header="content-disposition")
+        if name:
+            fields[str(name)] = part.get_payload(decode=True) or b""
+    return fields
+
+
+def align_module():
+    try:
+        import align
+    except ImportError as error:
+        raise RelayError(503, f"실화상 정렬 모듈을 불러오지 못했습니다(numpy·pillow 필요): {error}")
+    return align
 
 
 def call(request: urllib.request.Request, timeout: float) -> tuple[int, bytes]:
@@ -122,8 +157,11 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         self.path = PREFIX.sub("", self.path) or "/"
-        if self.path.split("?", 1)[0] == "/api/health":
+        route, _, query = self.path.partition("?")
+        if route == "/api/health":
             return self.send_json(200, self.health())
+        if route == "/api/samples":
+            return self.send_json(200, self.sample_list(query))
         file = Path(self.translate_path(self.path))
         if file.is_dir():
             file = file / "index.html"
@@ -145,6 +183,7 @@ class Handler(SimpleHTTPRequestHandler):
             "/api/predict/solar": self.predict_solar,
             "/api/classify": self.classify,
             "/api/agent/opinion": self.agent_opinion,
+            "/api/align": self.align_rgb,
         }
         if route not in handlers:
             return self.send_json(404, {"error": "없는 경로입니다."})
@@ -152,7 +191,39 @@ class Handler(SimpleHTTPRequestHandler):
             status, payload = handlers[route]()
         except RelayError as error:
             status, payload = error.status, {"error": str(error)}
+        if isinstance(payload, bytes):
+            return self.send_bytes(status, payload, "image/jpeg")
         self.send_json(status, payload)
+
+    def sample_list(self, query: str) -> dict:
+        if not SAMPLES_JSON.is_file():
+            return {"samples": []}
+        site = urllib.parse.parse_qs(query).get("site", [None])[0]
+        rows = samples(SAMPLES_JSON.stat().st_mtime)
+        return {"samples": [row for row in rows if not site or row["site"] == site]}
+
+    def align_rgb(self) -> tuple[int, bytes]:
+        body = self.read_body(MAX_UPLOAD, "실화상은 30MB 이하로 올려 주세요.")
+        fields = parse_multipart(self.headers.get("Content-Type", ""), body)
+        if not fields.get("rgb"):
+            raise RelayError(400, "실화상 사진(rgb)을 보내 주세요.")
+        align = align_module()
+        from PIL import Image
+
+        try:
+            image = Image.open(io.BytesIO(fields["rgb"]))
+            image.load()
+        except Exception as error:  # PIL은 형식마다 다른 예외를 낸다.
+            raise RelayError(400, f"실화상 사진을 읽지 못했습니다: {error}")
+        try:
+            zoom = float(fields["zoom"].decode()) if fields.get("zoom") else None
+        except ValueError:
+            raise RelayError(400, "zoom 값은 숫자여야 합니다.")
+        if zoom is None:
+            zoom = float(image.getexif().get_ifd(EXIF_IFD).get(EXIF_DIGITAL_ZOOM, 1.0))
+        out = io.BytesIO()
+        align.warp_rgb_to_ir(image, zoom).save(out, format="JPEG", quality=85)
+        return 200, out.getvalue()
 
     def read_body(self, limit: int, message: str) -> bytes:
         length = int(self.headers.get("Content-Length") or 0)
@@ -261,9 +332,11 @@ class Handler(SimpleHTTPRequestHandler):
             raise RelayError(502, str(error))
 
     def send_json(self, status: int, payload: dict):
-        body = json.dumps(payload, ensure_ascii=False).encode()
+        self.send_bytes(status, json.dumps(payload, ensure_ascii=False).encode(), "application/json; charset=utf-8")
+
+    def send_bytes(self, status: int, body: bytes, content_type: str):
         self.send_response(status)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
