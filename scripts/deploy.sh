@@ -18,11 +18,11 @@ if [ -d data-demo/drone ]; then
   comm -23 "$list/local" "$list/remote" | cut -d' ' -f1 > "$list/send"
   echo "시연 사진 $(wc -l < "$list/send" | tr -d ' ')장 전송"
   if [ -s "$list/send" ]; then
-    COPYFILE_DISABLE=1 tar -cf - -C data-demo/drone -T "$list/send" | ssh ax "tar -xf - -C $REMOTE_DIR/data/drone"
+    COPYFILE_DISABLE=1 tar --no-xattrs -cf - -C data-demo/drone -T "$list/send" | ssh ax "tar -xf - -C $REMOTE_DIR/data/drone"
   fi
 fi
 
-COPYFILE_DISABLE=1 tar -czf - dist serve.py agentstream.py | ssh ax "rm -rf $REMOTE_DIR/next && mkdir -p $REMOTE_DIR/next && tar -xzf - -C $REMOTE_DIR/next"
+COPYFILE_DISABLE=1 tar --no-xattrs -czf - dist serve.py agentstream.py | ssh ax "rm -rf $REMOTE_DIR/next && mkdir -p $REMOTE_DIR/next && tar -xzf - -C $REMOTE_DIR/next"
 
 # pgrep 패턴은 ^로 고정해 원격 셸(bash -c ...)이나 다른 프로세스와 겹치지 않게 한다.
 ssh ax "set -e
