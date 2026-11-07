@@ -7,8 +7,20 @@ export type Prediction = {
   source: "provided" | "own"
 }
 
+export type FusionLabel = "normal" | "defect" | "non_panel"
+
+export type Classification = {
+  label: FusionLabel
+  confidence: number
+  probs: Record<FusionLabel, number>
+  irOnlyLabel: FusionLabel | null
+  usedRgb: boolean
+  source: "own"
+}
+
 export type Health = {
   serving: { ok: boolean; kind: string }
+  fusion: { ok: boolean }
   agent: { configured: boolean }
 }
 
@@ -25,6 +37,13 @@ export function predictSolar(file: File): Promise<Prediction> {
   const body = new FormData()
   body.append("file", file)
   return request<Prediction>("./api/predict/solar", { method: "POST", body })
+}
+
+export function classifyPair(ir: File | Blob, rgb?: File | Blob): Promise<Classification> {
+  const body = new FormData()
+  body.append("ir", ir)
+  if (rgb) body.append("rgb", rgb)
+  return request<Classification>("./api/classify", { method: "POST", body })
 }
 
 export function fetchHealth(): Promise<Health> {

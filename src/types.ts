@@ -19,6 +19,16 @@ export type Photo = {
   pending?: boolean
   error?: string
   source?: "own" | "provided"
+  // AIStream 자체 융합 모델(열화상+실화상) 판정. 업로드 사진은 판정 전 pending, 실패 시 error를 담는다.
+  fusion?:
+    | {
+        label: "normal" | "defect" | "non_panel"
+        confidence: number
+        probs: Record<"normal" | "defect" | "non_panel", number>
+        usedRgb: boolean
+      }
+    | { pending: true }
+    | { error: string }
 }
 
 export type Review = "unset" | "confirmed" | "rejected" | "excluded"

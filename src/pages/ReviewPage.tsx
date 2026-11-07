@@ -11,14 +11,14 @@ import {
 } from "lucide-react"
 
 import { DetectionImage } from "@/components/DetectionImage"
-import { ReviewBadge, SourceBadge, TierBadge } from "@/components/StatusBadges"
+import { FusionBadge, ReviewBadge, SourceBadge, TierBadge } from "@/components/StatusBadges"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SITES, siteById } from "@/data/sites"
-import { predictSolar } from "@/lib/api"
+import { classifyPair, predictSolar } from "@/lib/api"
 import { tierOf, totalArea, type Summary } from "@/lib/inspection"
 import { hrefOf } from "@/lib/route"
 import { addUploads, patchUpload, setReview } from "@/lib/store"
@@ -125,6 +125,18 @@ function PhotoDetail({
             <SourceBadge source={photo.source} />
           </div>
         )}
+        {photo.fusion && (
+          <div className="flex items-center justify-between gap-3 text-sm">
+            <span className="text-muted-foreground">
+              AIStream 자체 융합 모델
+              {"usedRgb" in photo.fusion && !photo.fusion.usedRgb && " · 열화상만"}
+            </span>
+            <FusionBadge fusion={photo.fusion} />
+          </div>
+        )}
+        {photo.fusion && "error" in photo.fusion && (
+          <p className="text-sm text-destructive">융합 판정을 받지 못했습니다. {photo.fusion.error}</p>
+        )}
         {photo.pending && <p className="text-sm text-muted-foreground">AIStream 서빙이 핫스팟을 찾고 있습니다.</p>}
         {photo.error && <p className="text-sm text-destructive">판정하지 못했습니다. {photo.error}</p>}
       </div>
@@ -215,22 +227,36 @@ export function ReviewPage({
   }
 
   function upload(list: FileList | null) {
-    const files = Array.from(list ?? [])
+    const all = Array.from(list ?? [])
+    // DJI 실화상(_V)은 같은 번호의 열화상과 짝지어 융합 판정에만 쓴다.
+    const rgbBySeq = new Map<string, File>()
+    const files: File[] = []
+    for (const file of all) {
+      const seq = file.name.match(/_(\d{4})_V\b/i)?.[1]
+      if (seq) rgbBySeq.set(seq, file)
+      else files.push(file)
+    }
     if (!files.length) return
     const stamp = Date.now()
-    const added: Photo[] = files.map((file, index) => ({
-      id: `U_${stamp}_${index}`,
-      site,
-      seq: file.name.match(/_(\d{4})_[TV]/)?.[1] ?? file.name.replace(/\.[^.]+$/, ""),
-      capturedAt: new Date().toLocaleString("sv-SE"),
-      ir: URL.createObjectURL(file),
-      width: 640,
-      height: 512,
-      boxes: [],
-      folder: "unknown",
-      uploaded: true,
-      pending: true,
-    }))
+    const added: Photo[] = files.map((file, index) => {
+      const seq = file.name.match(/_(\d{4})_T\b/i)?.[1] ?? file.name.replace(/\.[^.]+$/, "")
+      const rgb = rgbBySeq.get(seq)
+      return {
+        id: `U_${stamp}_${index}`,
+        site,
+        seq,
+        capturedAt: new Date().toLocaleString("sv-SE"),
+        ir: URL.createObjectURL(file),
+        rgb: rgb && URL.createObjectURL(rgb),
+        width: 640,
+        height: 512,
+        boxes: [],
+        folder: "unknown",
+        uploaded: true,
+        pending: true,
+        fusion: { pending: true },
+      }
+    })
     addUploads(added)
     setFilter("all")
     open(added[0].id)
@@ -248,6 +274,12 @@ export function ReviewPage({
           })
         } catch (error) {
           patchUpload(photo.id, { pending: false, error: error instanceof Error ? error.message : String(error) })
+        }
+        try {
+          const { label, confidence, probs, usedRgb } = await classifyPair(file, rgbBySeq.get(photo.seq))
+          patchUpload(photo.id, { fusion: { label, confidence, probs, usedRgb } })
+        } catch (error) {
+          patchUpload(photo.id, { fusion: { error: error instanceof Error ? error.message : String(error) } })
         }
       })
     })
@@ -400,6 +432,7 @@ export function ReviewPage({
                     </div>
                     <div className="flex flex-wrap gap-1">
                       <TierBadge photo={photo} />
+                      <FusionBadge fusion={photo.fusion} />
                       {review !== "unset" && <ReviewBadge review={review} />}
                     </div>
                   </div>

@@ -34,6 +34,24 @@ export function SourceBadge({ source }: { source: Photo["source"] }) {
   return <Badge variant={source === "own" ? "info" : "secondary"}>{SOURCE_LABEL[source]}</Badge>
 }
 
+const FUSION_LABEL = {
+  defect: { label: "결함 의심", variant: "destructive" },
+  normal: { label: "정상", variant: "success" },
+  non_panel: { label: "패널 외", variant: "secondary" },
+} as const
+
+export function FusionBadge({ fusion }: { fusion: Photo["fusion"] }) {
+  if (!fusion) return null
+  if ("pending" in fusion) return <Badge variant="info">융합 판정 중</Badge>
+  if ("error" in fusion) return <Badge variant="outline">융합 판정 실패</Badge>
+  const { label, variant } = FUSION_LABEL[fusion.label]
+  return (
+    <Badge variant={variant}>
+      {label} <span className="tabular">{Math.round(fusion.confidence * 100)}%</span>
+    </Badge>
+  )
+}
+
 export type SiteStatus = "todo" | "review" | "record" | "saved"
 
 const SITE_STATUS: Record<SiteStatus, { label: string; variant: "outline" | "warning" | "info" | "success" }> = {
