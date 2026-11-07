@@ -148,11 +148,11 @@
   ],
   "fusion": {
    "label": "defect",
-   "confidence": 0.9933,
+   "confidence": 0.9867,
    "probs": {
-    "normal": 0.0022,
-    "defect": 0.9933,
-    "non_panel": 0.0045
+    "normal": 0.0055,
+    "defect": 0.9867,
+    "non_panel": 0.0078
    },
    "usedRgb": true
   }
@@ -333,11 +333,11 @@
   ],
   "fusion": {
    "label": "defect",
-   "confidence": 0.994,
+   "confidence": 0.9818,
    "probs": {
-    "normal": 0.0017,
-    "defect": 0.994,
-    "non_panel": 0.0044
+    "normal": 0.0063,
+    "defect": 0.9818,
+    "non_panel": 0.0119
    },
    "usedRgb": true
   }
@@ -473,11 +473,11 @@
   ],
   "fusion": {
    "label": "defect",
-   "confidence": 0.8579,
+   "confidence": 0.6221,
    "probs": {
-    "normal": 0.0056,
-    "defect": 0.8579,
-    "non_panel": 0.1364
+    "normal": 0.0136,
+    "defect": 0.6221,
+    "non_panel": 0.3643
    },
    "usedRgb": true
   }
@@ -640,11 +640,11 @@
   ],
   "fusion": {
    "label": "defect",
-   "confidence": 0.9635,
+   "confidence": 0.9693,
    "probs": {
-    "normal": 0.0133,
-    "defect": 0.9635,
-    "non_panel": 0.0232
+    "normal": 0.0114,
+    "defect": 0.9693,
+    "non_panel": 0.0194
    },
    "usedRgb": true
   }
@@ -708,11 +708,11 @@
   ],
   "fusion": {
    "label": "defect",
-   "confidence": 0.9264,
+   "confidence": 0.9502,
    "probs": {
-    "normal": 0.0206,
-    "defect": 0.9264,
-    "non_panel": 0.053
+    "normal": 0.0172,
+    "defect": 0.9502,
+    "non_panel": 0.0326
    },
    "usedRgb": true
   }
@@ -758,11 +758,11 @@
   ],
   "fusion": {
    "label": "defect",
-   "confidence": 0.494,
+   "confidence": 0.851,
    "probs": {
-    "normal": 0.1597,
-    "defect": 0.494,
-    "non_panel": 0.3464
+    "normal": 0.0421,
+    "defect": 0.851,
+    "non_panel": 0.1069
    },
    "usedRgb": true
   }
@@ -816,12 +816,12 @@
    }
   ],
   "fusion": {
-   "label": "non_panel",
-   "confidence": 0.4548,
+   "label": "defect",
+   "confidence": 0.6794,
    "probs": {
-    "normal": 0.1181,
-    "defect": 0.4271,
-    "non_panel": 0.4548
+    "normal": 0.068,
+    "defect": 0.6794,
+    "non_panel": 0.2525
    },
    "usedRgb": true
   }
@@ -903,11 +903,11 @@
   ],
   "fusion": {
    "label": "non_panel",
-   "confidence": 0.859,
+   "confidence": 0.8497,
    "probs": {
-    "normal": 0.0529,
-    "defect": 0.0881,
-    "non_panel": 0.859
+    "normal": 0.0351,
+    "defect": 0.1152,
+    "non_panel": 0.8497
    },
    "usedRgb": true
   }
@@ -925,11 +925,11 @@
   "boxes": [],
   "fusion": {
    "label": "normal",
-   "confidence": 0.9751,
+   "confidence": 0.9485,
    "probs": {
-    "normal": 0.9751,
-    "defect": 0.0051,
-    "non_panel": 0.0198
+    "normal": 0.9485,
+    "defect": 0.0331,
+    "non_panel": 0.0184
    },
    "usedRgb": true
   }
@@ -947,11 +947,11 @@
   "boxes": [],
   "fusion": {
    "label": "normal",
-   "confidence": 0.9573,
+   "confidence": 0.9368,
    "probs": {
-    "normal": 0.9573,
-    "defect": 0.0047,
-    "non_panel": 0.038
+    "normal": 0.9368,
+    "defect": 0.024,
+    "non_panel": 0.0392
    },
    "usedRgb": true
   }
@@ -1060,11 +1060,11 @@
   ],
   "fusion": {
    "label": "defect",
-   "confidence": 0.9986,
+   "confidence": 0.9802,
    "probs": {
-    "normal": 0.0007,
-    "defect": 0.9986,
-    "non_panel": 0.0007
+    "normal": 0.0113,
+    "defect": 0.9802,
+    "non_panel": 0.0085
    },
    "usedRgb": true
   }
@@ -1254,11 +1254,11 @@
   ],
   "fusion": {
    "label": "defect",
-   "confidence": 0.9999,
+   "confidence": 0.9973,
    "probs": {
-    "normal": 0.0,
-    "defect": 0.9999,
-    "non_panel": 0.0001
+    "normal": 0.0005,
+    "defect": 0.9973,
+    "non_panel": 0.0022
    },
    "usedRgb": true
   }
@@ -1285,12 +1285,12 @@
    }
   ],
   "fusion": {
-   "label": "normal",
-   "confidence": 0.7579,
+   "label": "defect",
+   "confidence": 0.5254,
    "probs": {
-    "normal": 0.7579,
-    "defect": 0.217,
-    "non_panel": 0.0251
+    "normal": 0.4557,
+    "defect": 0.5254,
+    "non_panel": 0.0189
    },
    "usedRgb": true
   }
@@ -1317,12 +1317,12 @@
    }
   ],
   "fusion": {
-   "label": "normal",
-   "confidence": 0.511,
+   "label": "defect",
+   "confidence": 0.6171,
    "probs": {
-    "normal": 0.511,
-    "defect": 0.4116,
-    "non_panel": 0.0774
+    "normal": 0.3322,
+    "defect": 0.6171,
+    "non_panel": 0.0508
    },
    "usedRgb": true
   }
@@ -1340,11 +1340,11 @@
   "boxes": [],
   "fusion": {
    "label": "normal",
-   "confidence": 0.9097,
+   "confidence": 0.8834,
    "probs": {
-    "normal": 0.9097,
-    "defect": 0.0173,
-    "non_panel": 0.073
+    "normal": 0.8834,
+    "defect": 0.0396,
+    "non_panel": 0.0769
    },
    "usedRgb": true
   }
@@ -1362,11 +1362,11 @@
   "boxes": [],
   "fusion": {
    "label": "normal",
-   "confidence": 0.9415,
+   "confidence": 0.9124,
    "probs": {
-    "normal": 0.9415,
-    "defect": 0.0201,
-    "non_panel": 0.0383
+    "normal": 0.9124,
+    "defect": 0.0524,
+    "non_panel": 0.0352
    },
    "usedRgb": true
   }
@@ -1412,11 +1412,11 @@
   ],
   "fusion": {
    "label": "normal",
-   "confidence": 0.617,
+   "confidence": 0.5297,
    "probs": {
-    "normal": 0.617,
-    "defect": 0.317,
-    "non_panel": 0.066
+    "normal": 0.5297,
+    "defect": 0.3861,
+    "non_panel": 0.0842
    },
    "usedRgb": true
   }
@@ -1453,11 +1453,11 @@
   ],
   "fusion": {
    "label": "non_panel",
-   "confidence": 0.5027,
+   "confidence": 0.6905,
    "probs": {
-    "normal": 0.3744,
-    "defect": 0.1229,
-    "non_panel": 0.5027
+    "normal": 0.2069,
+    "defect": 0.1026,
+    "non_panel": 0.6905
    },
    "usedRgb": true
   }
@@ -1512,11 +1512,11 @@
   ],
   "fusion": {
    "label": "non_panel",
-   "confidence": 0.6274,
+   "confidence": 0.5323,
    "probs": {
-    "normal": 0.274,
-    "defect": 0.0986,
-    "non_panel": 0.6274
+    "normal": 0.1334,
+    "defect": 0.3343,
+    "non_panel": 0.5323
    },
    "usedRgb": true
   }
@@ -1571,11 +1571,11 @@
   ],
   "fusion": {
    "label": "non_panel",
-   "confidence": 0.6629,
+   "confidence": 0.6229,
    "probs": {
-    "normal": 0.2923,
-    "defect": 0.0448,
-    "non_panel": 0.6629
+    "normal": 0.1743,
+    "defect": 0.2028,
+    "non_panel": 0.6229
    },
    "usedRgb": true
   }
@@ -1630,11 +1630,11 @@
   ],
   "fusion": {
    "label": "non_panel",
-   "confidence": 0.7427,
+   "confidence": 0.6634,
    "probs": {
-    "normal": 0.2385,
-    "defect": 0.0189,
-    "non_panel": 0.7427
+    "normal": 0.2192,
+    "defect": 0.1174,
+    "non_panel": 0.6634
    },
    "usedRgb": true
   }
@@ -1689,11 +1689,11 @@
   ],
   "fusion": {
    "label": "non_panel",
-   "confidence": 0.6799,
+   "confidence": 0.6168,
    "probs": {
-    "normal": 0.3097,
-    "defect": 0.0104,
-    "non_panel": 0.6799
+    "normal": 0.2517,
+    "defect": 0.1315,
+    "non_panel": 0.6168
    },
    "usedRgb": true
   }
@@ -1775,11 +1775,11 @@
   ],
   "fusion": {
    "label": "non_panel",
-   "confidence": 0.8415,
+   "confidence": 0.8632,
    "probs": {
-    "normal": 0.1548,
-    "defect": 0.0037,
-    "non_panel": 0.8415
+    "normal": 0.0785,
+    "defect": 0.0583,
+    "non_panel": 0.8632
    },
    "usedRgb": true
   }
@@ -1825,11 +1825,11 @@
   ],
   "fusion": {
    "label": "non_panel",
-   "confidence": 0.9497,
+   "confidence": 0.9496,
    "probs": {
-    "normal": 0.0497,
-    "defect": 0.0005,
-    "non_panel": 0.9497
+    "normal": 0.042,
+    "defect": 0.0084,
+    "non_panel": 0.9496
    },
    "usedRgb": true
   }
@@ -1884,11 +1884,11 @@
   ],
   "fusion": {
    "label": "non_panel",
-   "confidence": 0.9315,
+   "confidence": 0.9502,
    "probs": {
-    "normal": 0.0678,
-    "defect": 0.0007,
-    "non_panel": 0.9315
+    "normal": 0.0397,
+    "defect": 0.0102,
+    "non_panel": 0.9502
    },
    "usedRgb": true
   }
@@ -1997,11 +1997,11 @@
   ],
   "fusion": {
    "label": "non_panel",
-   "confidence": 0.983,
+   "confidence": 0.974,
    "probs": {
-    "normal": 0.0154,
-    "defect": 0.0016,
-    "non_panel": 0.983
+    "normal": 0.0079,
+    "defect": 0.018,
+    "non_panel": 0.974
    },
    "usedRgb": true
   }
@@ -2074,11 +2074,11 @@
   ],
   "fusion": {
    "label": "non_panel",
-   "confidence": 0.9561,
+   "confidence": 0.96,
    "probs": {
-    "normal": 0.0416,
-    "defect": 0.0023,
-    "non_panel": 0.9561
+    "normal": 0.0232,
+    "defect": 0.0168,
+    "non_panel": 0.96
    },
    "usedRgb": true
   }
@@ -2115,11 +2115,11 @@
   ],
   "fusion": {
    "label": "non_panel",
-   "confidence": 0.9639,
+   "confidence": 0.9686,
    "probs": {
-    "normal": 0.0356,
-    "defect": 0.0004,
-    "non_panel": 0.9639
+    "normal": 0.0259,
+    "defect": 0.0055,
+    "non_panel": 0.9686
    },
    "usedRgb": true
   }
@@ -2156,11 +2156,11 @@
   ],
   "fusion": {
    "label": "non_panel",
-   "confidence": 0.9323,
+   "confidence": 0.935,
    "probs": {
-    "normal": 0.0661,
-    "defect": 0.0016,
-    "non_panel": 0.9323
+    "normal": 0.0398,
+    "defect": 0.0252,
+    "non_panel": 0.935
    },
    "usedRgb": true
   }
@@ -2260,11 +2260,11 @@
   ],
   "fusion": {
    "label": "non_panel",
-   "confidence": 0.9252,
+   "confidence": 0.8571,
    "probs": {
-    "normal": 0.0692,
-    "defect": 0.0056,
-    "non_panel": 0.9252
+    "normal": 0.06,
+    "defect": 0.0829,
+    "non_panel": 0.8571
    },
    "usedRgb": true
   }
@@ -2409,11 +2409,11 @@
   ],
   "fusion": {
    "label": "non_panel",
-   "confidence": 0.7696,
+   "confidence": 0.6994,
    "probs": {
-    "normal": 0.216,
-    "defect": 0.0144,
-    "non_panel": 0.7696
+    "normal": 0.1308,
+    "defect": 0.1698,
+    "non_panel": 0.6994
    },
    "usedRgb": true
   }
@@ -2567,11 +2567,11 @@
   ],
   "fusion": {
    "label": "non_panel",
-   "confidence": 0.5361,
+   "confidence": 0.5093,
    "probs": {
-    "normal": 0.4479,
-    "defect": 0.016,
-    "non_panel": 0.5361
+    "normal": 0.2328,
+    "defect": 0.2579,
+    "non_panel": 0.5093
    },
    "usedRgb": true
   }
@@ -2689,11 +2689,11 @@
   ],
   "fusion": {
    "label": "normal",
-   "confidence": 0.6762,
+   "confidence": 0.3592,
    "probs": {
-    "normal": 0.6762,
-    "defect": 0.0229,
-    "non_panel": 0.3009
+    "normal": 0.3592,
+    "defect": 0.3368,
+    "non_panel": 0.304
    },
    "usedRgb": true
   }
@@ -2793,11 +2793,11 @@
   ],
   "fusion": {
    "label": "normal",
-   "confidence": 0.7965,
+   "confidence": 0.5813,
    "probs": {
-    "normal": 0.7965,
-    "defect": 0.0066,
-    "non_panel": 0.1969
+    "normal": 0.5813,
+    "defect": 0.1471,
+    "non_panel": 0.2716
    },
    "usedRgb": true
   }
@@ -2842,12 +2842,12 @@
    }
   ],
   "fusion": {
-   "label": "normal",
-   "confidence": 0.5799,
+   "label": "non_panel",
+   "confidence": 0.3889,
    "probs": {
-    "normal": 0.5799,
-    "defect": 0.0198,
-    "non_panel": 0.4004
+    "normal": 0.3654,
+    "defect": 0.2456,
+    "non_panel": 0.3889
    },
    "usedRgb": true
   }
@@ -2892,12 +2892,12 @@
    }
   ],
   "fusion": {
-   "label": "normal",
-   "confidence": 0.5501,
+   "label": "non_panel",
+   "confidence": 0.4511,
    "probs": {
-    "normal": 0.5501,
-    "defect": 0.0093,
-    "non_panel": 0.4406
+    "normal": 0.4328,
+    "defect": 0.1161,
+    "non_panel": 0.4511
    },
    "usedRgb": true
   }
@@ -2969,12 +2969,12 @@
    }
   ],
   "fusion": {
-   "label": "normal",
-   "confidence": 0.5372,
+   "label": "non_panel",
+   "confidence": 0.5102,
    "probs": {
-    "normal": 0.5372,
-    "defect": 0.0111,
-    "non_panel": 0.4517
+    "normal": 0.3285,
+    "defect": 0.1613,
+    "non_panel": 0.5102
    },
    "usedRgb": true
   }
