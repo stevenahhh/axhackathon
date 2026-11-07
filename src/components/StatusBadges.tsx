@@ -40,13 +40,19 @@ const FUSION_LABEL = {
   non_panel: { label: "패널 외", variant: "secondary" },
 } as const
 
-export function FusionBadge({ fusion }: { fusion: Photo["fusion"] }) {
+// live가 참이면(업로드 사진) 판정 결과가 나오는 순간 한 번 팝인한다.
+export function FusionBadge({ fusion, live }: { fusion: Photo["fusion"]; live?: boolean }) {
   if (!fusion) return null
-  if ("pending" in fusion) return <Badge variant="info">융합 판정 중</Badge>
+  if ("pending" in fusion)
+    return (
+      <Badge variant="info" className={live ? "motion-pulse" : undefined}>
+        융합 판정 중
+      </Badge>
+    )
   if ("error" in fusion) return <Badge variant="outline">융합 판정 실패</Badge>
   const { label, variant } = FUSION_LABEL[fusion.label]
   return (
-    <Badge variant={variant}>
+    <Badge variant={variant} className={live ? "motion-pop" : undefined}>
       {label} <span className="tabular">{Math.round(fusion.confidence * 100)}%</span>
     </Badge>
   )
