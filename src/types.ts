@@ -58,6 +58,8 @@ export type Inspection = {
   marks: Record<string, Mark>
   opinion: string
   opinionEdited: boolean
+  opinionSource?: "template" | "agent"
+  thermalOpinion?: string
   inspector: string
   org: string
   weather: string

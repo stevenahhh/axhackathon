@@ -1,7 +1,9 @@
-import type { ChangeEvent, ReactNode } from "react"
+import { useState, type ChangeEvent, type ReactNode } from "react"
 import {
+  BotIcon,
   CheckIcon,
   CircleIcon,
+  Loader2Icon,
   LockIcon,
   MinusIcon,
   SaveIcon,
@@ -15,7 +17,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { siteById } from "@/data/sites"
+import { CURRENT_YM, HISTORY, siteById } from "@/data/sites"
+import { requestOpinion } from "@/lib/api"
 import {
   FORM9,
   HOTSPOT,
@@ -25,6 +28,8 @@ import {
   effectiveMark,
   hotspotSuggestion,
   missingCells,
+  thermalJudgement,
+  totalArea,
   type Summary,
 } from "@/lib/inspection"
 import { saveInspection, setFields, setMark } from "@/lib/store"
@@ -64,6 +69,39 @@ const MARKS: {
 ]
 
 const MARK_LABEL: Record<MarkValue, string> = { O: "○ 적합", X: "× 부적합", NA: "해당없음" }
+
+const WARNING_LINE = "rounded-lg bg-warning/18 px-3 py-2 text-sm text-[oklch(0.5_0.13_60)] dark:text-warning"
+
+function previousYm(ym: string) {
+  const [year, month] = ym.split("-").map(Number)
+  return month === 1 ? `${year - 1}-12` : `${year}-${String(month - 1).padStart(2, "0")}`
+}
+
+// AgentStream에 보낼 점검 요약. 서버가 key=value 줄로 바꿔 챗봇에 넘긴다.
+function opinionPayload(site: SiteId, inspection: Inspection, summary: Summary) {
+  const previous = previousYm(CURRENT_YM)
+  const top = [...summary.confirmed].sort((a, b) => totalArea(b) - totalArea(a)).slice(0, 3)
+  return {
+    site_alias: `${site}현장`,
+    ym: CURRENT_YM,
+    photos_total: summary.total,
+    excluded: summary.excluded,
+    flagged: summary.flagged,
+    confirmed: summary.confirmed.length,
+    rejected: summary.rejected,
+    top_photos: top.map((photo) => ({ seq: photo.seq, count: photo.boxes.length, area_px: totalArea(photo) })),
+    previous_month: {
+      ym: previous,
+      confirmed: HISTORY.find((entry) => entry.site === site && entry.ym === previous)?.confirmed ?? null,
+    },
+    hotspot_result: effectiveMark(HOTSPOT, inspection, summary) ?? "미입력",
+    article5_suggestion: article5(inspection, summary).label,
+    thermal: summary.confirmed.flatMap((photo) => {
+      const judgement = thermalJudgement(inspection.thermal[photo.id])
+      return judgement ? [{ seq: photo.seq, delta: judgement.delta, level: judgement.level }] : []
+    }),
+  }
+}
 
 const TEXTAREA_CLASS =
   "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40"
@@ -194,7 +232,11 @@ export function Form9Editor({
   const suggestion = hotspotSuggestion(summary)
   const hotspotChosen = inspection.marks[HOTSPOT] !== undefined
   const draft = draftOpinion(summary, inspection)
-  const opinion = inspection.opinionEdited ? inspection.opinion : draft
+  const fromAgent = inspection.opinionSource === "agent"
+  const opinion = inspection.opinionEdited || fromAgent ? inspection.opinion : draft
+  const [drafting, setDrafting] = useState(false)
+  const [agentError, setAgentError] = useState<string>()
+  const [agentWarnings, setAgentWarnings] = useState<string[]>([])
   const rule = article5(inspection, summary)
   const fillable = missing.cells.filter((cell) => cell !== HOTSPOT)
   const field = (key: "weather" | "org" | "inspector" | "insulation" | "ground") => ({
@@ -214,6 +256,32 @@ export function Form9Editor({
         : summary.judged === 0
           ? "AI 판정 사진이 없어 직접 골라야 합니다."
           : `우선 확인 사진 ${summary.pendingReview}장을 처리하면 제안이 생깁니다.`
+
+  async function draftWithAgent() {
+    if (
+      inspection.opinionEdited &&
+      !window.confirm("직접 고친 종합의견을 AgentStream 초안으로 바꿀까요?")
+    )
+      return
+    setDrafting(true)
+    setAgentError(undefined)
+    setAgentWarnings([])
+    try {
+      const result = await requestOpinion(opinionPayload(site, inspection, summary))
+      setFields(site, {
+        opinion: result.opinion,
+        opinionEdited: false,
+        opinionSource: "agent",
+        thermalOpinion: result.thermal_opinion,
+      })
+      setAgentWarnings(result.warnings ?? [])
+    } catch (error) {
+      if (!inspection.opinionEdited) setFields(site, { opinionSource: "template" })
+      setAgentError(error instanceof Error ? error.message : String(error))
+    } finally {
+      setDrafting(false)
+    }
+  }
 
   function fillRemaining() {
     if (!fillable.length) return
@@ -330,8 +398,8 @@ export function Form9Editor({
         <CardHeader>
           <CardTitle>종합의견</CardTitle>
           <CardAction>
-            <Badge variant={inspection.opinionEdited ? "secondary" : "info"}>
-              {inspection.opinionEdited ? "직접 수정" : "자동 문장"}
+            <Badge variant={inspection.opinionEdited ? "secondary" : fromAgent ? "success" : "info"}>
+              {inspection.opinionEdited ? "직접 수정" : fromAgent ? "AgentStream" : "자동 문장"}
             </Badge>
           </CardAction>
         </CardHeader>
@@ -340,6 +408,22 @@ export function Form9Editor({
             <p className="text-sm font-medium">제5조 구분: {rule.label}</p>
             <p className="text-xs text-muted-foreground">{rule.detail}</p>
           </div>
+          {!locked && (
+            <Button variant="outline" className="h-11" disabled={drafting} onClick={draftWithAgent}>
+              {drafting ? <Loader2Icon className="animate-spin" /> : <BotIcon />}
+              {drafting ? "AgentStream이 초안을 쓰는 중" : "AgentStream으로 초안 쓰기"}
+            </Button>
+          )}
+          {agentError && (
+            <p role="alert" className={WARNING_LINE}>
+              AgentStream 초안을 받지 못해 자동 문장을 유지합니다: {agentError}
+            </p>
+          )}
+          {agentWarnings.map((warning) => (
+            <p key={warning} role="status" className={WARNING_LINE}>
+              {warning}. 문장을 확인해 주세요.
+            </p>
+          ))}
           <textarea
             id="form9-opinion"
             aria-label="종합의견"
@@ -351,7 +435,8 @@ export function Form9Editor({
           />
           {!inspection.opinionEdited && (
             <p className="text-xs text-muted-foreground">
-              사진 확인 결과로 만든 초안입니다. 고치면 "직접 수정"으로 바뀝니다.
+              {fromAgent ? "AgentStream이 쓴 초안입니다." : "사진 확인 결과로 만든 초안입니다."} 고치면
+              "직접 수정"으로 바뀝니다.
             </p>
           )}
         </CardContent>

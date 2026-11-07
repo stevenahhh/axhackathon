@@ -219,7 +219,9 @@ export function ThermalPreview({
           <tbody>
             <tr>
               <td data-slot="thermal-opinion" className="h-[30mm] p-[2mm] align-top whitespace-pre-wrap">
-                {thermalOpinion(entry)}
+                {judgement && judgement.level !== "정상" && inspection.thermalOpinion
+                  ? inspection.thermalOpinion
+                  : thermalOpinion(entry)}
               </td>
             </tr>
           </tbody>

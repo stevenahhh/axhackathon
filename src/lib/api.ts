@@ -24,7 +24,12 @@ export type Health = {
   agent: { configured: boolean }
 }
 
-export type Opinion = { opinion: string; followups: string[] }
+export type Opinion = {
+  opinion: string
+  followups: string[]
+  thermal_opinion?: string
+  warnings: string[]
+}
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, init)
