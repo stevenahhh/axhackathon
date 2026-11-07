@@ -1,0 +1,65 @@
+# 썬텍 점검비서 디자인 규칙
+
+토큰의 원본은 `src/index.css`다. 색, 크기, 간격은 모두 여기 적힌 토큰과 Tailwind 단계만 쓴다. 컴포넌트는 `src/components/ui/*`(shadcn, base-ui)에서 시작한다.
+
+## 1. 색 역할
+
+| 토큰 | 쓰임 | 밝은 테마 | 어두운 테마 |
+| --- | --- | --- | --- |
+| `primary` | 주 동작 버튼, 활성 탭 글자, 링크 | 남색 oklch(0.52 0.19 262) | oklch(0.7 0.15 262) |
+| `solar` | 브랜드 포인트(로고 마크, 월차 점검 표시), 차트 2번 | 호박색 oklch(0.78 0.16 75) | oklch(0.82 0.15 78) |
+| `success` | 저장 완료, 이상 없음, 적합(○) | oklch(0.58 0.14 155) | oklch(0.74 0.15 155) |
+| `warning` | 사진 확인 중, 참고 등급, 서버 연결 경고, 미입력 칸 | oklch(0.72 0.16 65) | oklch(0.8 0.15 70) |
+| `info` | 기록표 작성 중, 판정 진행 중 | oklch(0.6 0.13 225) | oklch(0.74 0.12 225) |
+| `destructive` | 핫스팟 확정, 우선 확인, 부적합(×) | oklch(0.58 0.22 25) | oklch(0.7 0.19 25) |
+| `sidebar*` | 데스크톱 사이드바(짙은 남색 바탕, 호박색 마크) | oklch(0.24 0.06 262) | oklch(0.14 0.025 262) |
+| `muted`, `secondary`, `accent` | 보조 면과 글자, 해당없음(NA) | 회청색 단계 | 회청색 단계 |
+
+색은 면(`bg-<역할>/12~20`)과 잉크(`text-<역할>`)로만 쓴다. 상자 한쪽에 색 띠를 두르거나 둥근 카드에 2px 이상 색 테두리를 치지 않는다. 밝은 테마에서 `warning` 잉크로 글자나 아이콘을 쓸 때는 `badge.tsx`와 같은 짙은 값 `oklch(0.5 0.13 60)`을 쓴다.
+
+## 2. 글자 단계
+
+| 단계 | 클래스 | 쓰임 |
+| --- | --- | --- |
+| 캡션 | `text-xs`(12px) | 탭바 라벨, 배지, 보조 설명 |
+| 본문 | `text-sm`(14px) | 기본 글, 표, 입력 |
+| 제목 | `text-base font-semibold`(16px) | 앱바 h1, 카드 h2 |
+| 수치 | `text-2xl font-semibold tracking-tight`(24px) | KPI 숫자 |
+
+글꼴은 `--font-sans`(Geist Variable, 한글은 Apple SD Gothic Neo·Noto Sans KR). 숫자는 `tabular` 클래스로 자릿수를 맞춘다. 본문은 `word-break: keep-all`.
+
+## 3. 간격과 반경
+
+- 4px 격자. 요소 안은 `gap-1`~`gap-3`, 요소 사이는 `gap-4`, 구역 사이는 `gap-6`.
+- 화면 여백은 모바일 `p-4`, 데스크톱 `lg:p-8`. 본문 최대 폭 1400px.
+- 반경 기준 `--radius: 0.75rem`. 카드와 버튼 `rounded-lg`, 배지 `rounded-4xl`, 작은 마크 `rounded-lg`.
+- 그림자는 shadcn 기본값만 쓴다. 블러, 유리 효과, 메시 그라디언트는 쓰지 않는다.
+
+## 4. 레이아웃
+
+Layout: 모바일(<1024px)은 scroll-body-shell. 상단 앱바 56px가 sticky, 하단 탭바 56px + safe-area가 fixed, 스크롤은 문서가 맡고 main은 아래를 4.5rem + safe-area만큼 비운다. 데스크톱(`lg:`, ≥1024px)은 fixed-sidenav-shell. 그리드 `[248px | 1fr]`, 사이드바는 sticky 100dvh, 상단바 sticky, 스크롤은 문서가 맡고 탭바는 렌더링하지 않는다.
+
+모바일 우선 규칙:
+- 기본 스타일은 390px 기준으로 쓰고 `sm:`, `lg:`로 넓힌다. 390px에서 가로 스크롤이 생기면 결함이다.
+- 터치 대상은 44×44px 이상. 하단 탭 3개는 각 56px 높이, 앱바의 아이콘 버튼은 모바일 `size-11`, 데스크톱 `lg:size-8`.
+- 한 화면에 주 동작은 하나. 셸에서는 활성 탭이 그 역할이고, 테마 전환은 보조다.
+- 전환점은 Tailwind `lg:`(1024px) 하나다. 사이드바와 탭바는 CSS로 숨기지 않고 `matchMedia`로 렌더링을 나눈다.
+- 페이지 전환은 해시(`#/`, `#/review/<현장>`, `#/record/<현장>`)로 하고 라우터 라이브러리는 쓰지 않는다.
+
+## 5. 셸 브리프
+
+- 주 동작: 활성 탭(현재 화면). 다른 탭은 `text-muted-foreground`, 활성 탭만 `text-primary`.
+- 정보 우선순위: 1) 현재 화면 본문 2) 내가 어디 있는지(탭·제목) 3) 서버 연결 경고(연결 실패 시에만).
+- 필수 내용: 로고 마크, 화면 제목, 테마 전환, 탭 3개(대시보드·사진 확인·기록표), 데스크톱 사이드바의 담당 현장 3곳과 상태 점, 경고 문구 "AI 판정 서버에 연결하지 못했습니다"와 다시 시도.
+- 일부러 뺀 것: 햄버거 시트 메뉴, 앱바 블러, 모바일에서의 월차 점검 표시(`sm:`부터만), 탭 안의 숫자 배지.
+
+## 6. 상태 색 매핑
+
+| 상태 | 배지 변형 | 사이드바 점 | 뜻 |
+| --- | --- | --- | --- |
+| `todo` 미착수 | `outline` | `bg-muted-foreground` | 아직 사진을 확인하지 않음 |
+| `review` 사진 확인 중 | `warning` | `bg-warning` | 우선 확인 사진이 남음 |
+| `record` 기록표 작성 중 | `info` | `bg-info` | 우선 확인을 모두 처리함 |
+| `saved` 저장 완료 | `success` | `bg-success` | 기록표를 저장해 잠김 |
+
+사진 등급: 우선 확인 `destructive`, 참고 `warning`, 이상 없음 `success`, 판정 중 `info`, 판정 실패 `outline`. 확인 결과: 핫스팟 확정 `destructive`, 오탐·패널 외 `secondary`, 미확인 `outline`. 기록표 칸: ○ `success`, × `destructive`, 해당없음 `secondary`, 미입력 `warning`.

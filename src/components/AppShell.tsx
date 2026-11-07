@@ -1,96 +1,88 @@
-import { useState, type ReactNode } from "react"
+import { useState, useSyncExternalStore, type ReactNode } from "react"
 import {
   ClipboardListIcon,
   LayoutDashboardIcon,
-  MenuIcon,
   MoonIcon,
   ScanSearchIcon,
   SunIcon,
+  TriangleAlertIcon,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { SITES } from "@/data/sites"
 import { hrefOf, type Route } from "@/lib/route"
 import { cn } from "@/lib/utils"
 import type { SiteId } from "@/types"
 
-function Logo() {
-  return (
-    <div className="flex items-center gap-2.5">
-      <span className="grid size-8 place-items-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-        <SunIcon className="size-4.5" />
-      </span>
-      <div className="leading-tight">
-        <p className="text-sm font-semibold text-sidebar-accent-foreground">썬텍 점검비서</p>
-        <p className="text-xs text-sidebar-foreground/70">태양광 월차 점검 기록</p>
-      </div>
-    </div>
+const DESKTOP_QUERY = "(min-width: 1024px)"
+
+// CSS로 숨기면 숨은 사이드바 nav가 DOM에 남아 44px 터치 대상 검사에 걸리므로 렌더링 자체를 나눈다.
+function useIsDesktop() {
+  return useSyncExternalStore(
+    (notify) => {
+      const query = window.matchMedia(DESKTOP_QUERY)
+      query.addEventListener("change", notify)
+      return () => query.removeEventListener("change", notify)
+    },
+    () => window.matchMedia(DESKTOP_QUERY).matches
   )
 }
 
-function NavLink({
-  href,
-  active,
-  icon,
-  children,
-  onNavigate,
-}: {
-  href: string
-  active: boolean
-  icon: ReactNode
-  children: ReactNode
-  onNavigate?: () => void
-}) {
+type Page = Route["page"]
+
+const PAGES: { page: Page; label: string; icon: ReactNode }[] = [
+  { page: "dashboard", label: "대시보드", icon: <LayoutDashboardIcon /> },
+  { page: "review", label: "사진 확인", icon: <ScanSearchIcon /> },
+  { page: "record", label: "기록표", icon: <ClipboardListIcon /> },
+]
+
+const routeOf = (page: Page, site: SiteId): Route =>
+  page === "dashboard" ? { page } : page === "review" ? { page, site } : { page, site }
+
+function LogoMark() {
   return (
-    <a
-      href={href}
-      onClick={onNavigate}
-      aria-current={active ? "page" : undefined}
-      className={cn(
-        "flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm text-sidebar-foreground transition-colors outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring [&_svg]:size-4",
-        active && "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
-      )}
-    >
-      {icon}
-      {children}
-    </a>
+    <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+      <SunIcon className="size-4.5" />
+    </span>
   )
 }
 
 function SidebarBody({
   route,
+  site,
   dots,
-  onNavigate,
 }: {
   route: Route
+  site: SiteId
   dots: Record<SiteId, string>
-  onNavigate?: () => void
 }) {
-  const site = route.page === "dashboard" ? "A" : route.site
   return (
     <div className="flex h-full flex-col gap-6 p-4">
-      <Logo />
+      <div className="flex items-center gap-2.5">
+        <LogoMark />
+        <div className="leading-tight">
+          <p className="text-sm font-semibold text-sidebar-accent-foreground">썬텍 점검비서</p>
+          <p className="text-xs text-sidebar-foreground/70">태양광 월차 점검 기록</p>
+        </div>
+      </div>
       <nav className="flex flex-col gap-1" aria-label="주 메뉴">
-        <NavLink href="#/" active={route.page === "dashboard"} icon={<LayoutDashboardIcon />} onNavigate={onNavigate}>
-          대시보드
-        </NavLink>
-        <NavLink
-          href={hrefOf({ page: "review", site })}
-          active={route.page === "review"}
-          icon={<ScanSearchIcon />}
-          onNavigate={onNavigate}
-        >
-          열화상 확인
-        </NavLink>
-        <NavLink
-          href={hrefOf({ page: "record", site })}
-          active={route.page === "record"}
-          icon={<ClipboardListIcon />}
-          onNavigate={onNavigate}
-        >
-          기록표 작성
-        </NavLink>
+        {PAGES.map(({ page, label, icon }) => {
+          const active = route.page === page
+          return (
+            <a
+              key={page}
+              href={hrefOf(routeOf(page, site))}
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm text-sidebar-foreground transition-colors outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring [&_svg]:size-4",
+                active && "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+              )}
+            >
+              {icon}
+              {label}
+            </a>
+          )
+        })}
       </nav>
       <div className="flex flex-col gap-1">
         <p className="px-2.5 text-xs font-medium text-sidebar-foreground/60">담당 현장</p>
@@ -98,7 +90,6 @@ function SidebarBody({
           <a
             key={item.id}
             href={hrefOf({ page: route.page === "record" ? "record" : "review", site: item.id })}
-            onClick={onNavigate}
             className={cn(
               "flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm text-sidebar-foreground outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring",
               route.page !== "dashboard" && route.site === item.id && "text-sidebar-accent-foreground"
@@ -119,19 +110,51 @@ function SidebarBody({
   )
 }
 
+function TabBar({ route, site }: { route: Route; site: SiteId }) {
+  return (
+    <nav
+      aria-label="주 메뉴"
+      className="fixed inset-x-0 bottom-0 z-20 border-t bg-background pb-[env(safe-area-inset-bottom)]"
+    >
+      <div className="grid h-14 grid-cols-3">
+        {PAGES.map(({ page, label, icon }) => {
+          const active = route.page === page
+          return (
+            <a
+              key={page}
+              href={hrefOf(routeOf(page, site))}
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "flex flex-col items-center justify-center gap-1 text-xs font-medium text-muted-foreground transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset [&_svg]:size-5",
+                active && "text-primary"
+              )}
+            >
+              {icon}
+              {label}
+            </a>
+          )
+        })}
+      </div>
+    </nav>
+  )
+}
+
 export function AppShell({
   route,
   title,
   dots,
+  notice,
   children,
 }: {
   route: Route
   title: string
   dots: Record<SiteId, string>
+  notice?: ReactNode
   children: ReactNode
 }) {
-  const [menuOpen, setMenuOpen] = useState(false)
+  const isDesktop = useIsDesktop()
   const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"))
+  const site = route.page === "dashboard" ? "A" : route.site
 
   function toggleTheme() {
     document.documentElement.classList.toggle("dark", !dark)
@@ -140,44 +163,43 @@ export function AppShell({
 
   return (
     <div className="min-h-dvh bg-background text-foreground lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
-      <aside className="sticky top-0 hidden h-dvh bg-sidebar lg:block">
-        <SidebarBody route={route} dots={dots} />
-      </aside>
+      {isDesktop && (
+        <aside className="sticky top-0 h-dvh bg-sidebar">
+          <SidebarBody route={route} site={site} dots={dots} />
+        </aside>
+      )}
       <div className="min-w-0">
-        <header className="sticky top-0 z-20 border-b bg-background/85 backdrop-blur">
-          <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-2 px-4 lg:px-8">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden"
-              aria-label="메뉴 열기"
-              onClick={() => setMenuOpen(true)}
-            >
-              <MenuIcon />
-            </Button>
-            <h1 className="truncate text-base font-semibold">{title}</h1>
-            <span className="ml-auto hidden rounded-full bg-solar/20 px-2.5 py-1 text-xs font-medium text-foreground sm:inline">
+        <header className="sticky top-0 z-20 border-b bg-background">
+          <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-3 px-4 lg:px-8">
+            {!isDesktop && <LogoMark />}
+            <h1 className="min-w-0 flex-1 truncate text-base font-semibold">{title}</h1>
+            <span className="hidden shrink-0 rounded-full bg-solar/20 px-2.5 py-1 text-xs font-medium sm:inline">
               2026년 11월 월차 점검
             </span>
             <Button
               variant="ghost"
               size="icon"
+              className="size-11 lg:size-8"
               aria-label={dark ? "밝은 테마로 전환" : "어두운 테마로 전환"}
               onClick={toggleTheme}
-              className="ml-auto sm:ml-0"
             >
               {dark ? <SunIcon /> : <MoonIcon />}
             </Button>
           </div>
         </header>
-        <main className="mx-auto max-w-[1400px] p-4 lg:p-8">{children}</main>
+        {notice && (
+          <div role="status" className="border-b bg-warning/15">
+            <div className="mx-auto flex max-w-[1400px] items-center gap-2 px-4 py-2.5 text-sm lg:px-8">
+              <TriangleAlertIcon className="size-4 shrink-0 text-[oklch(0.5_0.13_60)] dark:text-warning" />
+              <p className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2">{notice}</p>
+            </div>
+          </div>
+        )}
+        <main className="mx-auto max-w-[1400px] p-4 pb-[calc(4.5rem_+_env(safe-area-inset-bottom))] lg:p-8">
+          {children}
+        </main>
       </div>
-      <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-        <SheetContent side="left" className="w-72 bg-sidebar p-0">
-          <SheetTitle className="sr-only">메뉴</SheetTitle>
-          <SidebarBody route={route} dots={dots} onNavigate={() => setMenuOpen(false)} />
-        </SheetContent>
-      </Sheet>
+      {!isDesktop && <TabBar route={route} site={site} />}
     </div>
   )
 }
