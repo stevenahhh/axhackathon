@@ -1,5 +1,4 @@
 import drone from "@/data/drone.json"
-import samples from "@/data/photos.json"
 import type { Folder, HistoryEntry, Photo, Site, SiteId } from "@/types"
 
 export const CURRENT_YM = "2026-11"
@@ -46,32 +45,10 @@ export const formatVoltage = (v: number) => (v === 380 ? "380/220V" : `${v.toLoc
 
 export const siteById = (id: SiteId) => SITES.find((site) => site.id === id) ?? SITES[0]
 
-type SamplePhoto = {
-  id: string
-  datetime: string
-  width: number
-  height: number
-  boxes: { bbox: number[]; area: number }[]
-}
-
-const samplePhotos: Photo[] = (samples as SamplePhoto[]).map((sample, index) => ({
-  id: `C_${sample.id}`,
-  site: "C",
-  seq: String(index + 1).padStart(4, "0"),
-  capturedAt: sample.datetime,
-  ir: `samples/${sample.id}.webp`,
-  width: sample.width,
-  height: sample.height,
-  boxes: sample.boxes.map(({ bbox, area }) => ({ bbox, area })),
-  folder: sample.id.includes("Positive") ? "abnormal" : "normal",
-}))
-
-export const BASE_PHOTOS: Photo[] = [
-  ...(drone as (Omit<Photo, "site" | "folder"> & { site: string; folder: string })[]).map(
-    (photo) => ({ ...photo, site: photo.site as SiteId, folder: photo.folder as Folder })
-  ),
-  ...samplePhotos,
-]
+// A(하동)·B(영광)·C(음성) 모두 scripts/prepare_demo.py가 만든 드론 열화상·실화상 쌍이다.
+export const BASE_PHOTOS: Photo[] = (
+  drone as (Omit<Photo, "site" | "folder"> & { site: string; folder: string })[]
+).map((photo) => ({ ...photo, site: photo.site as SiteId, folder: photo.folder as Folder }))
 
 export const HISTORY: HistoryEntry[] = [
   { site: "A", ym: "2026-08", photos: 284, confirmed: 3, savedAt: "2026-08-12", seeded: true },

@@ -1461,5 +1461,1522 @@
    },
    "usedRgb": true
   }
+ },
+ {
+  "id": "C_0001",
+  "site": "C",
+  "seq": "0001",
+  "folder": "outside",
+  "capturedAt": "2025-11-04 13:07:08",
+  "ir": "drone/C_0001_T.jpg",
+  "rgb": "drone/C_0001_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     146,
+     209,
+     7,
+     5
+    ],
+    "area": 27
+   },
+   {
+    "bbox": [
+     154,
+     257,
+     9,
+     8
+    ],
+    "area": 54
+   },
+   {
+    "bbox": [
+     522,
+     367,
+     14,
+     21
+    ],
+    "area": 189
+   },
+   {
+    "bbox": [
+     522,
+     397,
+     12,
+     7
+    ],
+    "area": 68
+   }
+  ],
+  "fusion": {
+   "label": "non_panel",
+   "confidence": 0.6274,
+   "probs": {
+    "normal": 0.274,
+    "defect": 0.0986,
+    "non_panel": 0.6274
+   },
+   "usedRgb": true
+  }
+ },
+ {
+  "id": "C_0002",
+  "site": "C",
+  "seq": "0002",
+  "folder": "outside",
+  "capturedAt": "2025-11-04 13:07:09",
+  "ir": "drone/C_0002_T.jpg",
+  "rgb": "drone/C_0002_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     183,
+     209,
+     13,
+     8
+    ],
+    "area": 74
+   },
+   {
+    "bbox": [
+     190,
+     260,
+     10,
+     7
+    ],
+    "area": 55
+   },
+   {
+    "bbox": [
+     556,
+     367,
+     14,
+     21
+    ],
+    "area": 166
+   },
+   {
+    "bbox": [
+     555,
+     398,
+     12,
+     7
+    ],
+    "area": 61
+   }
+  ],
+  "fusion": {
+   "label": "non_panel",
+   "confidence": 0.6629,
+   "probs": {
+    "normal": 0.2923,
+    "defect": 0.0448,
+    "non_panel": 0.6629
+   },
+   "usedRgb": true
+  }
+ },
+ {
+  "id": "C_0003",
+  "site": "C",
+  "seq": "0003",
+  "folder": "abnormal",
+  "capturedAt": "2025-11-04 13:07:11",
+  "ir": "drone/C_0003_T.jpg",
+  "rgb": "drone/C_0003_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     330,
+     209,
+     15,
+     8
+    ],
+    "area": 85
+   },
+   {
+    "bbox": [
+     334,
+     261,
+     12,
+     7
+    ],
+    "area": 74
+   },
+   {
+    "bbox": [
+     312,
+     404,
+     12,
+     9
+    ],
+    "area": 77
+   },
+   {
+    "bbox": [
+     316,
+     429,
+     10,
+     7
+    ],
+    "area": 57
+   }
+  ],
+  "fusion": {
+   "label": "non_panel",
+   "confidence": 0.7427,
+   "probs": {
+    "normal": 0.2385,
+    "defect": 0.0189,
+    "non_panel": 0.7427
+   },
+   "usedRgb": true
+  }
+ },
+ {
+  "id": "C_0004",
+  "site": "C",
+  "seq": "0004",
+  "folder": "abnormal",
+  "capturedAt": "2025-11-04 13:07:12",
+  "ir": "drone/C_0004_T.jpg",
+  "rgb": "drone/C_0004_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     486,
+     217,
+     12,
+     6
+    ],
+    "area": 65
+   },
+   {
+    "bbox": [
+     485,
+     264,
+     11,
+     9
+    ],
+    "area": 81
+   },
+   {
+    "bbox": [
+     460,
+     409,
+     11,
+     6
+    ],
+    "area": 60
+   },
+   {
+    "bbox": [
+     462,
+     430,
+     8,
+     9
+    ],
+    "area": 60
+   }
+  ],
+  "fusion": {
+   "label": "non_panel",
+   "confidence": 0.6799,
+   "probs": {
+    "normal": 0.3097,
+    "defect": 0.0104,
+    "non_panel": 0.6799
+   },
+   "usedRgb": true
+  }
+ },
+ {
+  "id": "C_0005",
+  "site": "C",
+  "seq": "0005",
+  "folder": "outside",
+  "capturedAt": "2025-11-04 13:07:13",
+  "ir": "drone/C_0005_T.jpg",
+  "rgb": "drone/C_0005_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     625,
+     222,
+     9,
+     6
+    ],
+    "area": 42
+   },
+   {
+    "bbox": [
+     621,
+     269,
+     9,
+     7
+    ],
+    "area": 57
+   },
+   {
+    "bbox": [
+     124,
+     355,
+     6,
+     5
+    ],
+    "area": 18
+   },
+   {
+    "bbox": [
+     110,
+     365,
+     9,
+     13
+    ],
+    "area": 93
+   },
+   {
+    "bbox": [
+     112,
+     396,
+     8,
+     12
+    ],
+    "area": 53
+   },
+   {
+    "bbox": [
+     593,
+     406,
+     12,
+     7
+    ],
+    "area": 65
+   },
+   {
+    "bbox": [
+     594,
+     430,
+     7,
+     6
+    ],
+    "area": 32
+   }
+  ],
+  "fusion": {
+   "label": "non_panel",
+   "confidence": 0.8415,
+   "probs": {
+    "normal": 0.1548,
+    "defect": 0.0037,
+    "non_panel": 0.8415
+   },
+   "usedRgb": true
+  }
+ },
+ {
+  "id": "C_0006",
+  "site": "C",
+  "seq": "0006",
+  "folder": "outside",
+  "capturedAt": "2025-11-04 13:07:14",
+  "ir": "drone/C_0006_T.jpg",
+  "rgb": "drone/C_0006_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     274,
+     356,
+     6,
+     9
+    ],
+    "area": 36
+   },
+   {
+    "bbox": [
+     255,
+     360,
+     10,
+     13
+    ],
+    "area": 97
+   },
+   {
+    "bbox": [
+     257,
+     393,
+     5,
+     10
+    ],
+    "area": 32
+   }
+  ],
+  "fusion": {
+   "label": "non_panel",
+   "confidence": 0.9497,
+   "probs": {
+    "normal": 0.0497,
+    "defect": 0.0005,
+    "non_panel": 0.9497
+   },
+   "usedRgb": true
+  }
+ },
+ {
+  "id": "C_0007",
+  "site": "C",
+  "seq": "0007",
+  "folder": "outside",
+  "capturedAt": "2025-11-04 13:07:15",
+  "ir": "drone/C_0007_T.jpg",
+  "rgb": "drone/C_0007_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     467,
+     318,
+     5,
+     4
+    ],
+    "area": 17
+   },
+   {
+    "bbox": [
+     405,
+     337,
+     8,
+     8
+    ],
+    "area": 51
+   },
+   {
+    "bbox": [
+     424,
+     371,
+     6,
+     4
+    ],
+    "area": 18
+   },
+   {
+    "bbox": [
+     399,
+     375,
+     6,
+     7
+    ],
+    "area": 29
+   }
+  ],
+  "fusion": {
+   "label": "non_panel",
+   "confidence": 0.9315,
+   "probs": {
+    "normal": 0.0678,
+    "defect": 0.0007,
+    "non_panel": 0.9315
+   },
+   "usedRgb": true
+  }
+ },
+ {
+  "id": "C_0008",
+  "site": "C",
+  "seq": "0008",
+  "folder": "outside",
+  "capturedAt": "2025-11-04 13:07:16",
+  "ir": "drone/C_0008_T.jpg",
+  "rgb": "drone/C_0008_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     606,
+     228,
+     7,
+     5
+    ],
+    "area": 27
+   },
+   {
+    "bbox": [
+     596,
+     272,
+     7,
+     5
+    ],
+    "area": 31
+   },
+   {
+    "bbox": [
+     555,
+     279,
+     7,
+     5
+    ],
+    "area": 27
+   },
+   {
+    "bbox": [
+     555,
+     287,
+     7,
+     7
+    ],
+    "area": 35
+   },
+   {
+    "bbox": [
+     538,
+     289,
+     10,
+     15
+    ],
+    "area": 124
+   },
+   {
+    "bbox": [
+     531,
+     321,
+     12,
+     16
+    ],
+    "area": 110
+   },
+   {
+    "bbox": [
+     555,
+     325,
+     6,
+     4
+    ],
+    "area": 19
+   },
+   {
+    "bbox": [
+     529,
+     497,
+     45,
+     12
+    ],
+    "area": 349
+   },
+   {
+    "bbox": [
+     476,
+     501,
+     20,
+     11
+    ],
+    "area": 158
+   },
+   {
+    "bbox": [
+     421,
+     505,
+     14,
+     7
+    ],
+    "area": 86
+   }
+  ],
+  "fusion": {
+   "label": "non_panel",
+   "confidence": 0.983,
+   "probs": {
+    "normal": 0.0154,
+    "defect": 0.0016,
+    "non_panel": 0.983
+   },
+   "usedRgb": true
+  }
+ },
+ {
+  "id": "C_0009",
+  "site": "C",
+  "seq": "0009",
+  "folder": "outside",
+  "capturedAt": "2025-11-04 13:07:18",
+  "ir": "drone/C_0009_T.jpg",
+  "rgb": "drone/C_0009_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     599,
+     443,
+     11,
+     11
+    ],
+    "area": 83
+   },
+   {
+    "bbox": [
+     543,
+     449,
+     12,
+     10
+    ],
+    "area": 92
+   },
+   {
+    "bbox": [
+     628,
+     480,
+     5,
+     3
+    ],
+    "area": 10
+   },
+   {
+    "bbox": [
+     636,
+     481,
+     4,
+     3
+    ],
+    "area": 11
+   },
+   {
+    "bbox": [
+     589,
+     484,
+     10,
+     7
+    ],
+    "area": 48
+   },
+   {
+    "bbox": [
+     539,
+     490,
+     8,
+     5
+    ],
+    "area": 28
+   }
+  ],
+  "fusion": {
+   "label": "non_panel",
+   "confidence": 0.9561,
+   "probs": {
+    "normal": 0.0416,
+    "defect": 0.0023,
+    "non_panel": 0.9561
+   },
+   "usedRgb": true
+  }
+ },
+ {
+  "id": "C_0010",
+  "site": "C",
+  "seq": "0010",
+  "folder": "outside",
+  "capturedAt": "2025-11-04 13:07:19",
+  "ir": "drone/C_0010_T.jpg",
+  "rgb": "drone/C_0010_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     629,
+     382,
+     11,
+     10
+    ],
+    "area": 79
+   },
+   {
+    "bbox": [
+     624,
+     426,
+     6,
+     5
+    ],
+    "area": 18
+   }
+  ],
+  "fusion": {
+   "label": "non_panel",
+   "confidence": 0.9639,
+   "probs": {
+    "normal": 0.0356,
+    "defect": 0.0004,
+    "non_panel": 0.9639
+   },
+   "usedRgb": true
+  }
+ },
+ {
+  "id": "C_0011",
+  "site": "C",
+  "seq": "0011",
+  "folder": "normal",
+  "capturedAt": "2025-11-04 13:07:20",
+  "ir": "drone/C_0011_T.jpg",
+  "rgb": "drone/C_0011_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     604,
+     338,
+     11,
+     11
+    ],
+    "area": 99
+   },
+   {
+    "bbox": [
+     601,
+     385,
+     7,
+     5
+    ],
+    "area": 31
+   }
+  ],
+  "fusion": {
+   "label": "non_panel",
+   "confidence": 0.9323,
+   "probs": {
+    "normal": 0.0661,
+    "defect": 0.0016,
+    "non_panel": 0.9323
+   },
+   "usedRgb": true
+  }
+ },
+ {
+  "id": "C_0012",
+  "site": "C",
+  "seq": "0012",
+  "folder": "abnormal",
+  "capturedAt": "2025-11-04 13:07:21",
+  "ir": "drone/C_0012_T.jpg",
+  "rgb": "drone/C_0012_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     624,
+     97,
+     12,
+     18
+    ],
+    "area": 138
+   },
+   {
+    "bbox": [
+     614,
+     106,
+     10,
+     14
+    ],
+    "area": 104
+   },
+   {
+    "bbox": [
+     613,
+     141,
+     6,
+     4
+    ],
+    "area": 16
+   },
+   {
+    "bbox": [
+     617,
+     326,
+     23,
+     11
+    ],
+    "area": 199
+   },
+   {
+    "bbox": [
+     572,
+     328,
+     12,
+     11
+    ],
+    "area": 102
+   },
+   {
+    "bbox": [
+     513,
+     330,
+     11,
+     12
+    ],
+    "area": 106
+   },
+   {
+    "bbox": [
+     614,
+     370,
+     22,
+     8
+    ],
+    "area": 83
+   },
+   {
+    "bbox": [
+     566,
+     374,
+     9,
+     7
+    ],
+    "area": 45
+   },
+   {
+    "bbox": [
+     512,
+     379,
+     8,
+     4
+    ],
+    "area": 24
+   }
+  ],
+  "fusion": {
+   "label": "non_panel",
+   "confidence": 0.9252,
+   "probs": {
+    "normal": 0.0692,
+    "defect": 0.0056,
+    "non_panel": 0.9252
+   },
+   "usedRgb": true
+  }
+ },
+ {
+  "id": "C_0013",
+  "site": "C",
+  "seq": "0013",
+  "folder": "abnormal",
+  "capturedAt": "2025-11-04 13:07:22",
+  "ir": "drone/C_0013_T.jpg",
+  "rgb": "drone/C_0013_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     528,
+     84,
+     7,
+     5
+    ],
+    "area": 20
+   },
+   {
+    "bbox": [
+     470,
+     101,
+     11,
+     15
+    ],
+    "area": 119
+   },
+   {
+    "bbox": [
+     487,
+     102,
+     7,
+     6
+    ],
+    "area": 29
+   },
+   {
+    "bbox": [
+     469,
+     136,
+     8,
+     7
+    ],
+    "area": 38
+   },
+   {
+    "bbox": [
+     491,
+     140,
+     5,
+     4
+    ],
+    "area": 15
+   },
+   {
+    "bbox": [
+     466,
+     145,
+     8,
+     6
+    ],
+    "area": 28
+   },
+   {
+    "bbox": [
+     480,
+     329,
+     47,
+     12
+    ],
+    "area": 435
+   },
+   {
+    "bbox": [
+     422,
+     330,
+     21,
+     12
+    ],
+    "area": 186
+   },
+   {
+    "bbox": [
+     364,
+     333,
+     13,
+     12
+    ],
+    "area": 133
+   },
+   {
+    "bbox": [
+     482,
+     376,
+     23,
+     6
+    ],
+    "area": 74
+   },
+   {
+    "bbox": [
+     426,
+     378,
+     11,
+     7
+    ],
+    "area": 55
+   },
+   {
+    "bbox": [
+     513,
+     378,
+     7,
+     4
+    ],
+    "area": 18
+   },
+   {
+    "bbox": [
+     367,
+     381,
+     11,
+     5
+    ],
+    "area": 40
+   },
+   {
+    "bbox": [
+     340,
+     383,
+     6,
+     4
+    ],
+    "area": 15
+   }
+  ],
+  "fusion": {
+   "label": "non_panel",
+   "confidence": 0.7696,
+   "probs": {
+    "normal": 0.216,
+    "defect": 0.0144,
+    "non_panel": 0.7696
+   },
+   "usedRgb": true
+  }
+ },
+ {
+  "id": "C_0014",
+  "site": "C",
+  "seq": "0014",
+  "folder": "abnormal",
+  "capturedAt": "2025-11-04 13:07:24",
+  "ir": "drone/C_0014_T.jpg",
+  "rgb": "drone/C_0014_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     386,
+     80,
+     5,
+     3
+    ],
+    "area": 14
+   },
+   {
+    "bbox": [
+     326,
+     97,
+     9,
+     15
+    ],
+    "area": 106
+   },
+   {
+    "bbox": [
+     342,
+     97,
+     7,
+     6
+    ],
+    "area": 36
+   },
+   {
+    "bbox": [
+     323,
+     132,
+     10,
+     6
+    ],
+    "area": 41
+   },
+   {
+    "bbox": [
+     348,
+     137,
+     6,
+     4
+    ],
+    "area": 16
+   },
+   {
+    "bbox": [
+     322,
+     139,
+     8,
+     9
+    ],
+    "area": 43
+   },
+   {
+    "bbox": [
+     287,
+     329,
+     15,
+     11
+    ],
+    "area": 142
+   },
+   {
+    "bbox": [
+     341,
+     328,
+     50,
+     12
+    ],
+    "area": 445
+   },
+   {
+    "bbox": [
+     225,
+     330,
+     12,
+     12
+    ],
+    "area": 124
+   },
+   {
+    "bbox": [
+     288,
+     377,
+     12,
+     7
+    ],
+    "area": 67
+   },
+   {
+    "bbox": [
+     347,
+     377,
+     14,
+     5
+    ],
+    "area": 44
+   },
+   {
+    "bbox": [
+     362,
+     377,
+     9,
+     3
+    ],
+    "area": 17
+   },
+   {
+    "bbox": [
+     232,
+     379,
+     9,
+     5
+    ],
+    "area": 32
+   },
+   {
+    "bbox": [
+     380,
+     379,
+     7,
+     3
+    ],
+    "area": 13
+   },
+   {
+    "bbox": [
+     205,
+     381,
+     5,
+     3
+    ],
+    "area": 10
+   }
+  ],
+  "fusion": {
+   "label": "non_panel",
+   "confidence": 0.5361,
+   "probs": {
+    "normal": 0.4479,
+    "defect": 0.016,
+    "non_panel": 0.5361
+   },
+   "usedRgb": true
+  }
+ },
+ {
+  "id": "C_0015",
+  "site": "C",
+  "seq": "0015",
+  "folder": "abnormal",
+  "capturedAt": "2025-11-04 13:07:25",
+  "ir": "drone/C_0015_T.jpg",
+  "rgb": "drone/C_0015_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     181,
+     93,
+     10,
+     21
+    ],
+    "area": 155
+   },
+   {
+    "bbox": [
+     192,
+     93,
+     13,
+     10
+    ],
+    "area": 97
+   },
+   {
+    "bbox": [
+     181,
+     133,
+     10,
+     17
+    ],
+    "area": 116
+   },
+   {
+    "bbox": [
+     204,
+     137,
+     6,
+     5
+    ],
+    "area": 25
+   },
+   {
+    "bbox": [
+     93,
+     328,
+     11,
+     12
+    ],
+    "area": 105
+   },
+   {
+    "bbox": [
+     152,
+     328,
+     13,
+     11
+    ],
+    "area": 122
+   },
+   {
+    "bbox": [
+     202,
+     328,
+     48,
+     12
+    ],
+    "area": 420
+   },
+   {
+    "bbox": [
+     157,
+     375,
+     10,
+     7
+    ],
+    "area": 51
+   },
+   {
+    "bbox": [
+     77,
+     377,
+     6,
+     3
+    ],
+    "area": 15
+   },
+   {
+    "bbox": [
+     104,
+     376,
+     7,
+     5
+    ],
+    "area": 22
+   },
+   {
+    "bbox": [
+     212,
+     376,
+     23,
+     6
+    ],
+    "area": 81
+   }
+  ],
+  "fusion": {
+   "label": "normal",
+   "confidence": 0.6762,
+   "probs": {
+    "normal": 0.6762,
+    "defect": 0.0229,
+    "non_panel": 0.3009
+   },
+   "usedRgb": true
+  }
+ },
+ {
+  "id": "C_0016",
+  "site": "C",
+  "seq": "0016",
+  "folder": "normal",
+  "capturedAt": "2025-11-04 13:07:26",
+  "ir": "drone/C_0016_T.jpg",
+  "rgb": "drone/C_0016_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     549,
+     12,
+     5,
+     3
+    ],
+    "area": 11
+   },
+   {
+    "bbox": [
+     50,
+     107,
+     8,
+     12
+    ],
+    "area": 70
+   },
+   {
+    "bbox": [
+     53,
+     139,
+     5,
+     4
+    ],
+    "area": 12
+   },
+   {
+    "bbox": [
+     536,
+     144,
+     10,
+     8
+    ],
+    "area": 62
+   },
+   {
+    "bbox": [
+     539,
+     171,
+     8,
+     10
+    ],
+    "area": 60
+   },
+   {
+    "bbox": [
+     28,
+     326,
+     11,
+     10
+    ],
+    "area": 85
+   },
+   {
+    "bbox": [
+     73,
+     326,
+     45,
+     12
+    ],
+    "area": 379
+   },
+   {
+    "bbox": [
+     36,
+     372,
+     9,
+     6
+    ],
+    "area": 45
+   },
+   {
+    "bbox": [
+     85,
+     373,
+     22,
+     5
+    ],
+    "area": 84
+   }
+  ],
+  "fusion": {
+   "label": "normal",
+   "confidence": 0.7965,
+   "probs": {
+    "normal": 0.7965,
+    "defect": 0.0066,
+    "non_panel": 0.1969
+   },
+   "usedRgb": true
+  }
+ },
+ {
+  "id": "C_0017",
+  "site": "C",
+  "seq": "0017",
+  "folder": "normal",
+  "capturedAt": "2025-11-04 13:07:27",
+  "ir": "drone/C_0017_T.jpg",
+  "rgb": "drone/C_0017_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     413,
+     4,
+     10,
+     7
+    ],
+    "area": 53
+   },
+   {
+    "bbox": [
+     397,
+     145,
+     9,
+     6
+    ],
+    "area": 47
+   },
+   {
+    "bbox": [
+     402,
+     171,
+     8,
+     8
+    ],
+    "area": 48
+   }
+  ],
+  "fusion": {
+   "label": "normal",
+   "confidence": 0.5799,
+   "probs": {
+    "normal": 0.5799,
+    "defect": 0.0198,
+    "non_panel": 0.4004
+   },
+   "usedRgb": true
+  }
+ },
+ {
+  "id": "C_0018",
+  "site": "C",
+  "seq": "0018",
+  "folder": "normal",
+  "capturedAt": "2025-11-04 13:07:28",
+  "ir": "drone/C_0018_T.jpg",
+  "rgb": "drone/C_0018_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     300,
+     2,
+     9,
+     8
+    ],
+    "area": 65
+   },
+   {
+    "bbox": [
+     280,
+     142,
+     11,
+     9
+    ],
+    "area": 80
+   },
+   {
+    "bbox": [
+     287,
+     173,
+     7,
+     6
+    ],
+    "area": 33
+   }
+  ],
+  "fusion": {
+   "label": "normal",
+   "confidence": 0.5501,
+   "probs": {
+    "normal": 0.5501,
+    "defect": 0.0093,
+    "non_panel": 0.4406
+   },
+   "usedRgb": true
+  }
+ },
+ {
+  "id": "C_0019",
+  "site": "C",
+  "seq": "0019",
+  "folder": "abnormal",
+  "capturedAt": "2025-11-04 13:07:29",
+  "ir": "drone/C_0019_T.jpg",
+  "rgb": "drone/C_0019_V.jpg",
+  "width": 640,
+  "height": 512,
+  "boxes": [
+   {
+    "bbox": [
+     245,
+     0,
+     5,
+     3
+    ],
+    "area": 13
+   },
+   {
+    "bbox": [
+     235,
+     5,
+     12,
+     6
+    ],
+    "area": 55
+   },
+   {
+    "bbox": [
+     597,
+     107,
+     12,
+     22
+    ],
+    "area": 160
+   },
+   {
+    "bbox": [
+     598,
+     139,
+     11,
+     9
+    ],
+    "area": 77
+   },
+   {
+    "bbox": [
+     214,
+     145,
+     12,
+     10
+    ],
+    "area": 85
+   },
+   {
+    "bbox": [
+     221,
+     173,
+     9,
+     9
+    ],
+    "area": 69
+   }
+  ],
+  "fusion": {
+   "label": "normal",
+   "confidence": 0.5372,
+   "probs": {
+    "normal": 0.5372,
+    "defect": 0.0111,
+    "non_panel": 0.4517
+   },
+   "usedRgb": true
+  }
  }
 ]
