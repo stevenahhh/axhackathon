@@ -40,7 +40,7 @@ PREFIX = re.compile(r"^/i/[^/]+")
 COMPRESSIBLE = (".js", ".css", ".html", ".svg")
 MAX_UPLOAD = 30 * 1024 * 1024
 MAX_JSON = 1024 * 1024
-IMMUTABLE = ("/assets/", "/samples/", "/drone/")
+IMMUTABLE = ("/assets/", "/drone/")
 
 PORT = int(os.environ.get("PORT", "8501"))
 SERVING_URL = os.environ.get(
