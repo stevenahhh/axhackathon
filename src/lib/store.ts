@@ -2,7 +2,9 @@ import { useSyncExternalStore } from "react"
 
 import type { Inspection, Mark, Photo, Review, SiteId, ThermalEntry } from "@/types"
 
-const KEY = "suntek-inspections-v1"
+// 점검 기록은 로그인한 id마다 따로 둔다. 로그인 전에 쓰던 키 하나짜리 기록은 처음 한 번 guest 몸으로 옮긴다.
+const LEGACY_KEY = "suntek-inspections-v1"
+const keyOf = (user: string) => `${LEGACY_KEY}:${user}`
 const SITE_IDS: SiteId[] = ["A", "B", "C", "D", "E"]
 
 const emptyInspection = (): Inspection => ({
@@ -22,28 +24,46 @@ export const EMPTY_THERMAL: ThermalEntry = { p1: "", p2: "", p3: "", part: "태�
 
 type State = { inspections: Record<SiteId, Inspection>; uploads: Photo[] }
 
-function load(): State {
+function migrateLegacy() {
+  const legacy = localStorage.getItem(LEGACY_KEY)
+  if (legacy === null) return
+  if (localStorage.getItem(keyOf("guest")) === null) localStorage.setItem(keyOf("guest"), legacy)
+  localStorage.removeItem(LEGACY_KEY)
+}
+
+function load(key: string | null): State {
   const fresh = Object.fromEntries(SITE_IDS.map((id) => [id, emptyInspection()])) as Record<
     SiteId,
     Inspection
   >
+  if (!key) return { inspections: fresh, uploads: [] }
   try {
-    const saved = JSON.parse(localStorage.getItem(KEY) ?? "null") as Partial<
+    const saved = JSON.parse(localStorage.getItem(key) ?? "null") as Partial<
       Record<SiteId, Inspection>
     > | null
     for (const id of SITE_IDS) if (saved?.[id]) fresh[id] = { ...emptyInspection(), ...saved[id] }
   } catch {
-    localStorage.removeItem(KEY)
+    localStorage.removeItem(key)
   }
   return { inspections: fresh, uploads: [] }
 }
 
-let state = load()
+let key: string | null = null
+let state = load(null)
 const listeners = new Set<() => void>()
 
 function commit(next: State) {
   state = next
-  localStorage.setItem(KEY, JSON.stringify(state.inspections))
+  if (key) localStorage.setItem(key, JSON.stringify(state.inspections))
+  listeners.forEach((notify) => notify())
+}
+
+// 로그인한 id의 기록을 불러온다. 같은 id로 다시 부르면 올린 사진(uploads)을 그대로 둔다.
+export function setStoreUser(user: string) {
+  if (key === keyOf(user)) return
+  migrateLegacy()
+  key = keyOf(user)
+  state = load(key)
   listeners.forEach((notify) => notify())
 }
 

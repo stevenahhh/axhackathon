@@ -7,8 +7,10 @@ import { Toaster } from "@/components/ui/sonner"
 import { fetchHealth } from "@/lib/api"
 import { photosOf, summarize, type Summary } from "@/lib/inspection"
 import { hrefOf, useRoute, type Route } from "@/lib/route"
+import { checkSession, signOut, useSession } from "@/lib/session"
 import { useAppState } from "@/lib/store"
 import { DashboardPage, type SiteStat } from "@/pages/DashboardPage"
+import { LoginPage } from "@/pages/LoginPage"
 import { RecordPage } from "@/pages/RecordPage"
 import { ReviewPage } from "@/pages/ReviewPage"
 import type { Inspection, Photo, SiteId } from "@/types"
@@ -85,6 +87,22 @@ function useServingHealth() {
 }
 
 export default function App() {
+  const session = useSession()
+  useEffect(() => {
+    void checkSession()
+  }, [])
+
+  return (
+    <>
+      {session.status === "loading" && <div className="min-h-dvh bg-background" />}
+      {session.status === "out" && <LoginPage />}
+      {session.status === "in" && <Workspace user={session.id} />}
+      <Toaster />
+    </>
+  )
+}
+
+function Workspace({ user }: { user: string }) {
   const route = useRoute()
   const { inspections, uploads } = useAppState()
   useServingHealth()
@@ -112,7 +130,7 @@ export default function App() {
   }, [href])
 
   return (
-    <AppShell route={route} title={TITLES[route.page]} dots={dots}>
+    <AppShell route={route} title={TITLES[route.page]} dots={dots} user={user} onSignOut={() => void signOut()}>
       {route.page === "dashboard" && <DashboardPage stats={stats} />}
       {route.page === "review" && (
         <ReviewPage
@@ -134,7 +152,6 @@ export default function App() {
           stats={stats}
         />
       )}
-      <Toaster />
     </AppShell>
   )
 }
