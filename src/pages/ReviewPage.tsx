@@ -11,6 +11,7 @@ import {
 } from "lucide-react"
 
 import { DetectionImage } from "@/components/DetectionImage"
+import { PhotoCompare } from "@/components/PhotoCompare"
 import { FusionBadge, ReviewBadge, SourceBadge, TierBadge } from "@/components/StatusBadges"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -90,23 +91,7 @@ function PhotoDetail({
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-4">
-        <div className={cn("grid gap-2", photo.rgb && "sm:grid-cols-2 lg:grid-cols-1")}>
-          <figure className="flex flex-col gap-1">
-            <DetectionImage photo={photo} className="rounded-lg" />
-            <figcaption className="text-xs text-muted-foreground">열화상 · AI 후보 {undecidable ? "-" : `${boxes}곳`}</figcaption>
-          </figure>
-          {photo.rgb && (
-            <figure className="flex flex-col gap-1">
-              <img
-                src={photo.rgb}
-                alt={`${photo.seq}번 실화상`}
-                decoding="async"
-                className="aspect-[4/3] w-full rounded-lg bg-muted object-cover"
-              />
-              <figcaption className="text-xs text-muted-foreground">같은 시각 실화상</figcaption>
-            </figure>
-          )}
-        </div>
+        <PhotoCompare photo={photo} caption={`열화상 · AI 후보 ${undecidable ? "-" : `${boxes}곳`}`} />
         <dl className="grid grid-cols-3 gap-2 text-center">
           {[
             ["후보 위치", `${boxes}곳`],

@@ -1,3 +1,5 @@
+import type { ReactNode } from "react"
+
 import { cn } from "@/lib/utils"
 import type { Photo } from "@/types"
 
@@ -9,11 +11,16 @@ export function DetectionImage({
   className,
   boxClassName = "border-2",
   loading = "eager",
+  layer,
+  children,
 }: {
   photo: Photo
   className?: string
   boxClassName?: string
   loading?: "eager" | "lazy"
+  // layer는 열화상과 박스 사이(비교용 실화상), children은 박스 위(비교 손잡이)에 그린다.
+  layer?: ReactNode
+  children?: ReactNode
 }) {
   return (
     <div className={cn("relative overflow-hidden bg-muted", className)}>
@@ -26,6 +33,7 @@ export function DetectionImage({
         decoding="async"
         className="block h-auto w-full"
       />
+      {layer}
       {photo.boxes.map(({ bbox: [x, y, w, h] }, index) => (
         <span
           key={index}
@@ -43,6 +51,7 @@ export function DetectionImage({
           }}
         />
       ))}
+      {children}
     </div>
   )
 }
