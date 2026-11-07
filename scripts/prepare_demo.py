@@ -2,9 +2,15 @@
 
 실행: uv run --no-project --with pillow python scripts/prepare_demo.py
 원본(data/drone)은 읽기만 한다.
+
+--fusion-only: drone.json의 사진 쌍(public/drone/<id>_T.jpg, _V.jpg)을 PREDICT_BASE(기본
+http://127.0.0.1:8601)의 /api/classify로 보내 fusion 판정만 기록한다. 박스는 그대로 둔다.
+실화상은 원본 비율(4:3)을 그대로 보내며, 열화상 화각 자르기는 서빙이 한다.
 """
 import json
+import os
 import re
+import sys
 import subprocess
 import unicodedata
 from pathlib import Path
@@ -37,6 +43,25 @@ def predict(path: Path) -> dict:
         capture_output=True, text=True, check=True,
     ).stdout
     return json.loads(out)
+
+
+def classify(ir: Path, rgb: Path) -> dict:
+    base = os.environ.get("PREDICT_BASE", "http://127.0.0.1:8601").rstrip("/")
+    out = subprocess.run(
+        ["curl", "-s", "-f", "-m", "90", "-F", f"ir=@{ir};type=image/jpeg", "-F", f"rgb=@{rgb};type=image/jpeg",
+         f"{base}/api/classify"],
+        capture_output=True, text=True, check=True,
+    ).stdout
+    return json.loads(out)
+
+
+def fusion_only() -> None:
+    photos = json.loads(OUT_JSON.read_text())
+    for photo in photos:
+        result = classify(WEB / "public" / photo["ir"], WEB / "public" / photo["rgb"])
+        photo["fusion"] = {key: result[key] for key in ("label", "confidence", "probs", "usedRgb")}
+        print(photo["id"], photo["folder"], result["label"], result["confidence"], len(photo["boxes"]))
+    OUT_JSON.write_text(json.dumps(photos, ensure_ascii=False, indent=1) + "\n")
 
 
 def main() -> None:
@@ -72,4 +97,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    fusion_only() if "--fusion-only" in sys.argv[1:] else main()

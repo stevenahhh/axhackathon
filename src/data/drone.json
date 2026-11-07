@@ -145,7 +145,17 @@
     ],
     "area": 62
    }
-  ]
+  ],
+  "fusion": {
+   "label": "defect",
+   "confidence": 0.9933,
+   "probs": {
+    "normal": 0.0022,
+    "defect": 0.9933,
+    "non_panel": 0.0045
+   },
+   "usedRgb": true
+  }
  },
  {
   "id": "A_0121",
@@ -320,7 +330,17 @@
     ],
     "area": 65
    }
-  ]
+  ],
+  "fusion": {
+   "label": "defect",
+   "confidence": 0.994,
+   "probs": {
+    "normal": 0.0017,
+    "defect": 0.994,
+    "non_panel": 0.0044
+   },
+   "usedRgb": true
+  }
  },
  {
   "id": "A_0054",
@@ -450,7 +470,17 @@
     ],
     "area": 48
    }
-  ]
+  ],
+  "fusion": {
+   "label": "defect",
+   "confidence": 0.8579,
+   "probs": {
+    "normal": 0.0056,
+    "defect": 0.8579,
+    "non_panel": 0.1364
+   },
+   "usedRgb": true
+  }
  },
  {
   "id": "A_0193",
@@ -607,7 +637,17 @@
     ],
     "area": 99
    }
-  ]
+  ],
+  "fusion": {
+   "label": "defect",
+   "confidence": 0.9635,
+   "probs": {
+    "normal": 0.0133,
+    "defect": 0.9635,
+    "non_panel": 0.0232
+   },
+   "usedRgb": true
+  }
  },
  {
   "id": "A_0133",
@@ -665,7 +705,17 @@
     ],
     "area": 66
    }
-  ]
+  ],
+  "fusion": {
+   "label": "defect",
+   "confidence": 0.9264,
+   "probs": {
+    "normal": 0.0206,
+    "defect": 0.9264,
+    "non_panel": 0.053
+   },
+   "usedRgb": true
+  }
  },
  {
   "id": "A_0004",
@@ -705,7 +755,17 @@
     ],
     "area": 63
    }
-  ]
+  ],
+  "fusion": {
+   "label": "defect",
+   "confidence": 0.494,
+   "probs": {
+    "normal": 0.1597,
+    "defect": 0.494,
+    "non_panel": 0.3464
+   },
+   "usedRgb": true
+  }
  },
  {
   "id": "A_0275",
@@ -754,7 +814,17 @@
     ],
     "area": 32
    }
-  ]
+  ],
+  "fusion": {
+   "label": "non_panel",
+   "confidence": 0.4548,
+   "probs": {
+    "normal": 0.1181,
+    "defect": 0.4271,
+    "non_panel": 0.4548
+   },
+   "usedRgb": true
+  }
  },
  {
   "id": "A_0164",
@@ -830,7 +900,17 @@
     ],
     "area": 79
    }
-  ]
+  ],
+  "fusion": {
+   "label": "non_panel",
+   "confidence": 0.859,
+   "probs": {
+    "normal": 0.0529,
+    "defect": 0.0881,
+    "non_panel": 0.859
+   },
+   "usedRgb": true
+  }
  },
  {
   "id": "A_0295",
@@ -842,7 +922,17 @@
   "rgb": "drone/A_0295_V.jpg",
   "width": 640,
   "height": 512,
-  "boxes": []
+  "boxes": [],
+  "fusion": {
+   "label": "normal",
+   "confidence": 0.9751,
+   "probs": {
+    "normal": 0.9751,
+    "defect": 0.0051,
+    "non_panel": 0.0198
+   },
+   "usedRgb": true
+  }
  },
  {
   "id": "A_0297",
@@ -854,7 +944,17 @@
   "rgb": "drone/A_0297_V.jpg",
   "width": 640,
   "height": 512,
-  "boxes": []
+  "boxes": [],
+  "fusion": {
+   "label": "normal",
+   "confidence": 0.9573,
+   "probs": {
+    "normal": 0.9573,
+    "defect": 0.0047,
+    "non_panel": 0.038
+   },
+   "usedRgb": true
+  }
  },
  {
   "id": "B_0646",
@@ -957,7 +1057,17 @@
     ],
     "area": 43
    }
-  ]
+  ],
+  "fusion": {
+   "label": "defect",
+   "confidence": 0.9986,
+   "probs": {
+    "normal": 0.0007,
+    "defect": 0.9986,
+    "non_panel": 0.0007
+   },
+   "usedRgb": true
+  }
  },
  {
   "id": "B_0586",
@@ -1141,7 +1251,17 @@
     ],
     "area": 62
    }
-  ]
+  ],
+  "fusion": {
+   "label": "defect",
+   "confidence": 0.9999,
+   "probs": {
+    "normal": 0.0,
+    "defect": 0.9999,
+    "non_panel": 0.0001
+   },
+   "usedRgb": true
+  }
  },
  {
   "id": "B_0078",
@@ -1163,7 +1283,17 @@
     ],
     "area": 524
    }
-  ]
+  ],
+  "fusion": {
+   "label": "normal",
+   "confidence": 0.7579,
+   "probs": {
+    "normal": 0.7579,
+    "defect": 0.217,
+    "non_panel": 0.0251
+   },
+   "usedRgb": true
+  }
  },
  {
   "id": "B_0327",
@@ -1185,7 +1315,17 @@
     ],
     "area": 396
    }
-  ]
+  ],
+  "fusion": {
+   "label": "normal",
+   "confidence": 0.511,
+   "probs": {
+    "normal": 0.511,
+    "defect": 0.4116,
+    "non_panel": 0.0774
+   },
+   "usedRgb": true
+  }
  },
  {
   "id": "B_0068",
@@ -1197,7 +1337,17 @@
   "rgb": "drone/B_0068_V.jpg",
   "width": 640,
   "height": 512,
-  "boxes": []
+  "boxes": [],
+  "fusion": {
+   "label": "normal",
+   "confidence": 0.9097,
+   "probs": {
+    "normal": 0.9097,
+    "defect": 0.0173,
+    "non_panel": 0.073
+   },
+   "usedRgb": true
+  }
  },
  {
   "id": "B_0405",
@@ -1209,7 +1359,17 @@
   "rgb": "drone/B_0405_V.jpg",
   "width": 640,
   "height": 512,
-  "boxes": []
+  "boxes": [],
+  "fusion": {
+   "label": "normal",
+   "confidence": 0.9415,
+   "probs": {
+    "normal": 0.9415,
+    "defect": 0.0201,
+    "non_panel": 0.0383
+   },
+   "usedRgb": true
+  }
  },
  {
   "id": "B_0581",
@@ -1249,7 +1409,17 @@
     ],
     "area": 70
    }
-  ]
+  ],
+  "fusion": {
+   "label": "normal",
+   "confidence": 0.617,
+   "probs": {
+    "normal": 0.617,
+    "defect": 0.317,
+    "non_panel": 0.066
+   },
+   "usedRgb": true
+  }
  },
  {
   "id": "B_0248",
@@ -1280,6 +1450,16 @@
     ],
     "area": 14
    }
-  ]
+  ],
+  "fusion": {
+   "label": "non_panel",
+   "confidence": 0.5027,
+   "probs": {
+    "normal": 0.3744,
+    "defect": 0.1229,
+    "non_panel": 0.5027
+   },
+   "usedRgb": true
+  }
  }
 ]
