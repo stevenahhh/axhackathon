@@ -1,8 +1,9 @@
-import { useEffect, useState, type ChangeEvent, type ReactNode } from "react"
+import { useState, type ChangeEvent, type ReactNode } from "react"
 import { ArrowRightIcon, LockIcon, PrinterIcon, ThermometerIcon } from "lucide-react"
 
 import { ReopenButton } from "@/components/Form9Editor"
 import { PaperFrame } from "@/components/PaperFrame"
+import { PrintPortal } from "@/components/PrintPortal"
 import { PART_LABELS, ThermalPreview, modeOf, thermalDate, type Level } from "@/components/ThermalPreview"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -10,6 +11,7 @@ import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { thermalJudgement, type Summary } from "@/lib/inspection"
+import { printDocument, usePrintTarget } from "@/lib/print"
 import { hrefOf } from "@/lib/route"
 import { EMPTY_THERMAL, setThermal } from "@/lib/store"
 import { cn } from "@/lib/utils"
@@ -111,22 +113,11 @@ export function ThermalRecord({
   summary: Summary
 }) {
   const [selectedId, setSelectedId] = useState<string>()
-  const [printAll, setPrintAll] = useState(false)
+  const printTarget = usePrintTarget()
   const confirmed = summary.confirmed
   const selected = confirmed.find((photo) => photo.id === selectedId) ?? confirmed[0]
   const locked = !!inspection.savedAt
   const entryOf = (photo: Photo): ThermalEntry => ({ ...EMPTY_THERMAL, ...inspection.thermal[photo.id] })
-
-  useEffect(() => {
-    if (!printAll) return
-    const reset = () => setPrintAll(false)
-    window.addEventListener("afterprint", reset)
-    const frame = requestAnimationFrame(() => window.print())
-    return () => {
-      cancelAnimationFrame(frame)
-      window.removeEventListener("afterprint", reset)
-    }
-  }, [printAll])
 
   if (!selected) {
     return (
@@ -152,7 +143,7 @@ export function ThermalRecord({
   const entry = entryOf(selected)
   const mode = modeOf(entry)
   const hint = MODES.find((item) => item.value === mode)!.hint
-  const pages = printAll ? confirmed : [selected]
+  const pages = printTarget === "thermal-all" ? confirmed : printTarget === "thermal-one" ? [selected] : []
   const field = (key: (typeof KEYS)[number] | "part") => ({
     id: `thermal-${key}`,
     value: entry[key],
@@ -220,38 +211,35 @@ export function ThermalRecord({
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm text-muted-foreground">A4 미리보기 · 확정 사진마다 1장</p>
             <div className="flex gap-2">
-              <Button variant="outline" className={TOUCH_BUTTON} onClick={() => window.print()}>
+              <Button variant="outline" className={TOUCH_BUTTON} onClick={() => void printDocument("thermal-one")}>
                 <PrinterIcon />
                 이 장 인쇄
               </Button>
               {confirmed.length > 1 && (
-                <Button variant="outline" className={TOUCH_BUTTON} onClick={() => setPrintAll(true)}>
+                <Button variant="outline" className={TOUCH_BUTTON} onClick={() => void printDocument("thermal-all")}>
                   <PrinterIcon />
                   전체 인쇄 {confirmed.length}장
                 </Button>
               )}
             </div>
           </div>
-          <PaperFrame printable={false}>
+          <PaperFrame>
             <ThermalPreview site={site} photo={selected} inspection={inspection} entry={entry} />
           </PaperFrame>
         </div>
       </div>
 
-      <div data-slot="thermal-print" className="paper print-area hidden print:block">
-        {confirmed.map((photo) => {
-          const index = pages.indexOf(photo)
-          return (
-            <div
-              key={photo.id}
-              hidden={index < 0}
-              className={cn("break-inside-avoid", index >= 0 && index < pages.length - 1 && "break-after-page")}
-            >
-              <ThermalPreview site={site} photo={photo} inspection={inspection} entry={entryOf(photo)} />
-            </div>
-          )
-        })}
-      </div>
+      <PrintPortal active={pages.length > 0}>
+        {pages.map((photo, index) => (
+          <div
+            key={photo.id}
+            data-slot="thermal-print-page"
+            className={cn("break-inside-avoid", index < pages.length - 1 && "break-after-page")}
+          >
+            <ThermalPreview site={site} photo={photo} inspection={inspection} entry={entryOf(photo)} />
+          </div>
+        ))}
+      </PrintPortal>
     </div>
   )
 }

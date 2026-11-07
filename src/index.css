@@ -166,23 +166,27 @@ body {
   padding: 3px 5px;
 }
 
+/* 인쇄는 #root(화면 레이아웃) 대신 body 바로 아래의 #print-root에 따로 그린 사본을 찍는다(src/lib/print.ts). */
+@media screen {
+  #print-root {
+    display: none;
+  }
+}
+
 @media print {
   @page {
     size: A4;
     margin: 12mm;
   }
-  body * {
-    visibility: hidden;
+  #root {
+    display: none !important;
   }
-  .print-area,
-  .print-area * {
-    visibility: visible;
+  #print-root {
+    display: block;
   }
-  .print-area {
-    position: absolute;
-    inset: 0 auto auto 0;
-    width: 100%;
-    box-shadow: none !important;
-    border: 0 !important;
+  /* 별지 제9호의 점검 항목 28행이 A4 한 장(여백 12mm)에 들어가도록 셀 상하 여백을 1px씩 줄인다. */
+  .paper th,
+  .paper td {
+    padding-block: 2px;
   }
 }

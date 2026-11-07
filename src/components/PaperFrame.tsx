@@ -2,17 +2,15 @@ import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode }
 
 import { cn } from "@/lib/utils"
 
-// 화면에서는 scale로 줄여 보이고, 인쇄 크기와 범위는 index.css의 .print-area 규칙이 정한다.
+// 화면 미리보기 전용. A4 폭을 scale로 줄여 보이고, 인쇄는 PrintPortal이 따로 그린 사본으로 한다.
 export function PaperFrame({
   children,
   className,
   paperClassName,
-  printable = true,
 }: {
   children: ReactNode
   className?: string
   paperClassName?: string
-  printable?: boolean
 }) {
   const frameRef = useRef<HTMLDivElement>(null)
   const paperRef = useRef<HTMLDivElement>(null)
@@ -40,15 +38,14 @@ export function PaperFrame({
   return (
     <div
       ref={frameRef}
-      className={cn("w-full min-w-0 overflow-hidden [contain:inline-size] print:h-auto print:overflow-visible print:[contain:none]", className)}
+      className={cn("w-full min-w-0 overflow-hidden [contain:inline-size]", className)}
       style={{ height }}
     >
       <div
         ref={paperRef}
         data-slot="paper"
         className={cn(
-          "paper w-[210mm] min-h-[297mm] origin-top-left scale-(--paper-scale) shadow-sm ring-1 ring-foreground/15 print:min-h-0 print:w-full print:scale-100 print:shadow-none print:ring-0",
-          printable && "print-area",
+          "paper w-[210mm] min-h-[297mm] origin-top-left scale-(--paper-scale) shadow-sm ring-1 ring-foreground/15",
           paperClassName
         )}
         style={{ "--paper-scale": scale } as CSSProperties}

@@ -4,12 +4,14 @@ import { PrinterIcon } from "lucide-react"
 import { Form9Editor } from "@/components/Form9Editor"
 import { Form9Preview } from "@/components/Form9Preview"
 import { PaperFrame } from "@/components/PaperFrame"
+import { PrintPortal } from "@/components/PrintPortal"
 import { SitePicker, SiteSummaryCard, type SiteChip } from "@/components/SitePicker"
 import { ThermalRecord } from "@/components/ThermalRecord"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SITES } from "@/data/sites"
 import { missingCells, type Summary } from "@/lib/inspection"
+import { printDocument, usePrintTarget } from "@/lib/print"
 import { cn } from "@/lib/utils"
 import type { SiteStat } from "@/pages/DashboardPage"
 import type { Inspection, Photo, SiteId } from "@/types"
@@ -30,6 +32,7 @@ export function RecordPage({
   stats: Record<SiteId, SiteStat>
 }) {
   const [tab, setTab] = useState<Tab>("edit")
+  const printTarget = usePrintTarget()
   const chips = Object.fromEntries(
     SITES.map((item) => {
       const stat = stats[item.id]
@@ -70,13 +73,13 @@ export function RecordPage({
           </div>
           <div
             className={cn(
-              "flex flex-col gap-3 lg:sticky lg:top-20 lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto print:static print:max-h-none print:overflow-visible",
+              "flex flex-col gap-3 lg:sticky lg:top-20 lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto",
               tab === "edit" && "hidden lg:flex"
             )}
           >
             <div className="flex items-center justify-between gap-3">
               <p className="text-sm text-muted-foreground">A4 미리보기 · 인쇄하면 이 서식만 나옵니다.</p>
-              <Button variant="outline" className="h-11 lg:h-8" onClick={() => window.print()}>
+              <Button variant="outline" className="h-11 lg:h-8" onClick={() => void printDocument("form9")}>
                 <PrinterIcon />
                 인쇄
               </Button>
@@ -87,6 +90,9 @@ export function RecordPage({
           </div>
         </div>
       )}
+      <PrintPortal active={printTarget === "form9"}>
+        <Form9Preview site={site} inspection={inspection} summary={summary} />
+      </PrintPortal>
     </div>
   )
 }
