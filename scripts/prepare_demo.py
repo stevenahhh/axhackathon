@@ -14,8 +14,10 @@
 
 --site: 처리할 발전소(쉼표 구분, 기본 전체). 지정하지 않은 발전소 항목은 그대로 둔다.
 --fusion-only: 지정한 발전소의 기존 항목에 융합 판정만 다시 기록한다. 박스는 그대로 둔다.
+--zoom-only: 지정한 발전소의 기존 항목에 실화상 줌(rgbZoom)만 원본 EXIF에서 다시 읽어 적는다.
 """
 import argparse
+import collections
 import contextlib
 import io
 import json
@@ -49,6 +51,7 @@ SITES = {
 FOLDER = {"비정상": "abnormal", "정상": "normal", "패널 외": "outside"}
 NAME = re.compile(r"DJI_(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})_(\d{4})_([TV])\.JPG$", re.IGNORECASE)
 FUSION_KEYS = ("label", "confidence", "probs", "usedRgb")
+EXIF_IFD, EXIF_DIGITAL_ZOOM = 0x8769, 0xA404
 
 
 def unpacked(src: Path, stack: contextlib.ExitStack) -> Path:
@@ -70,6 +73,13 @@ def index(root: Path, kind: str) -> dict[str, Path]:
         if match and match.group(8).upper() == kind:
             found[match.group(7)] = path
     return found
+
+
+def rgb_zoom(rgb_src: Path) -> float:
+    """실화상 EXIF의 DigitalZoomRatio. 웹의 열화상 화각 자르기 비율은 줌 1.0 기준이라 이 값으로 배율을 고친다.
+    같은 M3T라도 비행마다 1.0과 1.95가 섞여 있다(하동·음성·이천 1.95, 영광 1.0, 제주 대부분 1.95)."""
+    with Image.open(rgb_src) as image:
+        return float(image.getexif().get_ifd(EXIF_IFD).get(EXIF_DIGITAL_ZOOM, 1.0))
 
 
 def curl_json(args: list[str]) -> dict:
@@ -141,6 +151,7 @@ def build_pair(site: str, seq: str, ir_src: Path, rgb_src: Path, scratch: Path) 
         "capturedAt": f"{y}-{mo}-{d} {h}:{mi}:{s}",
         "ir": f"drone/{ir_out.name}",
         "rgb": f"drone/{rgb_out.name}",
+        "rgbZoom": rgb_zoom(rgb_src),
         "width": result["width"],
         "height": result["height"],
         "boxes": [{"bbox": x["bbox"], "area": x["area"]} for x in result["defects"]],
@@ -191,13 +202,32 @@ def fusion_only(sites: list[str]) -> None:
     save_photos(photos)
 
 
+def zoom_only(sites: list[str]) -> None:
+    photos = load_photos()
+    with contextlib.ExitStack() as stack:
+        for site in sites:
+            rgbs = index(unpacked(SITES[site][1], stack), "V")
+            mine = [photo for photo in photos if photo["site"] == site]
+            for photo in mine:
+                photo["rgbZoom"] = rgb_zoom(rgbs[photo["seq"]])
+            print(site, dict(collections.Counter(photo["rgbZoom"] for photo in mine)), flush=True)
+    save_photos(photos)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--site", default=",".join(SITES), help="처리할 발전소(쉼표 구분)")
-    parser.add_argument("--fusion-only", action="store_true", help="박스는 두고 fusion 판정만 다시 기록")
+    only = parser.add_mutually_exclusive_group()
+    only.add_argument("--fusion-only", action="store_true", help="박스는 두고 fusion 판정만 다시 기록")
+    only.add_argument("--zoom-only", action="store_true", help="실화상 줌(rgbZoom)만 원본 EXIF에서 다시 기록")
     args = parser.parse_args()
     chosen = [site for site in args.site.split(",") if site]
     unknown = set(chosen) - set(SITES)
     if unknown:
         parser.error(f"모르는 발전소: {', '.join(sorted(unknown))}")
-    fusion_only(chosen) if args.fusion_only else main(chosen)
+    if args.fusion_only:
+        fusion_only(chosen)
+    elif args.zoom_only:
+        zoom_only(chosen)
+    else:
+        main(chosen)
