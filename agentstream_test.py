@@ -58,6 +58,15 @@ class StreamTest(unittest.TestCase):
         ).splitlines(keepends=True)
         self.assertEqual(agentstream.read_stream(lines, float("inf")), "앞뒤")
 
+    def test_reads_live_shape_where_type_and_event_differ(self):
+        lines = ndjson(
+            {"type": "progress", "event": "agent.progress", "event_id": "t:1"},
+            {"type": "AIMessageChunk", "event": "assistant.delta", "event_id": "t:2", "content": '{"opinion":'},
+            {"type": "AIMessageChunk", "event": "assistant.delta", "event_id": "t:3", "content": '"ok"}'},
+            {"event": "turn.completed", "event_id": "t:4"},
+        ).splitlines(keepends=True)
+        self.assertEqual(agentstream.read_stream(lines, float("inf")), '{"opinion":"ok"}')
+
     def test_stream_without_completion_fails(self):
         lines = ndjson({"type": "assistant.delta", "content": "중간"}).splitlines()
         with self.assertRaises(agentstream.UpstreamError):

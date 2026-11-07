@@ -109,7 +109,7 @@ def read_stream(lines, deadline: float) -> str:
             if event_id in seen:
                 continue
             seen.add(event_id)
-        kind = event.get("type") or event.get("event")
+        kind = event.get("event") or event.get("type")
         if kind == "assistant.delta":
             parts.append(delta_text(event))
         elif kind in ("turn.failed", "tool.failed"):
