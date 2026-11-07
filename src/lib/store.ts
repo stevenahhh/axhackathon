@@ -94,6 +94,19 @@ export function saveInspection(site: SiteId) {
   })
 }
 
+// 저장된 기록을 다시 연다. 직전 저장 시각은 lastSavedAt에 남기고 수정 회차를 올린다.
+export function reopenInspection(site: SiteId) {
+  const { savedAt, ...current } = state.inspections[site]
+  if (!savedAt) return
+  commit({
+    ...state,
+    inspections: {
+      ...state.inspections,
+      [site]: { ...current, lastSavedAt: savedAt, revision: (current.revision ?? 0) + 1 },
+    },
+  })
+}
+
 export function resetInspection(site: SiteId) {
   commit({ ...state, inspections: { ...state.inspections, [site]: emptyInspection() } })
 }

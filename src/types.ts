@@ -68,6 +68,9 @@ export type Inspection = {
   thermal: Record<string, ThermalEntry>
   startedAt?: string
   savedAt?: string
+  // 저장 뒤 다시 열어 고칠 때: lastSavedAt은 직전 저장 시각, revision은 다시 연 횟수.
+  lastSavedAt?: string
+  revision?: number
 }
 
 export type HistoryEntry = {

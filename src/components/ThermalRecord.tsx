@@ -1,6 +1,7 @@
 import { useEffect, useState, type ChangeEvent, type ReactNode } from "react"
 import { ArrowRightIcon, LockIcon, PrinterIcon, ThermometerIcon } from "lucide-react"
 
+import { ReopenButton } from "@/components/Form9Editor"
 import { PaperFrame } from "@/components/PaperFrame"
 import { PART_LABELS, ThermalPreview, modeOf, thermalDate, type Level } from "@/components/ThermalPreview"
 import { Badge } from "@/components/ui/badge"
@@ -204,10 +205,13 @@ export function ThermalRecord({
               <Input {...field("part")} className="h-11" />
             </Field>
             {locked && (
-              <p className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
-                <LockIcon className="size-4 shrink-0" />
-                저장된 기록이라 바꿀 수 없습니다.
-              </p>
+              <>
+                <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <LockIcon className="size-4 shrink-0" />
+                  기록표를 저장해 온도 입력이 잠겼습니다.
+                </p>
+                <ReopenButton site={site} />
+              </>
             )}
           </CardContent>
         </Card>

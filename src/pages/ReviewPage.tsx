@@ -11,6 +11,7 @@ import {
 } from "lucide-react"
 
 import { DetectionImage } from "@/components/DetectionImage"
+import { ReopenButton } from "@/components/Form9Editor"
 import { PhotoCompare } from "@/components/PhotoCompare"
 import { FusionBadge, ReviewBadge, SourceBadge, TierBadge } from "@/components/StatusBadges"
 import { Button } from "@/components/ui/button"
@@ -128,10 +129,13 @@ function PhotoDetail({
 
       <div className="flex flex-col gap-2 border-t p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         {locked ? (
-          <p className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
-            <LockIcon className="size-4" />
-            저장된 기록이라 바꿀 수 없습니다.
-          </p>
+          <>
+            <p className="flex items-center gap-2 text-sm text-muted-foreground">
+              <LockIcon className="size-4 shrink-0" />
+              기록표를 저장해 판정이 잠겼습니다.
+            </p>
+            <ReopenButton site={photo.site} />
+          </>
         ) : (
           <>
             <Button

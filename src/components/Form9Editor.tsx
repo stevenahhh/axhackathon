@@ -6,6 +6,7 @@ import {
   Loader2Icon,
   LockIcon,
   MinusIcon,
+  PencilLineIcon,
   SaveIcon,
   SparklesIcon,
   WandSparklesIcon,
@@ -32,7 +33,7 @@ import {
   totalArea,
   type Summary,
 } from "@/lib/inspection"
-import { saveInspection, setFields, setMark } from "@/lib/store"
+import { reopenInspection, saveInspection, setFields, setMark } from "@/lib/store"
 import { cn } from "@/lib/utils"
 import type { Inspection, Mark, SiteId } from "@/types"
 
@@ -71,6 +72,22 @@ const MARKS: {
 const MARK_LABEL: Record<MarkValue, string> = { O: "○ 적합", X: "× 부적합", NA: "해당없음" }
 
 const WARNING_LINE = "rounded-lg bg-warning/18 px-3 py-2 text-sm text-[oklch(0.5_0.13_60)] dark:text-warning"
+
+const savedTime = (iso: string) => new Date(iso).toLocaleString("sv-SE").slice(0, 16)
+
+// 저장된 기록을 다시 열어 고치는 진입점. 기록표·열화상·사진 확인 화면이 같은 버튼을 쓴다.
+export function ReopenButton({ site, className }: { site: SiteId; className?: string }) {
+  function reopen() {
+    if (!window.confirm("저장된 기록을 수정합니다. 수정 후 다시 저장해 주세요.")) return
+    reopenInspection(site)
+  }
+  return (
+    <Button variant="outline" className={cn("h-11", className)} onClick={reopen}>
+      <PencilLineIcon />
+      기록 수정
+    </Button>
+  )
+}
 
 function previousYm(ym: string) {
   const [year, month] = ym.split("-").map(Number)
@@ -226,6 +243,7 @@ export function Form9Editor({
 }) {
   const info = siteById(site)
   const locked = !!inspection.savedAt
+  const revision = inspection.revision ?? 0
   const missing = missingCells(inspection, summary)
   const markOf = (cell: string) => effectiveMark(cell, inspection, summary)
   const appearance = appearanceMark(inspection, summary)
@@ -444,11 +462,13 @@ export function Form9Editor({
 
       <div className="sticky bottom-[var(--app-tabbar,calc(3.5rem_+_1px_+_env(safe-area-inset-bottom)))] z-10 -mx-4 border-t bg-background px-4 py-3 lg:bottom-0 lg:mx-0 lg:rounded-xl lg:border lg:bg-card lg:ring-1 lg:ring-foreground/10">
         <div className="flex flex-col gap-2 @lg:flex-row @lg:items-center @lg:justify-between">
-          <p className="flex items-center gap-2 text-sm">
+          <p className="flex flex-wrap items-center gap-2 text-sm">
             {locked ? (
               <>
                 <LockIcon className="size-4 text-success" />
-                저장 완료 · {new Date(inspection.savedAt!).toLocaleString("sv-SE").slice(0, 16)}
+                {revision > 0
+                  ? `최종 저장 ${savedTime(inspection.savedAt!)} (수정 ${revision}회)`
+                  : `저장 완료 · ${savedTime(inspection.savedAt!)}`}
               </>
             ) : missing.count === 0 ? (
               <>
@@ -465,8 +485,11 @@ export function Form9Editor({
                 )}
               </>
             )}
+            {!locked && revision > 0 && <Badge variant="secondary">수정 {revision}회차</Badge>}
           </p>
-          {!locked && (
+          {locked ? (
+            <ReopenButton site={site} />
+          ) : (
             <div className="grid grid-cols-[1fr_auto] gap-2 @lg:flex">
               <Button
                 variant="outline"
@@ -479,7 +502,7 @@ export function Form9Editor({
               </Button>
               <Button className="h-11 min-w-24" disabled={missing.count > 0} onClick={save}>
                 <SaveIcon />
-                저장
+                {revision > 0 ? "다시 저장" : "저장"}
               </Button>
             </div>
           )}
