@@ -81,7 +81,7 @@ function SidebarBody({
           >
             <span className={cn("size-2 rounded-full", dots[item.id])} />
             <span className="truncate">{item.name}</span>
-            <span className="ml-auto text-xs text-sidebar-foreground/60">{item.region}</span>
+            <span className="ml-auto shrink-0 text-xs whitespace-nowrap text-sidebar-foreground/60">{item.region}</span>
           </a>
         ))}
       </div>

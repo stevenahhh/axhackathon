@@ -8,7 +8,7 @@ const MODULE = { type: "HiS-S440 단결정", pmaxKw: 0.44, vmpV: 41.2, impA: 10.
 export const SITES: Site[] = [
   {
     id: "A",
-    name: "A 태양광발전소",
+    name: "하동 태양광발전소",
     region: "경남 하동",
     capacityKw: 9000,
     voltageV: 22900,
@@ -18,7 +18,7 @@ export const SITES: Site[] = [
   },
   {
     id: "B",
-    name: "B 태양광발전소",
+    name: "영광 태양광발전소",
     region: "전남 영광",
     capacityKw: 10000,
     voltageV: 22900,
@@ -28,7 +28,7 @@ export const SITES: Site[] = [
   },
   {
     id: "C",
-    name: "C 태양광발전소",
+    name: "음성 태양광발전소",
     region: "충북 음성",
     capacityKw: 1000,
     voltageV: 22900,
@@ -38,7 +38,7 @@ export const SITES: Site[] = [
   },
   {
     id: "D",
-    name: "D 태양광발전소",
+    name: "이천 태양광발전소",
     region: "경기 이천",
     capacityKw: 3000,
     voltageV: 22900,
@@ -48,7 +48,7 @@ export const SITES: Site[] = [
   },
   {
     id: "E",
-    name: "E 태양광발전소",
+    name: "제주 와산 태양광발전소",
     region: "제주 제주시",
     capacityKw: 5000,
     voltageV: 22900,
