@@ -10,8 +10,6 @@ cd "$(dirname "$0")/.."
 REMOTE_DIR=/data/hackathon/web
 UV=/data/hackathon/.tools/bin/uv
 UV_ENV="UV_CACHE_DIR=/data/hackathon/.cache/uv UV_PYTHON_INSTALL_DIR=/data/hackathon/.tools/uv-python XDG_CACHE_HOME=/data/hackathon/.cache"
-RESTART="setsid nohup .venv/bin/python serve.py >> server.log 2>&1 < /dev/null &"
-SERVE_PATTERN='^(\.venv/bin/python|python3) serve\.py$'
 
 bun run build
 
@@ -37,9 +35,13 @@ export $UV_ENV
 $UV pip install --python .venv/bin/python --quiet numpy pillow
 .venv/bin/python -c 'import numpy, PIL; print(\"venv ok\", numpy.__version__, PIL.__version__)'"
 
-# pgrep 패턴은 ^로 고정해 원격 셸(bash -c ...)이나 다른 프로세스와 겹치지 않게 한다.
-ssh ax "set -e
-cd $REMOTE_DIR
+# 서버 프로세스는 누가 띄웠느냐에 따라 'python3 serve.py'일 수도 '.venv/bin/python serve.py'일 수도 있다.
+# 명령줄이 serve.py로 끝나고 작업 폴더(/proc/<pid>/cwd)가 $REMOTE_DIR인 프로세스만 멈춘다. 다른 폴더의 serve.py는 건드리지 않는다.
+# 다시 띄울 때는 .venv 파이썬이 있으면 그것을, 없으면 python3을 쓴다.
+ssh ax bash -s -- "$REMOTE_DIR" <<'REMOTE'
+set -e
+REMOTE_DIR=$1
+cd "$REMOTE_DIR"
 rm -rf dist.prev serve.py.prev
 [ -e dist ] && mv dist dist.prev
 [ -e serve.py ] && mv serve.py serve.py.prev
@@ -49,18 +51,29 @@ mv next/agentstream.py agentstream.py
 mv next/samples.json samples.json
 mkdir -p scripts && mv next/scripts/align.py scripts/align.py && mv next/scripts/align_params.json scripts/align_params.json
 rm -rf next
-pids=\$(pgrep -f '$SERVE_PATTERN' || true)
-[ -n \"\$pids\" ] && kill \$pids
+serve_pids() {
+  for pid in $(pgrep -f 'serve\.py$' || true); do
+    [ "$(readlink "/proc/$pid/cwd" 2>/dev/null)" = "$REMOTE_DIR" ] && echo "$pid"
+  done
+  return 0
+}
+pids=$(serve_pids)
+if [ -n "$pids" ]; then
+  echo "기존 serve.py 종료: $pids"
+  kill $pids
+fi
 for i in 1 2 3 4 5 6 7 8 9 10; do
-  [ -z \"\$(pgrep -f '$SERVE_PATTERN' || true)\" ] && break
+  [ -z "$(serve_pids)" ] && break
   sleep 0.5
 done
-$RESTART
+if [ -x .venv/bin/python ]; then PY=.venv/bin/python; else PY=python3; fi
+setsid nohup "$PY" serve.py >> server.log 2>&1 < /dev/null &
 sleep 1
-pgrep -af '$SERVE_PATTERN'"
+for pid in $(serve_pids); do ps -o pid=,args= -p "$pid"; done
+REMOTE
 
 echo
-echo "배포 완료. 롤백 명령(dist, serve.py 둘 다 복원):"
+echo "배포 완료. 롤백은 dist.prev·serve.py.prev를 되돌린 뒤 같은 방식으로 다시 띄운다:"
 cat <<'EOF'
-ssh ax "cd /data/hackathon/web && rm -rf dist && mv dist.prev dist && mv serve.py.prev serve.py && kill \$(pgrep -f '^(\.venv/bin/python|python3) serve\.py\$'); sleep 1; setsid nohup .venv/bin/python serve.py >> server.log 2>&1 < /dev/null &"
+ssh ax 'cd /data/hackathon/web && rm -rf dist && mv dist.prev dist && mv serve.py.prev serve.py && for p in $(pgrep -f "serve\.py$"); do [ "$(readlink /proc/$p/cwd)" = /data/hackathon/web ] && kill $p; done; sleep 1; setsid nohup .venv/bin/python serve.py >> server.log 2>&1 < /dev/null &'
 EOF
