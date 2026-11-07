@@ -12,7 +12,7 @@ import { RecordPage } from "@/pages/RecordPage"
 import { ReviewPage } from "@/pages/ReviewPage"
 import type { Inspection, Photo, SiteId } from "@/types"
 
-const SITE_IDS: SiteId[] = ["A", "B", "C"]
+const SITE_IDS: SiteId[] = ["A", "B", "C", "D", "E"]
 
 const TITLES: Record<Route["page"], string> = {
   dashboard: "대시보드",

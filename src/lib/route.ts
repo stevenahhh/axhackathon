@@ -9,7 +9,7 @@ export type Route =
 
 function parse(hash: string): Route {
   const [, page, site] = hash.replace(/^#/, "").split("/")
-  const id = (["A", "B", "C"].includes(site) ? site : "A") as SiteId
+  const id = (["A", "B", "C", "D", "E"].includes(site) ? site : "A") as SiteId
   if (page === "review") return { page: "review", site: id }
   if (page === "record") return { page: "record", site: id }
   return { page: "dashboard" }

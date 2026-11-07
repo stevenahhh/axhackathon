@@ -3,7 +3,7 @@ import { useSyncExternalStore } from "react"
 import type { Inspection, Mark, Photo, Review, SiteId, ThermalEntry } from "@/types"
 
 const KEY = "suntek-inspections-v1"
-const SITE_IDS: SiteId[] = ["A", "B", "C"]
+const SITE_IDS: SiteId[] = ["A", "B", "C", "D", "E"]
 
 const emptyInspection = (): Inspection => ({
   reviews: {},

@@ -1,4 +1,4 @@
-export type SiteId = "A" | "B" | "C"
+export type SiteId = "A" | "B" | "C" | "D" | "E"
 
 export type Box = { bbox: number[]; area: number }
 

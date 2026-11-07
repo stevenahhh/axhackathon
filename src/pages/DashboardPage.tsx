@@ -36,7 +36,13 @@ import type { Inspection, Site, SiteId } from "@/types"
 export type SiteStat = { summary: Summary; inspection: Inspection; status: SiteStatus }
 
 const MONTHS = ["2026-08", "2026-09", "2026-10", CURRENT_YM]
-const SITE_COLOR: Record<SiteId, string> = { A: "bg-chart-1", B: "bg-chart-2", C: "bg-chart-3" }
+const SITE_COLOR: Record<SiteId, string> = {
+  A: "bg-chart-1",
+  B: "bg-chart-2",
+  C: "bg-chart-3",
+  D: "bg-chart-4",
+  E: "bg-chart-5",
+}
 
 const monthOf = (ym: string) => `${Number(ym.slice(5))}월`
 const monthLabel = (ym: string) => `${ym.slice(0, 4)}년 ${monthOf(ym)}`
@@ -155,7 +161,7 @@ function TrendChart({ stats }: { stats: Record<SiteId, SiteStat> }) {
           className="grid h-44 grid-cols-4 items-end gap-3 border-b pb-1"
         >
           {MONTHS.map((ym) => (
-            <div key={ym} className="flex h-full items-end justify-center gap-1">
+            <div key={ym} className="flex h-full min-w-0 items-end justify-center gap-0.5 sm:gap-1">
               {SITES.map((site) => {
                 const count = value(site.id, ym)
                 return (
@@ -165,7 +171,7 @@ function TrendChart({ stats }: { stats: Record<SiteId, SiteStat> }) {
                     aria-label={`${site.name} ${monthLabel(ym)} 확정 핫스팟 ${count}장`}
                     title={`${site.name} ${monthLabel(ym)}: ${count}장`}
                     className={cn(
-                      "w-3.5 rounded-t-sm",
+                      "min-w-0 max-w-3.5 flex-1 rounded-t-sm",
                       SITE_COLOR[site.id],
                       ym !== CURRENT_YM && "opacity-60"
                     )}

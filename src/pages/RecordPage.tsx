@@ -33,18 +33,20 @@ export function RecordPage({
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center gap-3">
-        <Tabs
-          value={site}
-          onValueChange={(value) => (window.location.hash = hrefOf({ page: "record", site: value as SiteId }))}
-        >
-          <TabsList className="group-data-horizontal/tabs:h-11">
-            {SITES.map((item) => (
-              <TabsTrigger key={item.id} value={item.id} className="min-w-11 px-3">
-                {item.name.replace(" 태양광발전소", "")}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+        <div className="max-w-full overflow-x-auto">
+          <Tabs
+            value={site}
+            onValueChange={(value) => (window.location.hash = hrefOf({ page: "record", site: value as SiteId }))}
+          >
+            <TabsList className="group-data-horizontal/tabs:h-11">
+              {SITES.map((item) => (
+                <TabsTrigger key={item.id} value={item.id} className="min-w-11 px-3">
+                  {item.name.replace(" 태양광발전소", "")}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
         <p className="text-sm text-muted-foreground">
           {info.region} · {formatCapacity(info.capacityKw)}
         </p>

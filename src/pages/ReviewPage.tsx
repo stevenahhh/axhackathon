@@ -32,6 +32,8 @@ type Filter = Tier | "all"
 const DESKTOP_QUERY = "(min-width: 1024px)"
 const TOUCH_TABS = "group-data-horizontal/tabs:h-11 lg:group-data-horizontal/tabs:h-8"
 const TOUCH_BUTTON = "h-11 lg:h-8"
+// 한 발전소에 사진이 수백 장이라 카드는 48장씩 더 그린다.
+const PAGE = 48
 
 function useIsDesktop() {
   return useSyncExternalStore(
@@ -179,7 +181,12 @@ export function ReviewPage({
   inspection: Inspection
   summary: Summary
 }) {
-  const [filter, setFilter] = useState<Filter>("review")
+  const [filter, setFilterState] = useState<Filter>("review")
+  const [limit, setLimit] = useState(PAGE)
+  const setFilter = (next: Filter) => {
+    setFilterState(next)
+    setLimit(PAGE)
+  }
   const [selectedId, setSelectedId] = useState<string>()
   const [sheetOpen, setSheetOpen] = useState(false)
   const fileInput = useRef<HTMLInputElement>(null)
@@ -211,8 +218,11 @@ export function ReviewPage({
     const next = visible.find(
       (photo) => photo.id !== selected.id && !photo.pending && !photo.error && reviewOf(photo) === "unset"
     )
-    if (next) setSelectedId(next.id)
-    else setSheetOpen(false)
+    if (next) {
+      setSelectedId(next.id)
+      const shownUpTo = Math.ceil((visible.indexOf(next) + 1) / PAGE) * PAGE
+      setLimit((current) => Math.max(current, shownUpTo))
+    } else setSheetOpen(false)
   }
 
   function upload(list: FileList | null) {
@@ -397,7 +407,7 @@ export function ReviewPage({
             </Tabs>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-            {visible.map((photo) => {
+            {visible.slice(0, limit).map((photo) => {
               const review = reviewOf(photo)
               return (
                 <button
@@ -434,6 +444,16 @@ export function ReviewPage({
               </p>
             )}
           </div>
+          {visible.length > limit && (
+            <Button
+              variant="outline"
+              className={cn(TOUCH_BUTTON, "self-center")}
+              data-slot="more-photos"
+              onClick={() => setLimit((current) => current + PAGE)}
+            >
+              더 보기 ({visible.length - limit}장 남음)
+            </Button>
+          )}
         </div>
         {isDesktop && detail && (
           <aside className="lg:sticky lg:top-20 lg:self-start">
