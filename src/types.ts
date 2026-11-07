@@ -13,6 +13,8 @@ export type Photo = {
   rgb?: string
   // 실화상 EXIF DigitalZoomRatio(M3T는 1.0 또는 1.95). 열화상 화각 자르기 비율은 줌 1.0 기준이라 겹칠 때 이 값으로 배율을 고친다. 없으면 1.
   rgbZoom?: number
+  // 실화상을 열화상 렌즈 왜곡·화각에 맞춰 640x512로 리매핑한 정렬본(scripts/align.py). 있으면 열화상 위에 1:1로 겹친다.
+  rgbAligned?: string
   width: number
   height: number
   boxes: Box[]

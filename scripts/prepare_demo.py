@@ -1,9 +1,10 @@
 """드론 시연 사진을 EXIF 없이 다시 저장하고 두 서빙의 판정 결과를 함께 기록한다.
 
-실행: uv run --no-project --with pillow python -I scripts/prepare_demo.py [--site D,E] [--fusion-only]
+실행: uv run --no-project --with pillow --with numpy python -I scripts/prepare_demo.py [--site D,E] [--fusion-only|--zoom-only|--align-only]
 원본(data/drone 폴더, ~/Downloads zip)은 읽기만 한다. zip 원본은 발전소마다 새 임시 폴더에 풀어 읽고 끝나면 지운다.
 
-사진은 git 밖 data-demo/drone/<id>_{T,V}.jpg에 쓴다(열화상 640x512 q90, 실화상 긴 변 960 q78).
+사진은 git 밖 data-demo/drone/<id>_{T,V,A}.jpg에 쓴다(열화상 640x512 q90, 실화상 긴 변 960 q78,
+정렬본 A는 실화상을 열화상 렌즈 왜곡·화각에 맞춰 640x512로 리매핑한 것, align.py·align_params.json).
 박스는 제공 서빙 SV-e434a471 /predict/solar, 융합 판정은 PREDICT_BASE(기본 http://127.0.0.1:8601)의
 /api/classify로 받는다. 로컬 serve.py를 먼저 띄운다: `DATA_DIR=data-demo PORT=8601 python3 serve.py`.
 융합 판정에는 실화상을 긴 변 1280으로 보낸다. 열화상 화각 자르기는 서빙이 한다.
@@ -15,6 +16,7 @@
 --site: 처리할 발전소(쉼표 구분, 기본 전체). 지정하지 않은 발전소 항목은 그대로 둔다.
 --fusion-only: 지정한 발전소의 기존 항목에 융합 판정만 다시 기록한다. 박스는 그대로 둔다.
 --zoom-only: 지정한 발전소의 기존 항목에 실화상 줌(rgbZoom)만 원본 EXIF에서 다시 읽어 적는다.
+--align-only: 지정한 발전소의 기존 항목에 정렬본(_A.jpg, rgbAligned)과 rgbZoom만 원본에서 다시 만든다.
 """
 import argparse
 import collections
@@ -24,6 +26,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 import tempfile
 import time
 import unicodedata
@@ -31,6 +34,9 @@ import zipfile
 from pathlib import Path
 
 from PIL import Image
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import align  # noqa: E402 - python -I는 스크립트 폴더를 sys.path에 넣지 않는다
 
 WEB = Path(__file__).resolve().parent.parent
 DRONE = WEB.parent / "data" / "drone"
@@ -120,9 +126,17 @@ def save_photos(photos: list[dict]) -> None:
 def complete(photo: dict) -> bool:
     return (
         "fusion" in photo
+        and "rgbAligned" in photo
         and (OUT_IMG / Path(photo["ir"]).name).is_file()
         and (OUT_IMG / Path(photo["rgb"]).name).is_file()
+        and (OUT_IMG / Path(photo["rgbAligned"]).name).is_file()
     )
+
+
+def save_aligned(rgb: Image.Image, zoom: float, site: str, seq: str) -> str:
+    out = OUT_IMG / f"{site}_{seq}_A.jpg"
+    align.warp_rgb_to_ir(rgb, zoom).save(out, quality=85)
+    return f"drone/{out.name}"
 
 
 def build_pair(site: str, seq: str, ir_src: Path, rgb_src: Path, scratch: Path) -> dict:
@@ -134,6 +148,8 @@ def build_pair(site: str, seq: str, ir_src: Path, rgb_src: Path, scratch: Path) 
         ir = ir.resize((640, 512))
     ir.save(ir_out, quality=90)
     rgb = Image.open(rgb_src).convert("RGB")
+    zoom = rgb_zoom(rgb_src)
+    aligned = save_aligned(rgb, zoom, site, seq)
     rgb_fusion = rgb.copy()
     rgb_fusion.thumbnail((1280, 1280))
     fusion_input = scratch / "rgb_fusion.jpg"
@@ -151,7 +167,8 @@ def build_pair(site: str, seq: str, ir_src: Path, rgb_src: Path, scratch: Path) 
         "capturedAt": f"{y}-{mo}-{d} {h}:{mi}:{s}",
         "ir": f"drone/{ir_out.name}",
         "rgb": f"drone/{rgb_out.name}",
-        "rgbZoom": rgb_zoom(rgb_src),
+        "rgbZoom": zoom,
+        "rgbAligned": aligned,
         "width": result["width"],
         "height": result["height"],
         "boxes": [{"bbox": x["bbox"], "area": x["area"]} for x in result["defects"]],
@@ -214,12 +231,30 @@ def zoom_only(sites: list[str]) -> None:
     save_photos(photos)
 
 
+def align_only(sites: list[str]) -> None:
+    OUT_IMG.mkdir(parents=True, exist_ok=True)
+    photos = load_photos()
+    with contextlib.ExitStack() as stack:
+        for site in sites:
+            rgbs = index(unpacked(SITES[site][1], stack), "V")
+            mine = [photo for photo in photos if photo["site"] == site]
+            for n, photo in enumerate(mine, 1):
+                src = rgbs[photo["seq"]]
+                photo["rgbZoom"] = rgb_zoom(src)
+                with Image.open(src) as rgb:
+                    photo["rgbAligned"] = save_aligned(rgb, photo["rgbZoom"], site, photo["seq"])
+                if n % 50 == 0 or n == len(mine):
+                    print(f"{site}: 정렬본 {n}/{len(mine)}", flush=True)
+            save_photos(photos)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--site", default=",".join(SITES), help="처리할 발전소(쉼표 구분)")
     only = parser.add_mutually_exclusive_group()
     only.add_argument("--fusion-only", action="store_true", help="박스는 두고 fusion 판정만 다시 기록")
     only.add_argument("--zoom-only", action="store_true", help="실화상 줌(rgbZoom)만 원본 EXIF에서 다시 기록")
+    only.add_argument("--align-only", action="store_true", help="정렬본(_A.jpg)과 rgbZoom만 원본에서 다시 만듦")
     args = parser.parse_args()
     chosen = [site for site in args.site.split(",") if site]
     unknown = set(chosen) - set(SITES)
@@ -229,5 +264,7 @@ if __name__ == "__main__":
         fusion_only(chosen)
     elif args.zoom_only:
         zoom_only(chosen)
+    elif args.align_only:
+        align_only(chosen)
     else:
         main(chosen)

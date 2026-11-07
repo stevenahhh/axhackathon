@@ -44,16 +44,21 @@ function readMode(): Mode {
 }
 
 function AlignedRgb({ photo, style }: { photo: Photo; style?: CSSProperties }) {
+  // 서버가 렌즈 왜곡까지 맞춘 정렬본이 있으면 그대로 덮고, 없으면(업로드 사진) 줌 기준 배율로 맞춘다.
   // 실화상이 덧지 않는 가장자리는 검게 비워, 비치는 열화상이 실화상처럼 보이지 않게 한다.
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden bg-black" style={style}>
-      <img
-        src={photo.rgb}
-        alt=""
-        decoding="async"
-        className="absolute max-w-none"
-        style={alignedRgbStyle(photo.rgbZoom)}
-      />
+      {photo.rgbAligned ? (
+        <img src={photo.rgbAligned} alt="" decoding="async" className="absolute inset-0 size-full" />
+      ) : (
+        <img
+          src={photo.rgb}
+          alt=""
+          decoding="async"
+          className="absolute max-w-none"
+          style={alignedRgbStyle(photo.rgbZoom)}
+        />
+      )}
     </div>
   )
 }
