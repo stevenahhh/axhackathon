@@ -39,11 +39,18 @@ const PAGES: { page: Page; label: string; icon: ReactNode }[] = [
 const routeOf = (page: Page, site: SiteId): Route =>
   page === "dashboard" ? { page } : page === "review" ? { page, site } : { page, site }
 
-function LogoMark() {
+function BrandLink({ className }: { className?: string }) {
   return (
-    <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-      <SunIcon className="size-4.5" />
-    </span>
+    <a
+      href="#/"
+      aria-label="썬텍 점검비서 대시보드로 이동"
+      className={cn(
+        "shrink-0 rounded-md text-[1.53125rem] leading-tight font-semibold tracking-tight whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        className
+      )}
+    >
+      썬텍 점검비서
+    </a>
   )
 }
 
@@ -58,13 +65,7 @@ function SidebarBody({
 }) {
   return (
     <div className="flex h-full flex-col gap-6 p-4">
-      <div className="flex items-center gap-2.5">
-        <LogoMark />
-        <div className="leading-tight">
-          <p className="text-sm font-semibold text-sidebar-accent-foreground">썬텍 점검비서</p>
-          <p className="text-xs text-sidebar-foreground/70">태양광 월차 점검 기록</p>
-        </div>
-      </div>
+      <BrandLink className="self-start px-1 text-sidebar-accent-foreground focus-visible:ring-sidebar-ring" />
       <nav className="flex flex-col gap-1" aria-label="주 메뉴">
         {PAGES.map(({ page, label, icon }) => {
           const active = route.page === page
@@ -171,8 +172,15 @@ export function AppShell({
       <div className="min-w-0">
         <header className="sticky top-0 z-20 border-b bg-background">
           <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-3 px-4 lg:px-8">
-            {!isDesktop && <LogoMark />}
-            <h1 className="min-w-0 flex-1 truncate text-base font-semibold">{title}</h1>
+            {!isDesktop && <BrandLink />}
+            <h1
+              className={cn(
+                "min-w-0 flex-1 truncate",
+                isDesktop ? "text-base font-semibold" : "text-sm text-muted-foreground"
+              )}
+            >
+              {title}
+            </h1>
             <span className="hidden shrink-0 rounded-full bg-solar/20 px-2.5 py-1 text-xs font-medium sm:inline">
               2026년 11월 월차 점검
             </span>
