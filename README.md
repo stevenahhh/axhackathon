@@ -1,6 +1,8 @@
-# 썬텍 점검비서
+# SunSET
 
-드론 사진은 AI가 먼저 가려 보고, 점검자는 확인과 서명만 하는 태양광 정기점검 기록 도우미입니다.
+**태양광 정기점검 기록 에이전트**
+
+SunSET(선셋)은 드론 사진을 AI가 먼저 가려 보고 점검자는 확인과 서명만 하는 태양광 정기점검 기록 도우미입니다.
 
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-7-3178C6?logo=typescript&logoColor=white)
@@ -17,7 +19,7 @@
 
 전기안전관리를 대행하는 점검자는 담당 태양광발전소마다 분기 정기점검을 돌고 법정 서식을 채워야 합니다. 드론으로 찍은 열화상 사진은 현장 한 곳에서만 수백 장이 나옵니다. 이 사진을 한 장씩 넘겨 핫스팟을 찾고 서식에 옮겨 적는 일이 점검 시간의 상당 부분을 차지합니다.
 
-썬텍 점검비서는 이 과정을 세 단계로 줄입니다.
+SunSET은 이 과정을 세 단계로 줄입니다.
 
 1. **사진 판정**: AI가 핫스팟 의심 사진을 골라 면적순으로 앞에 놓습니다.
 2. **서식 초안**: 점검자가 확인한 결과로 점검기록표와 열화상 측정기록표 초안을 채웁니다.
@@ -103,7 +105,7 @@ bun run dev                                      # http://localhost:5173
 
 ```bash
 bun test ./src/lib/inspection.test.ts
-python3 -m unittest agentstream_test
+python3 -m unittest agentstream_test serve_auth_test
 bun run build
 ```
 
@@ -128,7 +130,7 @@ bash scripts/deploy.sh
 | `AGENTSTREAM_BASE_URL`, `AGENTSTREAM_WORKSPACE_ID`, `AGENTSTREAM_CHATBOT_ID`, `AGENTSTREAM_CHAT_PATH` | AgentStream 연동 정보 |
 | `AGENTSTREAM_API_KEY` | AgentStream API Key, 서버 `.env`에만 둡니다 |
 | `APP_ACCOUNTS` | 로그인 계정 `id:pw,id2:pw2`, 기본 `guest:guest,test1:1234,test2:1234,test3:1234` |
-| `SESSION_SECRET` | 세션 쿠키 서명 키, 없으면 서버를 띄울 때마다 새로 만들어 재시작하면 다시 로그인합니다 |
+| `SESSION_SECRET` | 세션 쿠키(`sunset_session`) 서명 키, 없으면 서버를 띄울 때마다 새로 만들어 재시작하면 다시 로그인합니다 |
 
 키가 없으면 종합의견을 템플릿 문장으로 채우고 "자동 문장" 표시를 붙입니다.
 
