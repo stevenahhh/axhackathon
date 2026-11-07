@@ -33,3 +33,4 @@ server.log
 
 # Demo photos live outside git (served from DATA_DIR by serve.py)
 data-demo/
+data-demo
