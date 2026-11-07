@@ -136,7 +136,7 @@ function PhotoDetail({
           <>
             <Button
               variant="destructive"
-              className="h-11 bg-destructive text-white hover:bg-destructive/90 dark:bg-destructive dark:text-[oklch(0.17_0.02_262)]"
+              className="h-11 bg-destructive text-white hover:bg-destructive/90 dark:bg-destructive dark:text-[oklch(0.145_0_0)]"
               disabled={undecidable}
               onClick={() => onReview("confirmed")}
             >

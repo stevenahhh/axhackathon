@@ -328,7 +328,7 @@ export function DashboardPage({ stats }: { stats: Record<SiteId, SiteStat> }) {
     <div className="flex flex-col gap-6">
       <section
         aria-labelledby="dashboard-summary"
-        className="flex flex-col gap-4 rounded-2xl bg-linear-to-br from-primary to-[oklch(0.45_0.17_285)] p-5 text-primary-foreground lg:flex-row lg:items-end lg:justify-between lg:p-6 dark:from-[oklch(0.35_0.12_262)] dark:to-[oklch(0.3_0.1_290)] dark:text-foreground"
+        className="flex flex-col gap-4 rounded-2xl bg-linear-to-br from-primary to-[oklch(0.45_0.17_285)] p-5 text-primary-foreground lg:flex-row lg:items-end lg:justify-between lg:p-6 dark:from-[oklch(0.3_0_0)] dark:to-[oklch(0.22_0_0)] dark:text-foreground"
       >
         <div>
           <p className="text-sm opacity-80">{monthOf(CURRENT_YM)} 월차 점검</p>
@@ -343,7 +343,7 @@ export function DashboardPage({ stats }: { stats: Record<SiteId, SiteStat> }) {
           <Button
             size="lg"
             nativeButton={false}
-            className="h-11 w-full bg-solar text-base text-[oklch(0.22_0.05_262)] hover:bg-solar/90 lg:h-9 lg:w-auto lg:text-sm"
+            className="h-11 w-full bg-solar text-base text-[oklch(0.22_0.05_262)] hover:bg-solar/90 dark:text-[oklch(0.18_0_0)] lg:h-9 lg:w-auto lg:text-sm"
             render={
               <a
                 href={hrefOf({
