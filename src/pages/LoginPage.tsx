@@ -40,13 +40,17 @@ function useReveal(ref: RefObject<HTMLElement | null>, active: boolean) {
       settled = true
       settleSignIn()
     }
-    surface.addEventListener("transitionend", done, { once: true })
+    // 카드 페이드와 버튼 비활성 전환의 transitionend도 여기까지 버블링하므로, 이 면의 clip-path 전환이 끝났을 때만 마친다.
+    const onTransitionEnd = (event: TransitionEvent) => {
+      if (event.target === surface && event.propertyName === "clip-path") done()
+    }
+    surface.addEventListener("transitionend", onTransitionEnd)
     // transitionend가 오지 않는 경우(탭 숨김 등)에도 화면이 남지 않게 한다.
     const timer = window.setTimeout(done, 600)
     return () => {
       cancelAnimationFrame(frame)
       window.clearTimeout(timer)
-      surface.removeEventListener("transitionend", done)
+      surface.removeEventListener("transitionend", onTransitionEnd)
     }
   }, [ref, active])
 }
