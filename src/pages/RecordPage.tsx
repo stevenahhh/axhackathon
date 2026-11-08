@@ -1,16 +1,17 @@
 import { useState } from "react"
-import { PrinterIcon } from "lucide-react"
+import { FileDownIcon, Loader2Icon, PrinterIcon } from "lucide-react"
 
 import { Form9Editor } from "@/components/Form9Editor"
 import { Form9Preview } from "@/components/Form9Preview"
 import { PaperFrame } from "@/components/PaperFrame"
-import { PrintPortal } from "@/components/PrintPortal"
+import { PrintPage, PrintPortal } from "@/components/PrintPortal"
 import { SitePicker, SiteSummaryCard, type SiteChip } from "@/components/SitePicker"
 import { ThermalRecord } from "@/components/ThermalRecord"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SITES } from "@/data/sites"
 import { missingCells, type Summary } from "@/lib/inspection"
+import { pdfFileName, usePdfDownload } from "@/lib/pdf"
 import { printDocument, usePrintTarget } from "@/lib/print"
 import { cn } from "@/lib/utils"
 import type { SiteStat } from "@/pages/DashboardPage"
@@ -33,6 +34,7 @@ export function RecordPage({
 }) {
   const [tab, setTab] = useState<Tab>("edit")
   const printTarget = usePrintTarget()
+  const pdf = usePdfDownload()
   const chips = Object.fromEntries(
     SITES.map((item) => {
       const stat = stats[item.id]
@@ -77,12 +79,28 @@ export function RecordPage({
               tab === "edit" && "hidden lg:flex"
             )}
           >
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-sm text-muted-foreground">A4 미리보기 · 인쇄하면 이 서식만 나옵니다.</p>
-              <Button variant="outline" className="h-11 lg:h-8" onClick={() => void printDocument("form9")}>
-                <PrinterIcon />
-                인쇄
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="h-11 lg:h-8"
+                  disabled={pdf.busy !== null}
+                  onClick={() => void printDocument("form9")}
+                >
+                  <PrinterIcon />
+                  인쇄
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-11 lg:h-8"
+                  disabled={pdf.busy !== null}
+                  onClick={() => void pdf.download("form9", pdfFileName("점검기록표", site))}
+                >
+                  {pdf.busy === "form9" ? <Loader2Icon className="animate-spin" /> : <FileDownIcon />}
+                  PDF 다운로드
+                </Button>
+              </div>
             </div>
             <PaperFrame>
               <Form9Preview site={site} inspection={inspection} summary={summary} />
@@ -91,7 +109,9 @@ export function RecordPage({
         </div>
       )}
       <PrintPortal active={printTarget === "form9"}>
-        <Form9Preview site={site} inspection={inspection} summary={summary} />
+        <PrintPage>
+          <Form9Preview site={site} inspection={inspection} summary={summary} />
+        </PrintPage>
       </PrintPortal>
     </div>
   )

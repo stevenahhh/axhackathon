@@ -84,6 +84,12 @@ Layout(사진 크게 보기): 사진 상세의 비교 이미지는 탭으로 여
 - 일부러 뺀 것: 박스 숨기기 토글, 메타데이터 표, 썸네일 필름스트립, 다운로드·공유, 뷰어 안 캡션 문장(인라인 캡션에 있음), 사용법 안내 문구.
 - 접근성: 열릴 때 포커스는 팝업으로 가고 닫히면 `크게 보기` 버튼으로 돌아간다. 열기·닫기 전환은 `motion-reduce:transition-none`.
 
+### 기록표 인쇄·PDF 브리프
+
+- 기록표 미리보기 머리에는 인쇄 버튼 옆에 PDF 버튼이 하나씩 있다(outline, `FileDownIcon`). 별지 제9호는 `인쇄`·`PDF 다운로드`, 열화상은 `이 장 인쇄`·`이 장 PDF`와 확정 사진이 둘 이상일 때 `전체 인쇄 n장`·`전체 PDF n장`이다. 버튼 줄은 `flex-wrap`이라 390px에서 두 줄로 접힌다.
+- PDF는 인쇄와 같은 사본(`PrintPortal` 안의 `PrintPage`, `data-slot="print-page"`)을 `#print-root[data-capture]`로 보이지 않게 A4 폭에 그린 뒤 장마다 2배 해상도 JPEG로 떠 A4 한 장씩 넣는다(`src/lib/pdf.ts`, modern-screenshot + jspdf, 누를 때만 내려받는다). 파일 이름은 `SunSET_점검기록표_<지역>_2026-11.pdf`, `SunSET_열화상측정기록표_<지역>_2026-11.pdf`(이 장은 `_<사진번호>번`을 덧붙인다).
+- 만드는 동안 누른 버튼의 아이콘만 스피너로 바뀌고 글자와 크기는 그대로다. 같은 인쇄 사본을 쓰는 인쇄·PDF 버튼은 모두 비활성이 된다. 진행·성공·실패는 같은 id의 토스트 하나로 알린다(7절).
+
 ### 로그인 바닥과 전환 브리프
 
 Layout(로그인): 화면 전체가 로고 마크와 같은 `bg-sidebar-primary` 면이고 글자는 `text-sidebar-primary-foreground`다. 가운데에 `Card`(`max-w-sm`, `px-6 py-8`, `gap-8`) 하나만 놓고 로고 마크·워드마크·태그라인·입력·버튼·체험 계정 안내를 모두 그 안에 둔다. 카드 위의 글자와 입력은 카드 토큰(`text-card-foreground`, `text-muted-foreground`, `border-input`)이라 면 색과 무관하게 AA를 지킨다.

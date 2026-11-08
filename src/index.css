@@ -176,6 +176,31 @@ body {
   }
 }
 
+/* PDF 다운로드(src/lib/pdf.ts)는 인쇄 사본을 보이지 않게 A4 폭으로 그려 장마다 캡처한다.
+   인쇄와 같은 생김새를 위해 서식의 10mm 여백에 2mm를 더해 @page 12mm와 맞추고, 셀 상하 여백도 인쇄와 같이 2px로 줄인다. */
+#print-root[data-capture] {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 210mm;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#print-root[data-capture] [data-slot="print-page"] {
+  box-sizing: border-box;
+  min-height: 297mm;
+  padding: 2mm;
+  background: #fff;
+}
+
+#print-root[data-capture] .paper th,
+#print-root[data-capture] .paper td {
+  padding-block: 2px;
+}
+
 @media print {
   @page {
     size: A4;

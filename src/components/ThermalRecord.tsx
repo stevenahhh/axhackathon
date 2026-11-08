@@ -1,9 +1,9 @@
 import { useState, type ChangeEvent, type ReactNode } from "react"
-import { ArrowRightIcon, LockIcon, PrinterIcon, ThermometerIcon } from "lucide-react"
+import { ArrowRightIcon, FileDownIcon, Loader2Icon, LockIcon, PrinterIcon, ThermometerIcon } from "lucide-react"
 
 import { ReopenButton } from "@/components/Form9Editor"
 import { PaperFrame } from "@/components/PaperFrame"
-import { PrintPortal } from "@/components/PrintPortal"
+import { PrintPage, PrintPortal } from "@/components/PrintPortal"
 import { PART_LABELS, ThermalPreview, modeOf, thermalDate, type Level } from "@/components/ThermalPreview"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -11,7 +11,8 @@ import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { thermalJudgement, type Summary } from "@/lib/inspection"
-import { printDocument, usePrintTarget } from "@/lib/print"
+import { pdfFileName, usePdfDownload } from "@/lib/pdf"
+import { printDocument, usePrintTarget, type PrintTarget } from "@/lib/print"
 import { hrefOf } from "@/lib/route"
 import { EMPTY_THERMAL, setThermal } from "@/lib/store"
 import { cn } from "@/lib/utils"
@@ -114,6 +115,7 @@ export function ThermalRecord({
 }) {
   const [selectedId, setSelectedId] = useState<string>()
   const printTarget = usePrintTarget()
+  const pdf = usePdfDownload()
   const confirmed = summary.confirmed
   const selected = confirmed.find((photo) => photo.id === selectedId) ?? confirmed[0]
   const locked = !!inspection.savedAt
@@ -144,6 +146,9 @@ export function ThermalRecord({
   const mode = modeOf(entry)
   const hint = MODES.find((item) => item.value === mode)!.hint
   const pages = printTarget === "thermal-all" ? confirmed : printTarget === "thermal-one" ? [selected] : []
+  const paperBusy = pdf.busy !== null
+  const pdfIcon = (target: PrintTarget) =>
+    pdf.busy === target ? <Loader2Icon className="animate-spin" /> : <FileDownIcon />
   const field = (key: (typeof KEYS)[number] | "part") => ({
     id: `thermal-${key}`,
     value: entry[key],
@@ -210,16 +215,48 @@ export function ThermalRecord({
         <div className="flex flex-col gap-3 lg:sticky lg:top-20 lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm text-muted-foreground">A4 미리보기 · 확정 사진마다 1장</p>
-            <div className="flex gap-2">
-              <Button variant="outline" className={TOUCH_BUTTON} onClick={() => void printDocument("thermal-one")}>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                className={TOUCH_BUTTON}
+                disabled={paperBusy}
+                onClick={() => void printDocument("thermal-one")}
+              >
                 <PrinterIcon />
                 이 장 인쇄
               </Button>
+              <Button
+                variant="outline"
+                className={TOUCH_BUTTON}
+                disabled={paperBusy}
+                onClick={() =>
+                  void pdf.download("thermal-one", pdfFileName("열화상측정기록표", site, `${selected.seq}번`))
+                }
+              >
+                {pdfIcon("thermal-one")}
+                이 장 PDF
+              </Button>
               {confirmed.length > 1 && (
-                <Button variant="outline" className={TOUCH_BUTTON} onClick={() => void printDocument("thermal-all")}>
-                  <PrinterIcon />
-                  전체 인쇄 {confirmed.length}장
-                </Button>
+                <>
+                  <Button
+                    variant="outline"
+                    className={TOUCH_BUTTON}
+                    disabled={paperBusy}
+                    onClick={() => void printDocument("thermal-all")}
+                  >
+                    <PrinterIcon />
+                    전체 인쇄 {confirmed.length}장
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className={TOUCH_BUTTON}
+                    disabled={paperBusy}
+                    onClick={() => void pdf.download("thermal-all", pdfFileName("열화상측정기록표", site))}
+                  >
+                    {pdfIcon("thermal-all")}
+                    전체 PDF {confirmed.length}장
+                  </Button>
+                </>
               )}
             </div>
           </div>
@@ -231,13 +268,9 @@ export function ThermalRecord({
 
       <PrintPortal active={pages.length > 0}>
         {pages.map((photo, index) => (
-          <div
-            key={photo.id}
-            data-slot="thermal-print-page"
-            className={cn("break-inside-avoid", index < pages.length - 1 && "break-after-page")}
-          >
+          <PrintPage key={photo.id} last={index === pages.length - 1}>
             <ThermalPreview site={site} photo={photo} inspection={inspection} entry={entryOf(photo)} />
-          </div>
+          </PrintPage>
         ))}
       </PrintPortal>
     </div>
