@@ -23,6 +23,8 @@ SEARCH_RADIUS = 40  # 이동 탐색 범위(±px)
 EDGE_SIGMA = 2.0  # 에지맵을 흐리는 정도. 패널 격자선 몇 px 어긋남에도 NCC가 매끄럽게 변하게 한다.
 SHIFT_GAIN = 0.03  # 사진 자체 이동이 기준 이동(비행 중앙값과 0 중 나은 쪽)보다 이만큼 NCC를 올려야 채택한다.
 
+SHIFT_MIN_SCORE = 0.2  # 열화상에 패널 윤곽이 거의 없으면(패널 외 사진) NCC 봉우리는 잡음이다. 이보다 낮은 자체 이동은 쓰지 않는다.
+
 Shift = tuple[int, int]
 
 
@@ -165,7 +167,8 @@ def choose_shift(e: Edges, own: Shift, priors: tuple[Shift, ...]) -> Shift:
     """기준 이동은 priors(비행 중앙값, 이동 없음) 중 NCC가 높은 쪽이다. 사진 자체 이동은 그보다 SHIFT_GAIN 이상 나을 때만 쓴다.
     패널 격자가 반복돼 NCC 봉우리가 여럿 생기므로, 차이가 작으면 엉뚱한 봉우리로 튀지 않게 기준을 지킨다."""
     prior = max(priors, key=lambda s: score(e, s))
-    return own if score(e, own) - score(e, prior) >= SHIFT_GAIN else prior
+    own_score = score(e, own)
+    return own if own_score >= SHIFT_MIN_SCORE and own_score - score(e, prior) >= SHIFT_GAIN else prior
 
 
 @dataclass(frozen=True, slots=True)
