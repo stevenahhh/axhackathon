@@ -1,8 +1,15 @@
 import drone from "@/data/drone.json"
 import type { Folder, HistoryEntry, Photo, Site, SiteId } from "@/types"
 
-// 점검 주기는 분기다. HistoryEntry.ym에는 "2026-Q4"처럼 연도와 분기를 적는다.
+// 점검 이력과 추이 차트는 분기로 묶는다. HistoryEntry.ym에는 "2026-Q4"처럼 연도와 분기를 적는다.
+// 이번 점검의 이름은 월 단위다(앱바 배지, 대시보드 배너, AgentStream 요약, PDF 파일 이름). 세 값은 같은 달이어야 한다.
+// 열화상 측정기록표의 주기 표기(분기·반기·연차)는 ThermalPreview가 따로 가진다.
 export const CURRENT_PERIOD = "2026-Q4"
+export const CURRENT_INSPECTION = {
+  month: "2026-11",
+  label: "2026년 11월 정기점검",
+  short: "11월 정기점검",
+} as const
 
 export const quarterOf = (period: string) => `${Number(period.slice(6))}분기`
 export const quarterShort = (period: string) => `${Number(period.slice(6))}Q`
