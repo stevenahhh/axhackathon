@@ -34,6 +34,11 @@ class SearchShiftTest(unittest.TestCase):
         self.assertEqual(align.choose_shift(e, (13, -7), ((0, 0),)), (13, -7))
         self.assertEqual(align.choose_shift(e, (13, -7), ((0, 0), (12, -7))), (12, -7))
 
+    def test_ignores_own_shift_on_featureless_thermal(self):
+        e = shifted_pair(13, -7)
+        flat = align.Edges(np.zeros_like(e.ir), e.rgb, e.valid)
+        self.assertEqual(align.choose_shift(flat, (13, -7), ((0, 0),)), (0, 0))
+
 
 if __name__ == "__main__":
     unittest.main()
