@@ -1,17 +1,63 @@
-import { useState, type FormEvent } from "react"
+import { useEffect, useRef, useState, type FormEvent, type RefObject } from "react"
 import { SunIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { signIn } from "@/lib/session"
+import { settleSignIn, signIn } from "@/lib/session"
+import { cn } from "@/lib/utils"
 
 const GUEST = { id: "guest", pw: "guest" }
 
-export function LoginPage() {
+// 로그인 성공 직후의 전환. 앱 셸이 밑에 그려진 상태에서 이 화면(로고와 같은 호박색)을 원으로 오려 내고,
+// 그 원을 셸의 로고 마크(data-slot="brand-mark") 자리와 크기까지 줄여 로고 위에 정확히 내려앉게 한다.
+// 로고 자리는 셸이 마운트된 뒤 getBoundingClientRect로 잰다. 끝나면 settleSignIn()이 이 화면을 치운다.
+// 움직임을 줄이는 설정이면 전환 없이 바로 치운다.
+function useReveal(ref: RefObject<HTMLElement | null>, active: boolean) {
+  useEffect(() => {
+    if (!active) return
+    const surface = ref.current
+    const mark = document.querySelector<HTMLElement>('[data-slot="brand-mark"]')
+    if (!surface || !mark || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      settleSignIn()
+      return
+    }
+    const { innerWidth: width, innerHeight: height } = window
+    const target = mark.getBoundingClientRect()
+    // 시작 원은 화면 가운데에서 네 모서리까지 닿는 반지름이라 첫 프레임이 전체 화면과 같다.
+    surface.style.clipPath = `circle(${Math.hypot(width, height) / 2}px at ${width / 2}px ${height / 2}px)`
+    void surface.offsetWidth
+    const frame = requestAnimationFrame(() => {
+      surface.classList.add("motion-reveal")
+      surface.style.clipPath = `circle(${target.width / 2}px at ${target.left + target.width / 2}px ${
+        target.top + target.height / 2
+      }px)`
+    })
+    let settled = false
+    const done = () => {
+      if (settled) return
+      settled = true
+      settleSignIn()
+    }
+    surface.addEventListener("transitionend", done, { once: true })
+    // transitionend가 오지 않는 경우(탭 숨김 등)에도 화면이 남지 않게 한다.
+    const timer = window.setTimeout(done, 600)
+    return () => {
+      cancelAnimationFrame(frame)
+      window.clearTimeout(timer)
+      surface.removeEventListener("transitionend", done)
+    }
+  }, [ref, active])
+}
+
+// revealing: 로그인이 끝나 앱 셸 위에서 전환을 그리는 중. 입력은 받지 않고 카드는 사라진다.
+export function LoginPage({ revealing = false }: { revealing?: boolean }) {
+  const surfaceRef = useRef<HTMLElement>(null)
   const [id, setId] = useState("")
   const [pw, setPw] = useState("")
   const [busy, setBusy] = useState<"form" | "guest" | null>(null)
+  useReveal(surfaceRef, revealing)
 
   async function submit(account: { id: string; pw: string }, source: "form" | "guest") {
     setBusy(source)
@@ -32,10 +78,27 @@ export function LoginPage() {
   }
 
   return (
-    <main className="grid min-h-dvh place-items-center bg-background px-4 py-10 text-foreground">
-      <div className="flex w-full max-w-sm flex-col gap-8">
+    <main
+      ref={surfaceRef}
+      data-slot="login"
+      aria-hidden={revealing || undefined}
+      inert={revealing || undefined}
+      className={cn(
+        "grid min-h-dvh place-items-center bg-sidebar-primary px-4 py-10 text-sidebar-primary-foreground",
+        revealing && "fixed inset-0 z-50 min-h-0 overflow-hidden"
+      )}
+    >
+      <Card
+        className={cn(
+          "w-full max-w-sm gap-8 px-6 py-8 transition-opacity duration-150 motion-reduce:transition-none",
+          revealing && "opacity-0"
+        )}
+      >
         <div className="flex flex-col items-center gap-3">
-          <span className="grid size-12 place-items-center rounded-full bg-sidebar-primary text-sidebar-primary-foreground">
+          <span
+            data-slot="login-mark"
+            className="grid size-12 place-items-center rounded-full bg-sidebar-primary text-sidebar-primary-foreground"
+          >
             <SunIcon className="size-6" />
           </span>
           <div className="flex flex-col items-center gap-1">
@@ -91,7 +154,7 @@ export function LoginPage() {
           </Button>
           <p className="text-center text-xs text-muted-foreground">체험 계정: guest / guest · test1~test3 / 1234</p>
         </div>
-      </div>
+      </Card>
     </main>
   )
 }

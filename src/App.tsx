@@ -95,8 +95,11 @@ export default function App() {
   return (
     <>
       {session.status === "loading" && <div className="min-h-dvh bg-background" />}
-      {session.status === "out" && <LoginPage />}
       {session.status === "in" && <Workspace user={session.id} />}
+      {/* 방금 로그인했으면 앱 셸을 먼저 그려 두고, 그 위에 남은 로그인 화면이 로고 자리로 모이며 사라진다(LoginPage의 전환). */}
+      {(session.status === "out" || (session.status === "in" && session.fresh)) && (
+        <LoginPage revealing={session.status === "in"} />
+      )}
       <Toaster />
     </>
   )

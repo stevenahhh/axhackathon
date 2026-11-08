@@ -4,7 +4,8 @@ import { toast } from "sonner"
 import { setStoreUser } from "@/lib/store"
 
 // 로그인 상태. 서버가 HttpOnly 쿠키(sunset_session)로 세션을 들고 있어 브라우저는 /api/me로만 확인한다.
-export type Session = { status: "loading" } | { status: "out" } | { status: "in"; id: string }
+// fresh는 이 탭에서 방금 로그인했다는 뜻이다. 그동안 로그인 화면이 남아 앱 셸 위에서 로고로 모이는 전환을 그리고, 끝나면 settleSignIn()으로 끈다.
+export type Session = { status: "loading" } | { status: "out" } | { status: "in"; id: string; fresh: boolean }
 
 let session: Session = { status: "loading" }
 const listeners = new Set<() => void>()
@@ -29,7 +30,7 @@ export async function checkSession() {
   try {
     const response = await fetch("./api/me")
     const data = response.ok ? ((await response.json()) as { id: string }) : null
-    set(data ? { status: "in", id: data.id } : { status: "out" })
+    set(data ? { status: "in", id: data.id, fresh: false } : { status: "out" })
   } catch {
     set({ status: "out" })
   }
@@ -43,7 +44,12 @@ export async function signIn(id: string, pw: string) {
   })
   const data = await response.json().catch(() => null)
   if (!response.ok) throw new Error(data?.error ?? `HTTP ${response.status}`)
-  set({ status: "in", id: data.id })
+  set({ status: "in", id: data.id, fresh: true })
+}
+
+// 로그인 화면이 전환을 마치고 자신을 치울 때 부른다.
+export function settleSignIn() {
+  if (session.status === "in" && session.fresh) set({ ...session, fresh: false })
 }
 
 export async function signOut() {
