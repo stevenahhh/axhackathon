@@ -84,15 +84,15 @@ Layout(사진 크게 보기): 사진 상세의 비교 이미지는 탭으로 여
 - 일부러 뺀 것: 박스 숨기기 토글, 메타데이터 표, 썸네일 필름스트립, 다운로드·공유, 뷰어 안 캡션 문장(인라인 캡션에 있음), 사용법 안내 문구.
 - 접근성: 열릴 때 포커스는 팝업으로 가고 닫히면 `크게 보기` 버튼으로 돌아간다. 열기·닫기 전환은 `motion-reduce:transition-none`.
 
-### 로그인 바닥과 전환 버리프
+### 로그인 바닥과 전환 브리프
 
 Layout(로그인): 화면 전체가 로고 마크와 같은 `bg-sidebar-primary` 면이고 글자는 `text-sidebar-primary-foreground`다. 가운데에 `Card`(`max-w-sm`, `px-6 py-8`, `gap-8`) 하나만 놓고 로고 마크·워드마크·태그라인·입력·버튼·체험 계정 안내를 모두 그 안에 둔다. 카드 위의 글자와 입력은 카드 토큰(`text-card-foreground`, `text-muted-foreground`, `border-input`)이라 면 색과 무관하게 AA를 지킨다.
 
 - 주 동작: `로그인`(primary). `게스트로 시작`은 outline.
-- 정보 우선순위: 1) 아이디·뱄밀번호 입력 2) 워드마크와 태그라인 3) 체험 계정 안내.
-- 필수 내용: 로고 마크(`size-12`), 워드마크, 태그라인, 아이디·뱄밀번호, 로그인 버튼, 구분선 "또는", 게스트 버튼, 체험 계정 안내.
-- 일부러 번 것: 배경 그림·그라디언트, 어두운 테마 전환 버튼, 제품 설명 문단.
-- 전환: 로그인이 성공하면(`Session.fresh`) 앱 셸을 먼저 그리고 로그인 화면은 `fixed inset-0 z-50`으로 그 위에 남는다. 카드는 `opacity-0`(150ms)로 사라지고, 호박색 면은 `clip-path: circle()`이 화면 전체(가운데에서 모서리까지의 반지름)에서 셸의 로고 마크(`[data-slot="brand-mark"]`의 `getBoundingClientRect`, 데스크탑은 사이드바·모바일은 앱바) 자리와 반지름으로 `--duration-reveal`(200ms) `--ease-standard`만큼 줄어든 뒤 사라진다(`.motion-reveal`). 전환 중에는 `inert`·`aria-hidden`이다. `prefers-reduced-motion: reduce`에서는 전환 없이 바로 바뀝다. 새 의존성은 쓰지 않는다.
+- 정보 우선순위: 1) 아이디·비밀번호 입력 2) 워드마크와 태그라인 3) 체험 계정 안내.
+- 필수 내용: 로고 마크(`size-12`), 워드마크, 태그라인, 아이디·비밀번호, 로그인 버튼, 구분선 "또는", 게스트 버튼, 체험 계정 안내.
+- 일부러 뺀 것: 배경 그림·그라디언트, 어두운 테마 전환 버튼, 제품 설명 문단.
+- 전환: 로그인이 성공하면(`Session.fresh`) 앱 셸을 먼저 그리고 로그인 화면은 `fixed inset-0 z-50`으로 그 위에 남는다. 카드는 `opacity-0`(150ms)로 사라지고, 호박색 면은 `clip-path: circle()`이 화면 전체(가운데에서 모서리까지의 반지름)에서 셸의 로고 마크(`[data-slot="brand-mark"]`의 `getBoundingClientRect`, 데스크톱은 사이드바·모바일은 앱바) 자리와 반지름으로 `--duration-reveal`(200ms) `--ease-standard`만큼 줄어든 뒤 사라진다(`.motion-reveal`). 전환 중에는 `inert`·`aria-hidden`이다. `prefers-reduced-motion: reduce`에서는 전환 없이 바로 바뀐다. 새 의존성은 쓰지 않는다.
 
 ## 6. 상태 색 매핑
 
@@ -119,4 +119,4 @@ Layout(로그인): 화면 전체가 로고 마크와 같은 `bg-sidebar-primary`
 
 ## 8. 움직임
 
-토큰은 `src/index.css`의 `--duration-reveal: 200ms`, `--ease-standard: cubic-bezier(0.4, 0, 0.2, 1)`이고 클래스는 `src/styles/motion.css`에 둔다. 움직임은 상태가 바뀜 때만 넣고(업로드 연산 단계, 사진 크게 보기 열기·닫기, 로그인 전환) `transform`·`opacity`·`clip-path`만 바꾼다. `prefers-reduced-motion: reduce`에서는 이동을 없애거나 1ms로 줄인다.
+토큰은 `src/index.css`의 `--duration-reveal: 200ms`, `--ease-standard: cubic-bezier(0.4, 0, 0.2, 1)`이고 클래스는 `src/styles/motion.css`에 둔다. 움직임은 상태가 바뀔 때만 넣고(업로드 연산 단계, 사진 크게 보기 열기·닫기, 로그인 전환) `transform`·`opacity`·`clip-path`만 바꾼다. `prefers-reduced-motion: reduce`에서는 이동을 없애거나 1ms로 줄인다.
