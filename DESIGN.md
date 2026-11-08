@@ -98,7 +98,7 @@ Layout(로그인): 화면 전체가 로고 마크와 같은 `bg-sidebar-primary`
 - 정보 우선순위: 1) 아이디·비밀번호 입력 2) 워드마크와 태그라인 3) 체험 계정 안내.
 - 필수 내용: 로고 마크(`size-12`), 워드마크, 태그라인, 아이디·비밀번호, 로그인 버튼, 구분선 "또는", 게스트 버튼, 체험 계정 안내.
 - 일부러 뺀 것: 배경 그림·그라디언트, 어두운 테마 전환 버튼, 제품 설명 문단.
-- 전환: 로그인이 성공하면(`Session.fresh`) 앱 셸을 먼저 그리고 로그인 화면은 `fixed inset-0 z-50`으로 그 위에 남는다. 카드는 `opacity-0`(150ms)로 사라지고, 호박색 면은 `clip-path: circle()`이 화면 전체(가운데에서 모서리까지의 반지름)에서 셸의 로고 마크(`[data-slot="brand-mark"]`의 `getBoundingClientRect`, 데스크톱은 사이드바·모바일은 앱바) 자리와 반지름으로 `--duration-reveal`(200ms) `--ease-standard`만큼 줄어든 뒤 사라진다(`.motion-reveal`). 전환 중에는 `inert`·`aria-hidden`이다. `prefers-reduced-motion: reduce`에서는 전환 없이 바로 바뀐다. 새 의존성은 쓰지 않는다.
+- 전환: 로그인이 성공하면(`Session.fresh`) 앱 셸을 먼저 그리고 로그인 화면은 `fixed inset-0 z-50`으로 그 위에 남는다. 카드는 `opacity-0`(150ms)로 사라지고, 호박색 면은 `clip-path: circle()`이 화면 전체(가운데에서 모서리까지의 반지름)에서 셸의 로고 마크(`[data-slot="brand-mark"]`의 `getBoundingClientRect`, 데스크톱은 사이드바·모바일은 앱바) 자리와 반지름으로 `--duration-reveal`(500ms) `--ease-standard`만큼 줄어든 뒤 사라진다(`.motion-reveal`). 전환 중에는 `inert`·`aria-hidden`이다. `prefers-reduced-motion: reduce`에서는 전환 없이 바로 바뀐다. 새 의존성은 쓰지 않는다.
 
 ## 6. 상태 색 매핑
 
@@ -125,4 +125,4 @@ Layout(로그인): 화면 전체가 로고 마크와 같은 `bg-sidebar-primary`
 
 ## 8. 움직임
 
-토큰은 `src/index.css`의 `--duration-reveal: 200ms`, `--ease-standard: cubic-bezier(0.4, 0, 0.2, 1)`이고 클래스는 `src/styles/motion.css`에 둔다. 움직임은 상태가 바뀔 때만 넣고(업로드 연산 단계, 사진 크게 보기 열기·닫기, 로그인 전환) `transform`·`opacity`·`clip-path`만 바꾼다. `prefers-reduced-motion: reduce`에서는 이동을 없애거나 1ms로 줄인다.
+토큰은 `src/index.css`의 `--duration-reveal: 500ms`, `--ease-standard: cubic-bezier(0.4, 0, 0.2, 1)`이고 클래스는 `src/styles/motion.css`에 둔다. 움직임은 상태가 바뀔 때만 넣고(업로드 연산 단계, 사진 크게 보기 열기·닫기, 로그인 전환) `transform`·`opacity`·`clip-path`만 바꾼다. `prefers-reduced-motion: reduce`에서는 이동을 없애거나 1ms로 줄인다.

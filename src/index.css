@@ -90,7 +90,7 @@
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.78 0.16 75);
     /* 움직임 토큰(DESIGN.md 8절). 로그인 전환은 이 둘만 쓴다. */
-    --duration-reveal: 200ms;
+    --duration-reveal: 500ms;
     --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
