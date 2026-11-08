@@ -46,7 +46,7 @@ function useReveal(ref: RefObject<HTMLElement | null>, active: boolean) {
     }
     surface.addEventListener("transitionend", onTransitionEnd)
     // transitionend가 오지 않는 경우(탭 숨김 등)에도 화면이 남지 않게 한다.
-    const timer = window.setTimeout(done, 600)
+    const timer = window.setTimeout(done, 900)
     return () => {
       cancelAnimationFrame(frame)
       window.clearTimeout(timer)
