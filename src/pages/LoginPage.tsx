@@ -35,7 +35,7 @@ export function LoginPage() {
     <main className="grid min-h-dvh place-items-center bg-background px-4 py-10 text-foreground">
       <div className="flex w-full max-w-sm flex-col gap-8">
         <div className="flex flex-col items-center gap-3">
-          <span className="grid size-12 place-items-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+          <span className="grid size-12 place-items-center rounded-full bg-sidebar-primary text-sidebar-primary-foreground">
             <SunIcon className="size-6" />
           </span>
           <div className="flex flex-col items-center gap-1">

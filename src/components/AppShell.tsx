@@ -37,7 +37,10 @@ function BrandLink({ className }: { className?: string }) {
         className
       )}
     >
-      <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+      <span
+        data-slot="brand-mark"
+        className="grid size-8 shrink-0 place-items-center rounded-full bg-sidebar-primary text-sidebar-primary-foreground"
+      >
         <SunIcon className="size-4.5" />
       </span>
       SunSET

@@ -6,7 +6,7 @@
 
 - 제품명은 워드마크 `SunSET` 한 가지로 쓴다(대소문자 고정). 한국어 문장에서 읽기가 필요하면 문서마다 처음 한 번만 `SunSET(선셋)`으로 쓰고 그 다음부터는 `SunSET`이다. 회사명 썬텍(2팀 썬텍, 점검자 소속 기본값 "썬텍 전기안전관리")은 제품명이 아니므로 그대로 둔다.
 - 태그라인은 "태양광 정기점검 기록 에이전트"다. 로그인 화면과 README 제목 아래에만 두고 앱 셸의 브랜드 링크에는 붙이지 않는다.
-- 로고 마크는 `bg-sidebar-primary`(호박색) 둥근 정사각형 안의 lucide `SunIcon`(`text-sidebar-primary-foreground`)이다. 앱 셸은 `size-8`/`size-4.5`, 로그인은 `size-12`/`size-6`. 파비콘 `public/favicon.svg`은 같은 두 토큰을 hex로 구운 같은 마크다. 워드마크 글자는 `text-[1.3125rem] font-semibold tracking-tight`.
+- 로고 마크는 `bg-sidebar-primary`(호박색) 원(`rounded-full`) 안의 lucide `SunIcon`(`text-sidebar-primary-foreground`)이다. 앱 셸은 `size-8`/`size-4.5`(`data-slot="brand-mark"`, 로그인 전환이 이 자리를 잰다), 로그인은 `size-12`/`size-6`. 파비콘 `public/favicon.svg`은 같은 두 토큰을 hex로 구운 같은 원 마크다. 둥근 정사각형 마크는 쓰지 않는다. 워드마크 글자는 `text-[1.3125rem] font-semibold tracking-tight`.
 
 ## 1. 색 역할
 
@@ -40,7 +40,7 @@
 
 - 4px 격자. 요소 안은 `gap-1`~`gap-3`, 요소 사이는 `gap-4`, 구역 사이는 `gap-6`.
 - 화면 여백은 모바일 `p-4`, 데스크톱 `lg:p-8`. 본문 최대 폭 1400px.
-- 반경 기준 `--radius: 0.75rem`. 카드와 버튼 `rounded-lg`, 배지 `rounded-4xl`, 작은 마크 `rounded-lg`.
+- 반경 기준 `--radius: 0.75rem`. 카드와 버튼 `rounded-lg`, 배지 `rounded-4xl`, KPI 아이콘 칸 `rounded-lg`, 로고 마크 `rounded-full`.
 - 그림자는 shadcn 기본값만 쓴다. 블러, 유리 효과, 메시 그라디언트는 쓰지 않는다.
 
 ## 4. 레이아웃
