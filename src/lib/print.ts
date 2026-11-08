@@ -32,7 +32,7 @@ export function printRoot() {
   return root
 }
 
-const twoFrames = () =>
+export const twoFrames = () =>
   new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
 
 const settled = (image: HTMLImageElement) =>
@@ -58,4 +58,20 @@ export async function printDocument(next: PrintTarget, capMs = 5000) {
   await imagesReady(printRoot(), capMs)
   window.addEventListener("afterprint", () => setTarget(null), { once: true })
   window.print()
+}
+
+// 같은 인쇄 사본을 그려 사진 로드까지 기다린 뒤 fn에 넘기고, 어떻게 끝나도 사본을 치운다. PDF 다운로드(src/lib/pdf.ts)가 쓴다.
+export async function withPrintCopy<T>(
+  next: PrintTarget,
+  fn: (root: HTMLElement) => Promise<T>,
+  capMs = 5000
+): Promise<T> {
+  setTarget(next)
+  try {
+    await twoFrames()
+    await imagesReady(printRoot(), capMs)
+    return await fn(printRoot())
+  } finally {
+    setTarget(null)
+  }
 }
