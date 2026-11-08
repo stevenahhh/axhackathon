@@ -28,12 +28,12 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import {
+  CURRENT_INSPECTION,
   CURRENT_PERIOD,
   HISTORY,
   SITES,
   formatCapacity,
   periodLabel,
-  quarterOf,
   quarterShort,
   siteById,
 } from "@/data/sites"
@@ -346,7 +346,7 @@ export function DashboardPage({ stats }: { stats: Record<SiteId, SiteStat> }) {
         className="flex flex-col gap-4 rounded-2xl bg-linear-to-br from-primary to-[oklch(0.45_0.17_285)] p-5 text-primary-foreground lg:flex-row lg:items-end lg:justify-between lg:p-6 dark:from-[oklch(0.3_0_0)] dark:to-[oklch(0.22_0_0)] dark:text-foreground"
       >
         <div>
-          <p className="text-sm opacity-80">{quarterOf(CURRENT_PERIOD)} 정기점검</p>
+          <p className="text-sm opacity-80">{CURRENT_INSPECTION.short}</p>
           <h2 id="dashboard-summary" className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
             담당 현장 {SITES.length}곳 중 {saved}곳 기록 완료
           </h2>

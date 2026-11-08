@@ -10,7 +10,7 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { CURRENT_PERIOD, SITES, periodLabel } from "@/data/sites"
+import { CURRENT_INSPECTION, SITES } from "@/data/sites"
 import { useIsDesktop } from "@/lib/media"
 import { hrefOf, type Route } from "@/lib/route"
 import { cn } from "@/lib/utils"
@@ -193,7 +193,7 @@ export function AppShell({
               {title}
             </h1>
             <span className="hidden shrink-0 rounded-full bg-solar/20 px-2.5 py-1 text-xs font-medium sm:inline">
-              {periodLabel(CURRENT_PERIOD)} 정기점검
+              {CURRENT_INSPECTION.label}
             </span>
             <Button
               variant="ghost"
