@@ -19,6 +19,9 @@ export type Photo = {
   rgbZoom?: number
   // 실화상을 열화상 렌즈 왜곡·화각에 맞춰 640x512로 리매핑한 정렬본(scripts/align.py). 있으면 열화상 위에 1:1로 겹친다.
   rgbAligned?: string
+  // 전역 리매핑 뒤 사진별로 더 옮긴 픽셀(dx, dy)과, 정렬본과 열화상 에지맵의 NCC(0~1). 점수가 낮으면 격자선이 어긋날 수 있다.
+  rgbShift?: [number, number]
+  alignScore?: number
   width: number
   height: number
   boxes: Box[]

@@ -11,9 +11,10 @@ import { ChevronsLeftRightIcon, Maximize2Icon } from "lucide-react"
 
 import { AlignedRgb, COMPARE_LABEL } from "@/components/AlignedRgb"
 import { DetectionImage } from "@/components/DetectionImage"
+import { AlignBadge } from "@/components/StatusBadges"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { COMPARE_MODES, capturePointer, clamp, isTap, rgbNarrower, type CompareMode } from "@/lib/compare"
+import { COMPARE_MODES, alignUncertain, capturePointer, clamp, isTap, rgbNarrower, type CompareMode } from "@/lib/compare"
 import { cn } from "@/lib/utils"
 import type { Photo } from "@/types"
 
@@ -206,6 +207,12 @@ export function PhotoCompare({
           ))}
         </TabsList>
       </Tabs>
+      {alignUncertain(photo) && (
+        <p className="flex items-center gap-2 text-xs text-muted-foreground">
+          <AlignBadge photo={photo} />
+          격자선이 어긋날 수 있어 나란히 보기로 열었습니다
+        </p>
+      )}
       {mode === "side" ? (
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
           <figure className="flex flex-col gap-1">

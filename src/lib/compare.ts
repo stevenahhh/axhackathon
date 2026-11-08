@@ -26,6 +26,23 @@ export function useCompareMode() {
   return [mode, choose] as const
 }
 
+// 정렬본과 열화상 에지맵의 NCC(alignScore)가 이보다 낮으면 격자선이 맞는지 확인할 수 없다. 시연 사진 1,098장에서
+// 하위 약 2%(22장, 모두 패널 외)가 0.45 아래이고 목록에 오르는 사진은 모두 0.49 이상이다.
+export const ALIGN_SCORE_MIN = 0.45
+
+export function alignUncertain(photo: Photo) {
+  return photo.alignScore !== undefined && photo.alignScore < ALIGN_SCORE_MIN
+}
+
+// 정렬이 불확실한 사진은 나란히 보기로 연다. 그 사진에서 고른 방식은 그 사진에만 쓰고 저장한 기본 방식은 바꾸지 않는다.
+export function usePhotoCompareMode(photo: Photo) {
+  const [saved, setSaved] = useCompareMode()
+  const [local, setLocal] = useState<{ id: string; mode: CompareMode } | null>(null)
+  const choose = useCallback((next: CompareMode) => setLocal({ id: photo.id, mode: next }), [photo.id])
+  if (!alignUncertain(photo)) return [saved, setSaved] as const
+  return [local?.id === photo.id ? local.mode : "side", choose] as const
+}
+
 // DJI M3T 열화상 화각은 줌 1.0 광각 실화상(4000x3000)의 가운데 2544x2040이다(짝 사진 24쌍 실측).
 // 실화상 줌이 z면 열화상 화각은 실화상의 가로 63.6%·z, 세로 68%·z에 해당한다. 그 역수만큼 실화상을
 // 키우거나(줌 1.0이면 157%) 줄여서(줌 1.95면 81%) 가운데에 두면 열화상 좌표의 박스가 두 사진 모두에 맞는다.

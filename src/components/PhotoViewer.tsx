@@ -23,7 +23,7 @@ import {
 import { AlignedRgb, COMPARE_LABEL } from "@/components/AlignedRgb"
 import { DetectionImage } from "@/components/DetectionImage"
 import { ReviewActions } from "@/components/ReviewActions"
-import { FusionBadge, ReviewBadge, TierBadge } from "@/components/StatusBadges"
+import { AlignBadge, FusionBadge, ReviewBadge, TierBadge } from "@/components/StatusBadges"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SITES } from "@/data/sites"
@@ -439,6 +439,7 @@ export function PhotoViewer({
                 <TierBadge photo={photo} />
                 <ReviewBadge review={review} />
                 <FusionBadge fusion={photo.fusion} live={!!photo.stage} />
+                <AlignBadge photo={photo} />
               </div>
             </div>
             <Button
