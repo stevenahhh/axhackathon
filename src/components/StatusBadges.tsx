@@ -1,6 +1,16 @@
 import { Badge } from "@/components/ui/badge"
+import { alignUncertain } from "@/lib/compare"
 import { tierOf } from "@/lib/inspection"
 import type { Photo, Review } from "@/types"
+
+export function AlignBadge({ photo }: { photo: Photo }) {
+  if (!alignUncertain(photo)) return null
+  return (
+    <Badge variant="outline" title={`정렬 점수 ${photo.alignScore?.toFixed(2)}`}>
+      정렬 참고용
+    </Badge>
+  )
+}
 
 export function TierBadge({ photo }: { photo: Photo }) {
   if (photo.pending) return <Badge variant="info">판정 중</Badge>

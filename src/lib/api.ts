@@ -70,18 +70,28 @@ export function fetchSamples(site?: string): Promise<{ samples: Sample[] }> {
   return request<{ samples: Sample[] }>(`./api/samples${query}`)
 }
 
+export type AlignResult = { image: Blob; shift?: [number, number]; score?: number }
+
 // 실화상을 열화상 틀(640x512)로 리매핑한 JPEG를 받는다. zoom을 빼면 서버가 EXIF에서 읽고, 없으면 1.0으로 본다.
-export async function alignRgb(rgb: File | Blob, zoom?: number): Promise<Blob> {
+// 열화상을 함께 보내면 서버가 사진별 이동까지 맞추고 이동량·정렬 점수를 헤더로 준다.
+export async function alignRgb(rgb: File | Blob, zoom?: number, ir?: File | Blob): Promise<AlignResult> {
   const body = new FormData()
   body.append("rgb", rgb)
   if (zoom !== undefined) body.append("zoom", String(zoom))
+  if (ir) body.append("ir", ir)
   const response = await fetch("./api/align", { method: "POST", body })
   if (response.status === 401) sessionExpired()
   if (!response.ok) {
     const data = await response.json().catch(() => null)
     throw new Error(data?.error ?? `HTTP ${response.status}`)
   }
-  return response.blob()
+  const shift = response.headers.get("X-Align-Shift")?.split(",").map(Number)
+  const score = Number(response.headers.get("X-Align-Score") ?? Number.NaN)
+  return {
+    image: await response.blob(),
+    shift: shift?.length === 2 && shift.every(Number.isFinite) ? [shift[0], shift[1]] : undefined,
+    score: Number.isFinite(score) ? score : undefined,
+  }
 }
 
 export function fetchHealth(): Promise<Health> {

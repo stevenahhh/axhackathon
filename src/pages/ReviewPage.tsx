@@ -17,7 +17,7 @@ import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle } from "@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SITES } from "@/data/sites"
 import { alignRgb, classifyPair, predictSolar, type Sample } from "@/lib/api"
-import { useCompareMode } from "@/lib/compare"
+import { usePhotoCompareMode } from "@/lib/compare"
 import { tierOf, totalArea, type Summary } from "@/lib/inspection"
 import { useIsDesktop } from "@/lib/media"
 import { hrefOf } from "@/lib/route"
@@ -98,7 +98,7 @@ function PhotoDetail({
   const boxes = photo.boxes.length
   const undecidable = photo.pending || !!photo.error
   const title = `${photo.seq}번 사진`
-  const [mode, setMode] = useCompareMode()
+  const [mode, setMode] = usePhotoCompareMode(photo)
   const [viewerOpen, setViewerOpen] = useState(false)
   const expandButton = useRef<HTMLButtonElement>(null)
   return (
@@ -361,8 +361,12 @@ export function ReviewPage({
         if (rgb) {
           patchUpload(photo.id, { stage: "aligning" })
           try {
-            const aligned = await paced(alignRgb(rgb, source.zoom))
-            patchUpload(photo.id, { rgbAligned: URL.createObjectURL(aligned) })
+            const aligned = await paced(alignRgb(rgb, source.zoom, ir))
+            patchUpload(photo.id, {
+              rgbAligned: URL.createObjectURL(aligned.image),
+              rgbShift: aligned.shift,
+              alignScore: aligned.score,
+            })
           } catch (error) {
             toast.warning(`${source.name} 실화상 정렬에 실패했습니다`, {
               description: `${errorMessage(error)} 줌 기준 배율로만 겹칩니다.`,
