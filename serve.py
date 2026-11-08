@@ -7,6 +7,7 @@ AIStream 서빙과 AgentStream 챗봇은 브라우저의 CORS 요청을 받지 �
 - POST /api/agent/opinion: 점검 요약 JSON으로 종합의견 초안 요청(agentstream.py)
 - GET /api/samples[?site=A]: 샘플 업로드 피커에 보여 줄 짝 사진 목록(같은 폴더의 samples.json, scripts/split_samples.py가 만든다)
 - POST /api/align: multipart rgb(필수)·zoom(선택, 없으면 EXIF)으로 실화상을 열화상 틀로 리매핑한 JPEG를 돌려준다(scripts/align.py, numpy·pillow 필요)
+  ir(선택)을 함께 보내면 에지 NCC로 사진별 이동까지 맞추고 X-Align-Shift(dx,dy)·X-Align-Score 헤더로 알려 준다(약 0.3초 더 걸림)
 - POST /api/login {id, pw}: APP_ACCOUNTS(id:pw,id2:pw2, 기본 guest:guest와 test1~test3:1234)와 대조해 sunset_session 쿠키(HMAC 서명, 12시간)를 준다.
   예전 이름 suntek_session으로 받은 쿠키도 읽기는 하므로 이름을 바꾸기 전에 로그인한 사람이 틕겨 나가지 않는다.
   실패는 IP마다 1분에 10번까지 받고 그 뒤로는 429. POST /api/logout은 쿠키를 지우고 GET /api/me는 {id} 또는 401.
@@ -33,6 +34,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from email.parser import BytesParser
+from dataclasses import dataclass
 from email.policy import HTTP
 from functools import lru_cache
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -208,6 +210,12 @@ def parse_multipart(content_type: str, body: bytes) -> dict[str, bytes]:
     return fields
 
 
+@dataclass(frozen=True, slots=True)
+class JpegReply:
+    body: bytes
+    headers: tuple[tuple[str, str], ...] = ()
+
+
 def align_module():
     try:
         import align
@@ -313,8 +321,8 @@ class Handler(SimpleHTTPRequestHandler):
             status, payload = handlers[route]()
         except RelayError as error:
             status, payload = error.status, {"error": str(error)}
-        if isinstance(payload, bytes):
-            return self.send_bytes(status, payload, "image/jpeg")
+        if isinstance(payload, JpegReply):
+            return self.send_bytes(status, payload.body, "image/jpeg", headers=payload.headers)
         self.send_json(status, payload)
 
     def session_user(self) -> str | None:
@@ -357,7 +365,7 @@ class Handler(SimpleHTTPRequestHandler):
         rows = samples(SAMPLES_JSON.stat().st_mtime)
         return {"samples": [row for row in rows if not site or row["site"] == site]}
 
-    def align_rgb(self) -> tuple[int, bytes]:
+    def align_rgb(self) -> tuple[int, JpegReply]:
         body = self.read_body(MAX_UPLOAD, "실화상은 30MB 이하로 올려 주세요.")
         fields = parse_multipart(self.headers.get("Content-Type", ""), body)
         if not fields.get("rgb"):
@@ -377,8 +385,18 @@ class Handler(SimpleHTTPRequestHandler):
         if zoom is None:
             zoom = float(image.getexif().get_ifd(EXIF_IFD).get(EXIF_DIGITAL_ZOOM, 1.0))
         out = io.BytesIO()
-        align.warp_rgb_to_ir(image, zoom).save(out, format="JPEG", quality=85)
-        return 200, out.getvalue()
+        if not fields.get("ir"):
+            align.warp_rgb_to_ir(image, zoom).save(out, format="JPEG", quality=85)
+            return 200, JpegReply(out.getvalue())
+        try:
+            ir = Image.open(io.BytesIO(fields["ir"]))
+            ir.load()
+        except Exception as error:  # PIL은 형식마다 다른 예외를 낸다.
+            raise RelayError(400, f"열화상 사진을 읽지 못했습니다: {error}")
+        result = align.align_pair(image, zoom, align.gray(ir.convert("RGB").resize((align.W, align.H))))
+        Image.fromarray(result.image).save(out, format="JPEG", quality=85)
+        dx, dy = result.shift
+        return 200, JpegReply(out.getvalue(), (("X-Align-Shift", f"{dx},{dy}"), ("X-Align-Score", f"{result.score:.2f}")))
 
     def read_body(self, limit: int, message: str) -> bytes:
         length = int(self.headers.get("Content-Length") or 0)
@@ -490,11 +508,16 @@ class Handler(SimpleHTTPRequestHandler):
         body = json.dumps(payload, ensure_ascii=False).encode()
         self.send_bytes(status, body, "application/json; charset=utf-8", cookies)
 
-    def send_bytes(self, status: int, body: bytes, content_type: str, cookies: tuple[str, ...] = ()):
+    def send_bytes(
+        self, status: int, body: bytes, content_type: str, cookies: tuple[str, ...] = (),
+        headers: tuple[tuple[str, str], ...] = (),
+    ):
         self.send_response(status)
         self.send_header("Content-Type", content_type)
         for cookie in cookies:
             self.send_header("Set-Cookie", cookie)
+        for name, value in headers:
+            self.send_header(name, value)
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
